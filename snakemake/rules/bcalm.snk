@@ -1,0 +1,22 @@
+#############
+import os
+
+############# BUILD UNITIGS
+
+#TODO: a finir
+rule bcalm:
+    input:
+	config['project_path'] + "/pipeline_output/kmdiff_output/{wildcard}_kmers.fa"
+    output:
+	config['project_path'] + "/pipeline_output/kmdiff_output/{wildcard}_kmers.unitigs.fa"
+    params:
+	memory = 20000
+	outfile = config['project_path'] + "/pipeline_output/kmdiff_output/{wildcard}_kmers"
+    threads:
+	120
+    conda :
+	config['src_path'] + "/env/bcalm.yaml"
+    shell:
+	"""
+	bcalm -in {input} -out {params.outfile} -nb-cores {threads} -abundance-min 1 -max-memory {params.memory}
+	"""

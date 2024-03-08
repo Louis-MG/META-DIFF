@@ -1,0 +1,59 @@
+###############
+
+#tout refaire pour cas et controles
+
+rule glment_extract:
+    input:
+	m8 = config['project_path'] + "/pipeline_output/RESULTS_DB/{wildcard}_results.m8",
+	fasta = config['project_path'] + "/pipeline_output/kmdiff_output/{wildcard}_kmers.unitigs.fa"
+    output:
+	config['project_path'] + "/pipeline_output/glmnet/{wildcard}_unclassified.fa"
+    params:
+	output = config['project_path'] + "/pipeline_output/glmnet/"
+    shell:
+	"""
+	bash find_unaligned.sh --fasta {input.fasta} --m8 {input.m8} --output {params.output}
+	mv {params.output}/unclassified.fa {output}
+	"""
+
+
+############## RENOMMER LES FICHIERS DE SOPRTIE POUR QUE CA CORRESPONDE
+rule glmnet_pval_agg:
+    input:
+	unitigs = config['project_path'] + "/pipeline_output/kmdiff_output/{wildcard}_kmers.unitigs.fa",
+	kmers = config['project_path'] + "/pipeline_output/kmdiff_output/{wildcard}_kmers.fa"
+    output:
+	config['project_path'] + "/{wildcard}_unclassified.aggregated.fa"
+    params:
+	output = output = config['project_path'] + "/pipeline_output/glmnet/"
+    shell:
+	"""
+	python3 pvalues_agg.py -k {input.kmers} -u {input.unitigs} -o {params.output}
+	mv {params.output}/unclassified.fa {output}
+	"""
+
+rule glmnet_matrix:
+    input:
+	config['project_path'] + "/unclassified_unitigs.aggregated.fa", config['project_path'] + "/kmdiff_output/kmers.fa"
+    output:
+	config['project_path'] + "/glmnet/top_kmers.tsv"
+    shell:
+	"""
+	bash matrix_unknown_kmers.sh -i -o -m 
+	"""
+
+rule glmnet_class:
+    input:
+	config['project_path'] + "/glmnet/top_kmers.tsv"
+    output:
+	config['project_path'] + "/glmnet/best_model.txt". config['project_path'] + "/glmnet/heatmap.pdf", config['project_path'] + "/glmnet/accuracy.txt"
+    threads:
+	30
+    params:
+	output_folder = 
+	nb_cas = 
+	nb_control =
+    shell:
+	"""
+	Rscript elasticNet_and_heatmap.R --threads {threads} --nbcas {params.nb_case} --nbcontrol {params.nb_controls} --output {params.output_folder}
+	"""

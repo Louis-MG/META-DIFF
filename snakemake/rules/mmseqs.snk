@@ -1,0 +1,80 @@
+############### BUILDS DABATASE WITH UNITIGS, SEARCHES CUSTOM DB WITH UNITIGS DB, SUMS UP RESULTS
+
+rule mmseqs_bdd:
+    input:
+	expand(config['project_path'] + "/pipeline_output/kmdiff_output/{wildcard}_kmers.unitigs.fa", wildcard = ["case", "control"])
+    ouput:
+	config['project_path'] + "/pipeline_output/QUERY_UNITIGS_DB/unitigsDB"
+    threads: 
+	120
+    params:
+	output_dir = config['project_path'] + "/pipeline_output/QUERY_UNITIGS_DB/"
+    conda :
+	config['src_path'] + "/env/mmseqs.yaml"
+    shell:
+	"""
+	mkdir {params.output_dir}
+	mmseqs createdb {input} {output} --dbtype 2
+	"""
+
+
+rule mmseqs_search:
+    input:
+	config['project_path'] + "/pipeline_output/QUERY_UNITIGS_DB/unitigsDB", config['taxonomic_db_path']   
+    ouput:
+	config['project_path'] + "/pipeline_output/RESULTS_DB/resultsDB"
+    params:
+	temp_folder = config['project_path'] + "/pipeline_output/temp/"
+    threads:    
+	120
+    conda :
+	config['src_path'] + "/env/mmseqs.yaml"
+    shell:
+	"""
+	mmseqs search {input} {output} {params.temp_folder} -t {threads} --max-seq-len 100000 -a --search-type 3 --start-sens 1 --sens-steps 3 -s 7
+	"""
+
+rule mmseqs_convert:
+    input:
+	config['project_path'] + "/pipeline_output/QUERY_UNITIGS_DB/unitigsDB", config['custom_db'], config['project_path'] + "/pipeline_output/RESULTS_DB/resultsDB"
+    ouput:
+	config['project_path'] + "/RESULTS_DB/results.m8"
+    threads:
+	120
+    params:
+	truc
+    conda :
+	config['src_path'] + "/env/mmseqs.yaml"
+    shell:
+	"""
+	mmseqs convertalis {input} {output} -t {threads} --format-output query,target,fident,alnlen,mismatch,gapopen,qstart,qend,tstart,tend,evalue,bits,qset
+	"""
+
+rule mmseqs_sep:
+    input:
+	just_to_check_rule = config['project_path'] + "/pipeline_output/{wildcard}_kmers.unitigs.fa",
+	true_input = config['project_path'] + "/pipeline_output/RESULTS_DB/results.m8"
+    output:
+	config['project_path'] + "/pipeline_output/RESULTS_DB/{wildcard}_results.m8"
+    params:
+	condition = {wildcard}_kmers.unitigs.fa
+    shell:
+	#changer pour awk
+	"""
+	grep -F "{params.condition}" {input.true_input} > {output}
+	"""
+
+rule mmseqs_sumup
+    input:	
+	config['project_path'] + "/pipeline_output/RESULTS_DB/{wildcard}_results.m8"
+    output:
+	config['project_path'] + "/pipeline_output/RESULTS_DB/{wildcard}_alignment_summary.txt, config['project_path'] + "/pipeline_output/RESULTS_DB/{wildcard}_alignment_summary_detailed.txt
+    params:
+	config['project_path'] + "/pipeline_output/RESULTS_DB/"
+    shell:
+	#va falloir donner l'exemple du fichier de conversion
+	"""
+	bash hits.sh -i {input} -o {params.output}
+	mv {params.output}/alignement_summary.txt {params.output}/{wildcard}_alignment_summary.txt
+	mv {params.output}/alignement_summary_detailed.txt {params.output}/{wildcard}_alignment_summary_detailed.txt 
+	"""

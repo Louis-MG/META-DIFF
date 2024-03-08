@@ -1,0 +1,51 @@
+#############
+
+rule annot_extract_candidates:
+    input:
+	config['project_path'] + "/pipeline_output/kmdiff_output/{wildcard}_kmers.unitigs.fa"
+    output:
+	config['project_path'] + "/pipeline_output/functional_annotation/{wildcard}_unitigs.1000.fa"
+    params:
+	length = 1000
+    conda:
+	config['src_path'] + "/env/seqkit.yaml"
+    shell:
+	"""
+	seqkit seq --min-len {params.length} -i {input} > {output} 
+	"""
+
+rule prodigal:
+    input:
+	config['project_path'] + "/pipeline_output/functional_annotation/{wildcard}_unitigs.1000.fa"
+    output:
+	config['project_path'] + "/pipeline_output/functional_annotation/{wildcard}_protein_translation.faa", config['project_path'] + "/pipeline_output/functional_annotation/{wildcard}_coords.gbk"
+    params:
+	coords = config['project_path'] + "/pipeline_output/functional_annotation/{wildcard}_coords.gbk"
+	translation = config['project_path'] + "/pipeline_output/functional_annotation/{wildcard}_protein_translation.faa"
+    conda:
+	config['src_path'] + "/env/prodigal.yaml"
+    shell:
+	"""
+	prodigal -p meta -i {input} -o {params.coords} -a {params.translation}
+	"""
+
+
+rule microbeannotator:
+    input:
+	config['project_path'] + "/pipeline_output/functional_annotation/case_protein_translation.faa", config['project_path'] + "/pipeline_output/functional_annotation/control_protein_translation.faa", 
+    output:
+	config['project_path'] + "/pipeline_output/functional_annotation/metabolic_summary__heatmap.pdf", config['project_path'] + "/pipeline_output/functional_annotation/metabolic_summary__barplot.pdf", config['project_path'] + "/functional_annotation/metabolic_summary__module_completexness.pdf"
+    threads:
+	60
+    params:
+	process = 2
+	database = config['mcirobeannotator_db_path']
+    conda:
+	config['src_path'] + "/env/microbeannotator.yaml"
+    shell:
+	"""
+	microbeannotator  -p {params.process} -t {threads} -m diamond --database {params.database} --clusters rows -i {input}
+	"""
+
+
+

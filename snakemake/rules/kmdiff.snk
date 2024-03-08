@@ -1,0 +1,50 @@
+######## RULE FILE FOR KMDIFF : COUNT THEN DIFF
+
+import os
+
+
+########### count
+rule kmdiff_count:
+    input:
+        config["project_path"] + "/fof.txt"
+    output: 
+        directory(config["project_path"] + "/pipeline_output/kmdiff_output/")
+    threads: 120
+    conda:
+        config["src_path"] + "/env/kmdiff.yaml"
+    shell:
+        """
+	kmdiff count -i {input} -o {output} -t {threads} --nb-partitions 40
+	"""
+
+########### diff
+
+#remplacer le directory du debut
+rule kmdiff_diff:
+    input:
+	directory(config["project_path"] + "/pipeline_output/kmdiff_output/")
+    output:
+	config["project_path"] + "/pipeline_output/kmdiff_output/case_kmers.fa", config["project_path"] + "/pipeline_output/kmdiff_output/control_kmers.fa"
+    params:
+	
+    threads: 120
+    conda:
+	config["src_path"] + "/env/kmdiff.yaml"
+    shell:
+	#ajouter le nombre de cas et de controles
+	"""
+	kmdiff diff --km-run {input} -t {threads} --output-dir {output} --save-sk --correction "benjamini"
+	"""
+rule kmdiff_dump:
+    input:	
+	config["project_path"] + "/pipeline_output/kmdiff_output/case_kmers.fa"
+    output:
+	config["project_path"] + "/pipeline_output/kmdiff_output/significant_kmers_matrix.txt"
+    params:
+	input_dir = config["project_path"] + "/pipeline_output/kmdiff_output/"
+    conda :
+	config['src_path'] + "/env/kmtricks.yaml"
+    shell:
+	"""
+	kmtricks aggregate --run-dir {params.input_folder}/positive_kmer_matrix --matrix kmer --cpr-in > {output}
+	"""
