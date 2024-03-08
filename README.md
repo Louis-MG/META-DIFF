@@ -19,7 +19,7 @@ The output is divided in several key files:
  - case/control funcitonal annotation in the form of a barplot, table and a heatmap of pathways detected.
  - performance of a classification model based on glmnet and the kmer counts of the most significant unclassified sequences. 
 
-<!--- ajouter les images de microbeannotator ? --->
+![Barplot](/figures/metabolic_summary__barplot.pdf "Example of a barplot of pathways complete at 90%") ![Heatmap](/figures/metabolic_summary__heatmap.pdf "Example of a heatmap of pathways complete at 90%")
 
 # Installation
 
