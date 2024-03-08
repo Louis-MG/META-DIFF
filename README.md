@@ -10,7 +10,7 @@ Metagenomics becomes increasingly important in building our kmowledge about micr
 
 The workflow is described by the following figure :
 
-![Schematic of the META-DIFF pipeline](/figures/figure_pipeline_pres.png?raw=true "Pipeline Overview")
+![Schematic of the META-DIFF pipeline](/figures/pipelinev3.png?raw=true "Pipeline Overview")
 
 # Output
 
