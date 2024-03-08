@@ -1,0 +1,15 @@
+resources:
+     mmseqs:
+          mem: 300 # Go
+
+singularity_checkm2 : "/mnt/projects_tn01/KMER_analysis/tools/checkm2.sif"
+
+microbeannotator_db_path: /path/to/db
+taxonomic_db_path: /path/to/db
+
+## This sections needs to be modified to match current analysis
+src_path: /mnt/projects_tn03/KMER_analysis/gitlab/snakemake/
+project_path: /path/to/your/project/
+fof: /path/to/your/file_of_file.txt
+
+
