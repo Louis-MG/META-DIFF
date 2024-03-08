@@ -28,13 +28,13 @@ Clone the repository:
 git clone https://github.com/Louis-MG/META-DIFF.git
 ```
 
-Get your functional database ready by following instructions at (MicrobeAnnotator)[https://github.com/cruizperez/MicrobeAnnotator]. Dont worry, it's jusst a few lines that take a while.
+Get your functional database ready by following instructions at [MicrobeAnnotator](https://github.com/cruizperez/MicrobeAnnotator). Dont worry, it's jusst a few lines that take a while.
 Copy the path to the MicrobeAnnotator_DB in the `snakemake/config` file:
 ```text
 microbeannotator_db_path: /path/to/MicrobeAnnotator_DB
 ```
 
-Get your taxonomic database ready by looking at (mmseqs documentation)[https://github.com/soedinglab/MMseqs2/wiki] (look at the module `createdb`). Again, just a few lines and fasta files.
+Get your taxonomic database ready by looking at [mmseqs documentation](https://github.com/soedinglab/MMseqs2/wiki) (look at the module `createdb`). Again, just a few lines and fasta files.
 Copy the path to your mmseqs-formated taxonomic database in the the `snakemake/config` file:
 ```text
 taxonomic_db_path: /path/to/mmseqs_DB
