@@ -15,9 +15,11 @@ The workflow is described by the following figure :
 # Output
 
 The output is divided in several key files:
- - case/control alignement summaries, which are taxonomic annotation reports.
+ - case/control alignement summaries.
  - case/control funcitonal annotation in the form of a barplot, table and a heatmap of pathways detected.
  - performance of a classification model based on glmnet and the kmer counts of the most significant unclassified sequences. 
+
+<!--- ajouter les images de microbeannotator ? --->
 
 # Installation
 
