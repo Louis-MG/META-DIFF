@@ -66,7 +66,9 @@ rule mmseqs_sep:
 
 rule mmseqs_sumup
     input:	
-	config['project_path'] + "/pipeline_output/RESULTS_DB/{wildcard}_results.m8"
+	results = config['project_path'] + "/pipeline_output/RESULTS_DB/{wildcard}_results.m8",
+	reference = config['seq_to_species']
+	detailed_reference = config['seq_to_genomes']
     output:
 	config['project_path'] + "/pipeline_output/RESULTS_DB/{wildcard}_alignment_summary.txt, config['project_path'] + "/pipeline_output/RESULTS_DB/{wildcard}_alignment_summary_detailed.txt
     params:
@@ -74,7 +76,7 @@ rule mmseqs_sumup
     shell:
 	#va falloir donner l'exemple du fichier de conversion
 	"""
-	bash hits.sh -i {input} -o {params.output}
+	bash hits.sh -i {input.results} -o {params.output} -r {input.reference} -d {input.detailed_reference}
 	mv {params.output}/alignement_summary.txt {params.output}/{wildcard}_alignment_summary.txt
 	mv {params.output}/alignement_summary_detailed.txt {params.output}/{wildcard}_alignment_summary_detailed.txt 
 	"""

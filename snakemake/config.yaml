@@ -2,12 +2,10 @@ resources:
      mmseqs:
           mem: 300 # Go
 
-singularity_checkm2 : "/mnt/projects_tn01/KMER_analysis/tools/checkm2.sif"
-
 microbeannotator_db_path: /path/to/db
 taxonomic_db_path: /path/to/db
-
-## This sections needs to be modified to match current analysis
+seq_to_genome: /path/to/ref
+seq_to_species: /path/to/retailed_ref
 src_path: /path/to/META-DIFF/
 project_path: /path/to/your/project/
 fof: /path/to/your/file_of_file.txt

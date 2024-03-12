@@ -8,8 +8,8 @@ This script summerises the blast results of unitigs. Its arguments are :
 	-i --input <PATH> path to the input file which should be named something like blast_results.txt.
 			  should be from '--format-output query,target,fident,alnlen,mismatch,gapopen,qstart,qend,tstart,tend,evalue,bits,qset'
 	-o --output <PATH> path to the output directory.
-	-r --reference <PATH> path to the file of sequenceID_to_genome.tsv correspondance.
-	-d --detailed <PATH> path to the file of sequenceID_to_species.tsv correspondance.
+	-r --reference <PATH> path to the file of sequenceID_to_species.tsv correspondance.
+	-d --detailed <PATH> path to the file of sequenceID_to_genomes.tsv correspondance.
 	-h --help displays this help message and exits.
 
 Output :
@@ -80,9 +80,9 @@ fi
 
 # fait un array associatif des noms de sequences a leur espece a partir du fichier de ref; parcours ensuite le fichier d'input pour prendre les noms de sp associes aux seq et imprime longueur d alignement \t sp
 
-awk -F'\t' 'FNR==NR {seq_to_sp[$1]=$2;next} {print $4, seq_to_sp[">"$2]}' "$ref" "$input" > "$output"/tmp.txt
+awk -F'\t' 'FNR==NR {seq_to_sp[$1]=$2;next} {print $4, seq_to_sp[">"$2]}' "$detailed" "$input" > "$output"/tmp.txt
 #premier fichier: FNR==NR, puis quand FNR!=NR
-awk -F'\t' 'FNR==NR {seq_to_sp[$1]=$2;next} {print $4, seq_to_sp[">"$2]}' "$detailed" "$input" > "$output"/tmp_simple.txt
+awk -F'\t' 'FNR==NR {seq_to_sp[$1]=$2;next} {print $4, seq_to_sp[">"$2]}' "$ref" "$input" > "$output"/tmp_simple.txt
 
 sed -i 's/ /\t/1' "$output"/tmp.txt
 sed -i 's/ /\t/1' "$output"/tmp_simple.txt
