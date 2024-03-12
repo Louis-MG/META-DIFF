@@ -19,7 +19,15 @@ The output is divided in several key files:
  - case/control funcitonal annotation in the form of a barplot, table and a heatmap of pathways detected.
  - performance of a classification model based on glmnet and the kmer counts of the most significant unclassified sequences. 
 
+Plots:
+
 ![Barplot](/figures/metabolic_summary__barplot.png?raw=true "Example of a barplot of pathways complete at 90%") ![Heatmap](/figures/metabolic_summary__heatmap.png?raw=true "Example of a heatmap of pathways complete at 90%")
+
+`best_model.txt`:
+```
+alpha	lambda	Accuracy	Kappa	AccuracySD	KappaSD
+1	0.012233193439917463	0.8071428571428572	0.6136666666666667	0.1277013475448753	0.2566471854078626
+```
 
 # Installation
 
