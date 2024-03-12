@@ -1,0 +1,13 @@
+name: glmnet
+channels:
+   - conda-forge
+
+dependencies:
+   - tidyverse
+   - r-compositions
+   - r-ggplot2
+   - r-rcolorbrewer
+   - r-caret
+   - r-optparse
+   - r-glmnet
+   - PARALLEL ??????????
