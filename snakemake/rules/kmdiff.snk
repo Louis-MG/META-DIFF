@@ -6,7 +6,7 @@ import os
 ########### count
 rule kmdiff_count:
     input:
-        config["project_path"] + "/fof.txt"
+        config["fof"]
     output: 
         directory(config["project_path"] + "/pipeline_output/kmdiff_output/")
     threads: 120

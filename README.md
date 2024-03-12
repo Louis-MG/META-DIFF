@@ -29,13 +29,13 @@ git clone https://github.com/Louis-MG/META-DIFF.git
 ```
 
 Get your functional database ready by following instructions at [MicrobeAnnotator](https://github.com/cruizperez/MicrobeAnnotator). Dont worry, it's jusst a few lines that take a while.
-Copy the path to the MicrobeAnnotator_DB in the `snakemake/config` file:
+Copy the path to the MicrobeAnnotator_DB in the `snakemake/config.yaml` file:
 ```text
 microbeannotator_db_path: /path/to/MicrobeAnnotator_DB
 ```
 
 Get your taxonomic database ready by looking at [mmseqs documentation](https://github.com/soedinglab/MMseqs2/wiki) (look at the module `createdb`). Again, just a few lines and fasta files.
-Copy the path to your mmseqs-formated taxonomic database in the the `snakemake/config` file:
+Copy the path to your mmseqs-formated taxonomic database in the the `snakemake/config.yaml` file:
 ```text
 taxonomic_db_path: /path/to/mmseqs_DB
 ```
@@ -62,9 +62,14 @@ Output is :
 WARNING: depending of the denomination of your files for paired ends (_R1 and _R2, _1 and _2 ...), you will have to modify lines 55-56 and 60-61. Yeah it's annoying. Add the single-end by hand.
 ```
 
-Provide the fof.txt to the snakemake pipeline:
+Add the last path to `./snakemake/config.yaml`:
 ```bash
-
+# path to this repo, "META-DIFF/" inclueded:
+src_path: /path/to/META-DIFF/
+# where your results will be
+project_path: /path/to/your/project/
+# path to your file of file:
+fof: /path/to/your/fof.txt
 ```
 
 
