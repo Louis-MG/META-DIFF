@@ -1,6 +1,6 @@
 # META-DIFF
 
-This is the repository of the pipeline META-KMER, which detects sequences in differential abundance between two conditions, and annotates them taxonomicaly and functionaly.
+This is the repository of the pipeline META-DIFF, which detects sequences in differential abundance between two conditions, and annotates them taxonomicaly and functionaly.
 
 # Motivation
 
@@ -45,6 +45,21 @@ taxonomic_db_path: /path/to/mmseqs_DB
 Build a file-of-files yourself or using the provided script:
 ```bash
 bash kmdiff_fof_prep.sh --help
+
+This script generates the file of file (fof.txt) for kmdiff. Its arguments are:
+	--cases -c <PATH> path to the directory of cases samples.
+	--controls -C <PATH> path to the directory of control samples.
+	--output -o <PATH> path to where the fof should be.
+	--help -h displays this help message and exits.
+
+Output is :
+	- a fof.txt named after the output parameter. The file is tab separated, format:
+		control1: /path/to/control1_read1.fastq ; /path/to/control1_read2.fastq
+		control2: /path/to/control2_read1.fastq ; /path/to/control2_read2.fastq
+		case1: /path/to/case1_read1.fastq ; /path/to/case1_read2.fastq
+		case2: /path/to/case2_read1.fastq ; /path/to/case2_read2.fastq
+
+WARNING: depending of the denomination of your files for paired ends (_R1 and _R2, _1 and _2 ...), you will have to modify lines 55-56 and 60-61. Yeah it's annoying. Add the single-end by hand.
 ```
 
 Provide the fof.txt to the snakemake pipeline:
