@@ -72,6 +72,10 @@ WARNING: depending of the denomination of your files for paired ends (_R1 and _R
 
 Add the last path to `./snakemake/config.yaml`:
 ```bash
+# path to the file of correpsondance between seq headers and the genome name (strain etc)
+seq_to_genome: /path/to/ref
+# path to the file of correpsondance between seq headers and the species
+seq_to_species: /path/to/retailed_ref
 # path to this repo, "META-DIFF/" inclueded:
 src_path: /path/to/META-DIFF/
 # where your results will be
