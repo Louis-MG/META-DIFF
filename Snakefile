@@ -41,8 +41,8 @@ rule all:
 ###########            OTHER RULES            ############
 ##########################################################
 
-include: f"{config['project_path']}/gitlab/snakemake/rules/kmdiff.snk"
-include: f"{config['project_path']}/gitlab/snakemake/rules/bcalm.snk"
-include: f"{config['project_path']}/gitlab/snakemake/rules/mmseqs.snk"
-include : f"{config['project_path']}/gitlab/snakemake/rules/functional_annotation.snk"
-include : f"{config['project_path']}/gitlab/snakemake/rules/glmnet.snk"
+include: f"{config['src_path']}/snakemake/rules/kmdiff.snk"
+include: f"{config['src_path']}/snakemake/rules/bcalm.snk"
+include: f"{config['src_path']}/snakemake/rules/mmseqs.snk"
+include : f"{config['src_path']}/snakemake/rules/functional_annotation.snk"
+include : f"{config['src_path']}/snakemake/rules/glmnet.snk"

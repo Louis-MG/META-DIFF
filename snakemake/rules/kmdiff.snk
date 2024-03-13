@@ -22,18 +22,18 @@ rule kmdiff_count:
 #remplacer le directory du debut
 rule kmdiff_diff:
     input:
-	directory(config["project_path"] + "/pipeline_output/kmdiff_output/")
+	config["project_path"] + "/pipeline_output/kmdiff_output/run_infos.txt")
     output:
 	config["project_path"] + "/pipeline_output/kmdiff_output/case_kmers.fa", config["project_path"] + "/pipeline_output/kmdiff_output/control_kmers.fa"
     params:
-	
+	run_folder = config["project_path"] + "/pipeline_output/kmdiff_output/")
     threads: 120
     conda:
 	config["src_path"] + "/env/kmdiff.yaml"
     shell:
 	#ajouter le nombre de cas et de controles
 	"""
-	kmdiff diff --km-run {input} -t {threads} --output-dir {output} --save-sk --correction "benjamini"
+	kmdiff diff --km-run {params.run_folder} -t {threads} --output-dir {params.run_folder} --save-sk --correction "benjamini"
 	"""
 rule kmdiff_dump:
     input:	
