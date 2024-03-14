@@ -1,68 +1,67 @@
-
 ###############
 
-rule glment_extract:
+rule glmnet_extract:
     input:
-	m8 = config['project_path'] + "/pipeline_output/RESULTS_DB/{wildcard}_results.m8",
-	fasta = config['project_path'] + "/pipeline_output/kmdiff_output/{wildcard}_kmers.unitigs.fa"
+        m8 = config['project_path'] + "/pipeline_output/RESULTS_DB/{condition}_results.m8",
+        fasta = config['project_path'] + "/pipeline_output/kmdiff_output/{condition}_kmers.unitigs.fa"
     output:
-	config['project_path'] + "/pipeline_output/glmnet/{wildcard}_unclassified.fa"
+        config['project_path'] + "/pipeline_output/glmnet/{condition}_unclassified.fa"
     params:
-	output = config['project_path'] + "/pipeline_output/glmnet/"
+        output = config['project_path'] + "/pipeline_output/glmnet/"
     shell:
-	"""
-	bash /scripts/find_unaligned.sh --fasta {input.fasta} --m8 {input.m8} --output {params.output}
-	mv {params.output}/unclassified.fa {output}
-	"""
+        """
+        bash /scripts/find_unaligned.sh --fasta {input.fasta} --m8 {input.m8} --output {params.output}
+        mv {params.output}/unclassified.fa {output}
+        """
 
 
 ############## RENOMMER LES FICHIERS DE SORTIE POUR QUE CA CORRESPONDE
 rule glmnet_pval_agg:
     input:
-	unitigs = config['project_path'] + "/pipeline_output/kmdiff_output/{wildcard}_kmers.unitigs.fa",
-	kmers = config['project_path'] + "/pipeline_output/kmdiff_output/{wildcard}_kmers.fa"
+        unitigs = config['project_path'] + "/pipeline_output/kmdiff_output/{condition}_kmers.unitigs.fa",
+        kmers = config['project_path'] + "/pipeline_output/kmdiff_output/{condition}_kmers.fa"
     output:
-	config['project_path'] + "/pipeline_output/glmnet/{wildcard}_unclassified.aggregated.fa"
+        config['project_path'] + "/pipeline_output/glmnet/{condition}_unclassified.aggregated.fa"
     params:
-	output = output = config['project_path'] + "/pipeline_output/glmnet/"
+        output = config['project_path'] + "/pipeline_output/glmnet/"
     conda:
-	conda['src_path'] + "/env/python.3.10.yaml"
+        config['src_path'] + "/env/python.3.10.yaml"
     shell:
-	"""
-	python3 /scripts/pvalues_agg.py -k {input.kmers} -u {input.unitigs} -o {params.output}
-	mv {params.output}/unclassified.fa {output}
-	"""
+        """
+        python3 /scripts/pvalues_agg.py -k {input.kmers} -u {input.unitigs} -o {params.output}
+        mv {params.output}/unclassified.fa {output}
+        """
 
+# revoir j'ai mal ecrit
 rule glmnet_matrix:
     input:
-	case = config['project_path'] + "/pipeline_output/kmdiff_output/case_kmers.fa",
-	control = config['project_path'] + "/pipeline_output/kmdiff_output/control_kmers.fa",
-	matrix = config['project_path'] + "/pipeline_output/kmdiff_output/significant_kmers_matrix.txt"
+        case = config['project_path'] + "/pipeline_output/kmdiff_output/case_kmers.fasta",
+        control = config['project_path'] + "/pipeline_output/kmdiff_output/control_kmers.fasta",
+        matrix = config['project_path'] + "/pipeline_output/kmdiff_output/significant_kmers_matrix.txt"
     output:
-	config['project_path'] + "/pipeline_output/glmnet/top_kmers.tsv"
+        config['project_path'] + "/pipeline_output/glmnet/top_kmers.tsv"
     params:
-	output = config['project_path'] + "/pipeline_output/glmnet/"
+        output = config['project_path'] + "/pipeline_output/glmnet/"
     shell:
-	"""
-	bash /scripts/matrix_unknown_kmers.sh -i {input.case},{input.control} -m {input.matrix} -o {params.output}
-	"""
+        """
+        bash /scripts/matrix_unknown_kmers.sh -i {input.case},{input.control} -m {input.matrix} -o {params.output}
+        """
 
 rule glmnet_class:
     input:
-	matrix = config['project_path'] + "/pipeline_output/glmnet/top_kmers.tsv",
-	fof = config['project_path'] + "/fof.txt" 
+        matrix = config['project_path'] + "/pipeline_output/glmnet/top_kmers.tsv",
+        fof = config['fof'] 
     output:
-	config['project_path'] + "/pipeline_output/glmnet/best_model.txt". config['project_path'] + "/pipeline_output/glmnet/heatmap.pdf", config['project_path'] + "/pipeline_output/glmnet/accuracy.txt", config['project_path'] + "/pipeline_output/glmnet/matrix.tsv"
-    threads:
-	30
+        config['project_path'] + "/pipeline_output/glmnet/best_model.txt", config['project_path'] + "/pipeline_output/glmnet/heatmap.pdf", config['project_path'] + "/pipeline_output/glmnet/accuracy.txt", config['project_path'] + "/pipeline_output/glmnet/matrix.tsv"
+    threads: 30
     params:
-	output_folder = config['project_path'] + "/pipeline_output/glmnet/",
-	split = 0.75
+        output_folder = config['project_path'] + "/pipeline_output/glmnet/",
+        split = 0.75
     conda:
-	conda['src_path'] + "/env/glmnet.yaml"
+        config['src_path'] + "/env/glmnet.yaml"
     shell:
-	"""
-	nb_control=$(grep -c -F 'case' {input.fof})
-	nb_case=$(grep -c -F 'control' {input.fof})
-	Rscript /scripts/elasticNet_and_heatmap.R -i {input.matrix} - {threads} --case "$nb_case" --control "$nb_control" --output {params.output_folder} -y {params.split}
-	"""
+        """
+        nb_control=$(grep -c -F 'case' {input.fof})
+        nb_case=$(grep -c -F 'control' {input.fof})
+        Rscript /scripts/elasticNet_and_heatmap.R -i {input.matrix} - {threads} --case "$nb_case" --control "$nb_control" --output {params.output_folder} -y {params.split}
+        """

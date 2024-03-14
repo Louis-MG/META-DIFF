@@ -1,50 +1,52 @@
 ######## RULE FILE FOR KMDIFF : COUNT THEN DIFF
 
-import os
-
-
 ########### count
 rule kmdiff_count:
     input:
         config["fof"]
-    output: 
-        directory(config["project_path"] + "/pipeline_output/kmdiff_output/")
+    output:
+        config["project_path"] + "/pipeline_output/kmdiff_output/run_infos.txt"
+    threads: 120
+    params:
+        output_folder = config["project_path"] + "/pipeline_output/kmdiff_output/"
+    conda:
+        config["src_path"] + "/env/kmdiff.yaml"
+    shell:
+        """
+        kmdiff count -i {input} -o {params.output_folder} -t {threads} --nb-partitions 40
+        """
+
+########### diff
+
+rule kmdiff_diff:
+    input:
+        test_file = config["project_path"] + "/pipeline_output/kmdiff_output/run_infos.txt",
+	fof = config['fof']
+    output:
+        expand(config["project_path"] + "/pipeline_output/kmdiff_output/{prefix}_kmers.fasta", prefix = ["case", "control"])
+    params:
+        output_folder = config["project_path"] + "/pipeline_output/kmdiff_output/"
     threads: 120
     conda:
         config["src_path"] + "/env/kmdiff.yaml"
     shell:
         """
-	kmdiff count -i {input} -o {output} -t {threads} --nb-partitions 40
-	"""
+        nb_control=$(grep -c -F 'case' {input.fof})
+        nb_case=$(grep -c -F 'control' {input.fof})
+        kmdiff diff --km-run {params.output_folder} -t {threads} --output-dir {params.output_folder} --nb-controls "$nb_control" --nb-cases "$nb_case" --save-sk --correction "benjamini"
+        """
 
-########### diff
 
-#remplacer le directory du debut
-rule kmdiff_diff:
-    input:
-	config["project_path"] + "/pipeline_output/kmdiff_output/run_infos.txt")
-    output:
-	config["project_path"] + "/pipeline_output/kmdiff_output/case_kmers.fa", config["project_path"] + "/pipeline_output/kmdiff_output/control_kmers.fa"
-    params:
-	run_folder = config["project_path"] + "/pipeline_output/kmdiff_output/")
-    threads: 120
-    conda:
-	config["src_path"] + "/env/kmdiff.yaml"
-    shell:
-	#ajouter le nombre de cas et de controles
-	"""
-	kmdiff diff --km-run {params.run_folder} -t {threads} --output-dir {params.run_folder} --save-sk --correction "benjamini"
-	"""
 rule kmdiff_dump:
-    input:	
-	config["project_path"] + "/pipeline_output/kmdiff_output/case_kmers.fa"
+    input:        
+        config["project_path"] + "/pipeline_output/kmdiff_output/case_kmers.fasta", config["project_path"] + "/pipeline_output/kmdiff_output/control_kmers.fasta"
     output:
-	config["project_path"] + "/pipeline_output/kmdiff_output/significant_kmers_matrix.txt"
+        config["project_path"] + "/pipeline_output/kmdiff_output/significant_kmers_matrix.txt"
     params:
-	input_dir = config["project_path"] + "/pipeline_output/kmdiff_output/"
+        input_folder = config["project_path"] + "/pipeline_output/kmdiff_output/"
     conda :
-	config['src_path'] + "/env/kmtricks.yaml"
+        config['src_path'] + "/env/kmtricks.yaml"
     shell:
-	"""
-	kmtricks aggregate --run-dir {params.input_folder}/positive_kmer_matrix --matrix kmer --cpr-in > {output}
-	"""
+        """
+        kmtricks aggregate --run-dir {params.input_folder}/positive_kmer_matrix --matrix kmer --cpr-in > {output}
+        """
