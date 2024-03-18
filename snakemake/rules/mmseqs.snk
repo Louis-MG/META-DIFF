@@ -67,11 +67,12 @@ rule mmseqs_sumup:
     output:
         config["project_path"] + "pipeline_output/taxonomy/{condition}_alignment_summary.txt", config["project_path"] + "pipeline_output/taxonomy/{condition}_alignment_summary_detailed.txt"
     params:
+        condition_name = lambda wildcards: wildcards.condition,
         output = config["project_path"] + "pipeline_output/taxonomy/"
     shell:
         #va falloir donner l"exemple du fichier de conversion
         """
         bash hits.sh -i {input.results} -o {params.output} -r {input.reference} -d {input.detailed_reference}
-        mv {params.output}/alignement_summary.txt {params.output}/{condition}_alignment_summary.txt
-        mv {params.output}/alignement_summary_detailed.txt {params.output}/{condition}_alignment_summary_detailed.txt 
+        mv {params.output}/alignement_summary.txt {params.output}/{params.condition_name}_alignment_summary.txt
+        mv {params.output}/alignement_summary_detailed.txt {params.output}/{params.condition_name}_alignment_summary_detailed.txt 
         """
