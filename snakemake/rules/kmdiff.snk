@@ -13,6 +13,7 @@ rule kmdiff_count:
         config["src_path"] + "/env/kmdiff.yaml"
     shell:
         """
+        ulimit -n 10000
         kmdiff count -i {input} -o {params.output_folder} -t {threads} --nb-partitions 40
         """
 
@@ -31,6 +32,7 @@ rule kmdiff_diff:
         config["src_path"] + "/env/kmdiff.yaml"
     shell:
         """
+        ulimit -n 10000
         nb_control=$(grep -c -F 'case' {input.fof})
         nb_case=$(grep -c -F 'control' {input.fof})
         kmdiff diff --km-run {params.output_folder} -t {threads} --output-dir {params.output_folder} --nb-controls "$nb_control" --nb-cases "$nb_case" --save-sk --correction "benjamini"
