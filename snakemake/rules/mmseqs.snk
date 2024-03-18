@@ -5,7 +5,7 @@ rule mmseqs_bdd:
         expand(config["project_path"] + "pipeline_output/kmdiff_output/{prefix}_kmers.unitigs.fa", prefix = ["case", "control"])
     output:
         config["project_path"] + "pipeline_output/QUERY_UNITIGS_DB/unitigsDB"
-    threads: 120
+    threads: config["threads"]
     params:
         output_dir = config["project_path"] + "pipeline_output/QUERY_UNITIGS_DB/"
     conda :
@@ -24,7 +24,7 @@ rule mmseqs_search:
         config["project_path"] + "pipeline_output/RESULTS_DB/resultsDB"
     params:
         temp_folder = config["project_path"] + "pipeline_output/temp/"
-    threads: 120
+    threads: config["threads"]
     conda :
         config["src_path"] + "/env/mmseqs.yaml"
     shell:
@@ -37,7 +37,7 @@ rule mmseqs_convert:
         config["project_path"] + "pipeline_output/QUERY_UNITIGS_DB/unitigsDB", config["taxonomic_db_path"], config["project_path"] + "pipeline_output/RESULTS_DB/resultsDB"
     output:
         config["project_path"] + "pipeline_output/RESULTS_DB/results.m8"
-    threads: 120
+    threads: config["threads"]
     conda :
         config["src_path"] + "/env/mmseqs.yaml"
     shell:

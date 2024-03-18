@@ -6,7 +6,7 @@ rule kmdiff_count:
         config["fof"]
     output:
         config["project_path"] + "pipeline_output/kmdiff_output/run_infos.txt"
-    threads: 120
+    threads: config["threads"]
     params:
         output_folder = config["project_path"] + "pipeline_output/kmdiff_output/"
     conda:
@@ -21,12 +21,12 @@ rule kmdiff_count:
 rule kmdiff_diff:
     input:
         test_file = config["project_path"] + "pipeline_output/kmdiff_output/run_infos.txt",
-	fof = config['fof']
+	fof = config["fof"]
     output:
         expand(config["project_path"] + "pipeline_output/kmdiff_output/{prefix}_kmers.fasta", prefix = ["case", "control"])
     params:
         output_folder = config["project_path"] + "pipeline_output/kmdiff_output/"
-    threads: 120
+    threads: config["threads"]
     conda:
         config["src_path"] + "/env/kmdiff.yaml"
     shell:
@@ -45,7 +45,7 @@ rule kmdiff_dump:
     params:
         input_folder = config["project_path"] + "pipeline_output/kmdiff_output/"
     conda :
-        config['src_path'] + "/env/kmtricks.yaml"
+        config["src_path"] + "/env/kmtricks.yaml"
     shell:
         """
         kmtricks aggregate --run-dir {params.input_folder}/positive_kmer_matrix --matrix kmer --cpr-in > {output}

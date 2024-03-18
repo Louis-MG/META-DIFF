@@ -6,7 +6,7 @@ rule annot_extract_candidates:
     output:
         config["project_path"] + "pipeline_output/functional_annotation/{condition}_unitigs.1000.fa"
     params:
-        length = 1000
+        length = config["unitig_length"]
     conda:
         config["src_path"] + "/env/seqkit.yaml"
     shell:
@@ -20,6 +20,7 @@ rule prodigal:
         config["project_path"] + "pipeline_output/functional_annotation/{condition}_unitigs.1000.fa"
     output:
         config["project_path"] + "pipeline_output/functional_annotation/{condition}_protein_translation.faa", config["project_path"] + "pipeline_output/functional_annotation/{condition}_coords.gbk"
+    threads : config["threads"]
     params:
         coords = config["project_path"] + "pipeline_output/functional_annotation/{condition}_coords.gbk",
         translation = config["project_path"] + "pipeline_output/functional_annotation/{condition}_protein_translation.faa",
@@ -33,13 +34,11 @@ rule prodigal:
 rule microbeannotator:
     input:
         expand(config["project_path"] + "pipeline_output/functional_annotation/{prefix}_protein_translation.faa", prefix = ["case", "control"])
-        #config["project_path"] + "pipeline_output/functional_annotation/control_protein_translation.faa",
-        #config["project_path"] + "pipeline_output/functional_annotation/case_protein_translation.faa"
     output:
         config["project_path"] + "pipeline_output/functional_annotation/metabolic_summary__heatmap.pdf", config["project_path"] + "pipeline_output/functional_annotation/metabolic_summary__barplot.pdf", config["project_path"] + "pipeline_output/functional_annotation/metabolic_summary__module_completeness.pdf"
-    threads: 60
+    threads: config["threads"]
     params:
-        process = 2,
+        process = 1,
         database = config["microbeannotator_db_path"]
     conda:
         config["src_path"] + "/env/microbeannotator.yaml"

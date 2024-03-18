@@ -6,9 +6,9 @@ rule bcalm:
     output:
         config["project_path"] + "pipeline_output/kmdiff_output/{condition}_kmers.unitigs.fa"
     params:
-        memory = 20000,
+        memory = config["bcalm_memory"]
         outfile = config["project_path"] + "pipeline_output/kmdiff_output/{condition}_kmers"
-    threads: 120
+    threads: config["threads"]
     conda :
         config["src_path"] + "/env/bcalm.yaml"
     shell:

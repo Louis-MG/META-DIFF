@@ -14,4 +14,6 @@ src_path: "/mnt/projects_tn03/KMER_analysis/META-DIFF/"
 project_path: "/mnt/scratch/LM/"
 fof: "/mnt/projects_tn03/KMER_analysis/META-DIFF/fof.txt"
 
-
+threads: 120
+unitig_length: 1000
+bcalm_memory: 20000
