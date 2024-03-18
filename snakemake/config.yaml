@@ -2,12 +2,16 @@ resources:
      mmseqs:
           mem: 300 # Go
 
-microbeannotator_db_path: /mnt/scratch/LM/KMER/MicrobeAnnotator_DB/
-taxonomic_db_path: /mnt/scratch/LM/KMER/ncbi_database/
-seq_to_genomes: /home/guelou01/seqid_in_all_seq.fna.txt
-seq_to_species: /home/guelou01/seqid_in_all_seq.fna_simplified_.txt
-src_path: /mnt/projects_tn03/KMER_analysis/META-DIFF/
-project_path: /home/guelou01/test
-fof: /mnt/projects_tn03/KMER_analysis/META-DIFF/fof.txt
+condition:
+     - case
+     - control
+
+microbeannotator_db_path: "/mnt/scratch/LM/KMER/MicrobeAnnotator_DB/"
+taxonomic_db_path: "/mnt/scratch/LM/KMER/ncbi_database/"
+seq_to_genomes: "/home/guelou01/seqid_in_all_seq.fna.txt"
+seq_to_species: "/home/guelou01/seqid_in_all_seq.fna_simplified_.txt"
+src_path: "/mnt/projects_tn03/KMER_analysis/META-DIFF/"
+project_path: "/mnt/scratch/LM/"
+fof: "/mnt/projects_tn03/KMER_analysis/META-DIFF/fof.txt"
 
 

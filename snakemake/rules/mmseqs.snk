@@ -2,14 +2,14 @@
 
 rule mmseqs_bdd:
     input:
-        expand(config['project_path'] + "/pipeline_output/kmdiff_output/{prefix}_kmers.unitigs.fa", prefix = ["case", "control"])
+        expand(config["project_path"] + "pipeline_output/kmdiff_output/{prefix}_kmers.unitigs.fa", prefix = ["case", "control"])
     output:
-        config['project_path'] + "/pipeline_output/QUERY_UNITIGS_DB/unitigsDB"
+        config["project_path"] + "pipeline_output/QUERY_UNITIGS_DB/unitigsDB"
     threads: 120
     params:
-        output_dir = config['project_path'] + "/pipeline_output/QUERY_UNITIGS_DB/"
+        output_dir = config["project_path"] + "pipeline_output/QUERY_UNITIGS_DB/"
     conda :
-        config['src_path'] + "/env/mmseqs.yaml"
+        config["src_path"] + "/env/mmseqs.yaml"
     shell:
         """
         mkdir {params.output_dir}
@@ -19,14 +19,14 @@ rule mmseqs_bdd:
 
 rule mmseqs_search:
     input:
-        config['project_path'] + "/pipeline_output/QUERY_UNITIGS_DB/unitigsDB", config['taxonomic_db_path']   
+        config["project_path"] + "pipeline_output/QUERY_UNITIGS_DB/unitigsDB", config["taxonomic_db_path"]   
     output:
-        config['project_path'] + "/pipeline_output/RESULTS_DB/resultsDB"
+        config["project_path"] + "pipeline_output/RESULTS_DB/resultsDB"
     params:
-        temp_folder = config['project_path'] + "/pipeline_output/temp/"
+        temp_folder = config["project_path"] + "pipeline_output/temp/"
     threads: 120
     conda :
-        config['src_path'] + "/env/mmseqs.yaml"
+        config["src_path"] + "/env/mmseqs.yaml"
     shell:
         """
         mmseqs search {input} {output} {params.temp_folder} -t {threads} --max-seq-len 100000 -a --search-type 3 --start-sens 1 --sens-steps 3 -s 7
@@ -34,12 +34,12 @@ rule mmseqs_search:
 
 rule mmseqs_convert:
     input:
-        config['project_path'] + "/pipeline_output/QUERY_UNITIGS_DB/unitigsDB", config['taxonomic_db_path'], config['project_path'] + "/pipeline_output/RESULTS_DB/resultsDB"
+        config["project_path"] + "pipeline_output/QUERY_UNITIGS_DB/unitigsDB", config["taxonomic_db_path"], config["project_path"] + "pipeline_output/RESULTS_DB/resultsDB"
     output:
-        config['project_path'] + "/RESULTS_DB/results.m8"
+        config["project_path"] + "pipeline_output/RESULTS_DB/results.m8"
     threads: 120
     conda :
-        config['src_path'] + "/env/mmseqs.yaml"
+        config["src_path"] + "/env/mmseqs.yaml"
     shell:
         """
         mmseqs convertalis {input} {output} -t {threads} --format-output query,target,fident,alnlen,mismatch,gapopen,qstart,qend,tstart,tend,evalue,bits,qset
@@ -47,29 +47,29 @@ rule mmseqs_convert:
 
 rule mmseqs_sep:
     input:
-        just_to_check_rule = config['project_path'] + "/pipeline_output/kmdiff_output/{condition}_kmers.unitigs.fa",
-        true_input = config['project_path'] + "/pipeline_output/RESULTS_DB/results.m8"
+        just_to_check_rule = config["project_path"] + "pipeline_output/kmdiff_output/{condition}_kmers.unitigs.fa",
+        true_input = config["project_path"] + "pipeline_output/RESULTS_DB/results.m8"
     output:
-        config['project_path'] + "/pipeline_output/RESULTS_DB/{condition}_results.m8"
+        config["project_path"] + "pipeline_output/RESULTS_DB/{condition}_results.m8"
     params:
-        condition = lambda wildcards: wilcards.condition + "_kmers.unitigs.fa"
+        condition_name = lambda wildcards: wildcards.condition + "_kmers.unitigs.fa"
     shell:
         #changer pour awk
         """
-        grep -F "{params.condition}" {input.true_input} > {output}
+        grep -F "{params.condition_name}" {input.true_input} > {output}
         """
 
 rule mmseqs_sumup:
     input:        
-        results = config['project_path'] + "/pipeline_output/RESULTS_DB/{condition}_results.m8",
-        reference = config['seq_to_species'],
-        detailed_reference = config['seq_to_genomes']
+        results = config["project_path"] + "pipeline_output/RESULTS_DB/{condition}_results.m8",
+        reference = config["seq_to_species"],
+        detailed_reference = config["seq_to_genomes"]
     output:
-        config['project_path'] + "/pipeline_output/RESULTS_DB/{condition}_alignment_summary.txt", config['project_path'] + "/pipeline_output/RESULTS_DB/{condition}_alignment_summary_detailed.txt"
+        config["project_path"] + "pipeline_output/taxonomy/{condition}_alignment_summary.txt", config["project_path"] + "pipeline_output/taxonomy/{condition}_alignment_summary_detailed.txt"
     params:
-        output = config['project_path'] + "/pipeline_output/RESULTS_DB/"
+        output = config["project_path"] + "pipeline_output/taxonomy/"
     shell:
-        #va falloir donner l'exemple du fichier de conversion
+        #va falloir donner l"exemple du fichier de conversion
         """
         bash hits.sh -i {input.results} -o {params.output} -r {input.reference} -d {input.detailed_reference}
         mv {params.output}/alignement_summary.txt {params.output}/{condition}_alignment_summary.txt

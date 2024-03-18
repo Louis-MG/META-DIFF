@@ -5,10 +5,10 @@ rule kmdiff_count:
     input:
         config["fof"]
     output:
-        config["project_path"] + "/pipeline_output/kmdiff_output/run_infos.txt"
+        config["project_path"] + "pipeline_output/kmdiff_output/run_infos.txt"
     threads: 120
     params:
-        output_folder = config["project_path"] + "/pipeline_output/kmdiff_output/"
+        output_folder = config["project_path"] + "pipeline_output/kmdiff_output/"
     conda:
         config["src_path"] + "/env/kmdiff.yaml"
     shell:
@@ -20,12 +20,12 @@ rule kmdiff_count:
 
 rule kmdiff_diff:
     input:
-        test_file = config["project_path"] + "/pipeline_output/kmdiff_output/run_infos.txt",
+        test_file = config["project_path"] + "pipeline_output/kmdiff_output/run_infos.txt",
 	fof = config['fof']
     output:
-        expand(config["project_path"] + "/pipeline_output/kmdiff_output/{prefix}_kmers.fasta", prefix = ["case", "control"])
+        expand(config["project_path"] + "pipeline_output/kmdiff_output/{prefix}_kmers.fasta", prefix = ["case", "control"])
     params:
-        output_folder = config["project_path"] + "/pipeline_output/kmdiff_output/"
+        output_folder = config["project_path"] + "pipeline_output/kmdiff_output/"
     threads: 120
     conda:
         config["src_path"] + "/env/kmdiff.yaml"
@@ -39,14 +39,16 @@ rule kmdiff_diff:
 
 rule kmdiff_dump:
     input:        
-        config["project_path"] + "/pipeline_output/kmdiff_output/case_kmers.fasta", config["project_path"] + "/pipeline_output/kmdiff_output/control_kmers.fasta"
+        expand(config["project_path"] + "pipeline_output/kmdiff_output/{prefix}_kmers.fasta", prefix = ["case", "control"])
     output:
-        config["project_path"] + "/pipeline_output/kmdiff_output/significant_kmers_matrix.txt"
+        config["project_path"] + "pipeline_output/kmdiff_output/significant_kmers_matrix.txt"
     params:
-        input_folder = config["project_path"] + "/pipeline_output/kmdiff_output/"
+        input_folder = config["project_path"] + "pipeline_output/kmdiff_output/"
     conda :
         config['src_path'] + "/env/kmtricks.yaml"
     shell:
         """
         kmtricks aggregate --run-dir {params.input_folder}/positive_kmer_matrix --matrix kmer --cpr-in > {output}
         """
+
+
