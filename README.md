@@ -28,6 +28,12 @@ alpha	lambda	Accuracy	Kappa	AccuracySD	KappaSD
 1	0.012233193439917463	0.8071428571428572	0.6136666666666667	0.1277013475448753	0.2566471854078626
 ```
 
+# Requirements
+
+Your CPU needs to support the instruction set `avx2` (to parallelise jobs). You can check this by using the command `lscpu | grep -F 'avx2'`. If it yields the `Flags` section with a bunch of abreviations such as `fpu vme de pse tsc msr`, you passed this requirements.
+Memory (RAM) needed will depend on the size of your alignment database.
+Disk space required mostly depends on the size of your dataset and databases. The number of kmers for 3To of CRC fasta files reached hundreds of millions, wich is about 500G of fasta files for the first step. Other steps will use less disk. The database of `MicrobeAnnotator` is about 690G.
+
 # Installation
 
 Clone the repository:
