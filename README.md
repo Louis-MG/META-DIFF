@@ -4,7 +4,7 @@ This is the repository of the pipeline META-DIFF, which detects sequences in dif
 
 # Motivation
 
-Metagenomics becomes increasingly important in building our kmowledge about microbes. Links between microbiomes perturbations and diseases are regularily uncovered. Using kmer-based methods, this pipeline allows its user to quickly find microbial DNA sequences in differential abundances between two conditions (e.g. healthy and not healthy), and annotate them taxonomicaly and functionaly. The pipline also isolates unclassified sequences and build apredictive model based on the most significant unitigs' kmers abundances. 
+Metagenomics becomes increasingly important in building our knowledge about microbes. Links between microbiome perturbations and diseases are regularily uncovered. Using kmer-based methods, this pipeline allows its users to quickly find microbial DNA sequences in differential abundances between two conditions (e.g. healthy and not healthy), and annotate them taxonomicaly and functionaly. The pipline also isolates unclassified sequences and builds a predictive model based on the most significant unitigs' kmers abundances. 
 
 # Workflow
 
@@ -70,7 +70,7 @@ Output is :
 WARNING: depending of the denomination of your files for paired ends (_R1 and _R2, _1 and _2 ...), you will have to modify lines 55-56 and 60-61. Yeah it's annoying. Add the single-end by hand.
 ```
 
-Add the last path to `./snakemake/config.yaml`:
+Add the last paths to `./snakemake/config.yaml`:
 ```bash
 # path to the file of correpsondance between seq headers and the genome name (strain etc)
 seq_to_genome: /path/to/ref.tsv
@@ -86,7 +86,7 @@ fof: /path/to/your/fof.txt
 
 Finally, start the pipeline:
 ```bash
-snakemake --cores X
+snakemake --cores X --use-conda
 ```
 
 # Issues
