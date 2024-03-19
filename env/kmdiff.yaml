@@ -1,37 +1,27 @@
-{% set version = "1.1.0" %}
-
-package:
-  name: kmdiff
-  version: {{ version }}
-
-source:
-  git_url: https://github.com/tlemane/kmdiff
-
-requirements:
-  build:
-    - {{ compiler('cxx') }}
-    - make
-    - cmake
-    - gsl
-    - openblas
-    - openblas-devel
-    - liblapacke
-
-  host:
-    - zlib
-
-  run:
-    - zlib
-    - gsl
-    - openblas
-    - liblapacke
-    - kmtricks==1.2.0
-
-about:
-  home: https://github.com/tlemane/kmdiff
-  license: AGPL-3.0
-  doc_url: https://github.com/tlemane/kmdiff
-
-extra:
-  recipe-maintainers:
-    - tlemane
+name: kmdiff
+channels:
+  - tlemane
+  - cruizperez
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - _libgcc_mutex=0.1=conda_forge
+  - _openmp_mutex=4.5=2_gnu
+  - gsl=2.7=he838d99_0
+  - kmdiff=1.1.0=hebd7700_0
+  - kmtricks=1.4.0=h8b7377a_0
+  - libblas=3.9.0=20_linux64_openblas
+  - libcblas=3.9.0=20_linux64_openblas
+  - libgcc-ng=13.2.0=h807b86a_3
+  - libgfortran-ng=13.2.0=h69a702a_3
+  - libgfortran5=13.2.0=ha4646dd_3
+  - libgomp=13.2.0=h807b86a_3
+  - liblapack=3.9.0=20_linux64_openblas
+  - liblapacke=3.9.0=20_linux64_openblas
+  - libopenblas=0.3.25=pthreads_h413a1c8_0
+  - libstdcxx-ng=13.2.0=h7e041cc_3
+  - libzlib=1.3=hd590300_0
+  - openblas=0.3.25=pthreads_h7a3da1a_0
+  - zlib=1.3=hd590300_0
+prefix: /home/guelou01/miniconda3/envs/kmdiff

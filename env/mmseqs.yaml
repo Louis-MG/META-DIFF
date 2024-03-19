@@ -1,56 +1,33 @@
-{% set version = "15-6f452" %}
-{% set sha256 = "7115ac5a7e2a49229466806aaa760d00204bb08c870e3c231b00e525c77531dc" %}
-
-package:
-  name: mmseqs2
-  version: {{ version|replace("-", ".")  }}
-
-build:
-  number: 1
-  run_exports:
-    - {{ pin_subpackage('mmseqs2', max_pin=None) }}
-
-source:
-  url: https://github.com/soedinglab/mmseqs2/archive/{{ version }}.tar.gz
-  sha256: {{ sha256 }}
-
-requirements:
-  build:
-    - {{ compiler('cxx') }}
-    - {{ compiler('c') }}
-    - cmake
-    - make
-    - llvm-openmp  # [osx]
-    - libgomp      # [linux]
-  host:
-    - perl
-    - gawk
-    - zlib
-    - bzip2
-  run:
-    - aria2
-    - wget
-    - gawk
-    - zlib
-    - bzip2
-
-test:
-  commands:
-    - mmseqs > /dev/null
-
-about:
-  home: https://github.com/soedinglab/mmseqs2
-  license: GPLv3
-  license_file: LICENSE.md
-  summary: "MMseqs2: ultra fast and sensitive sequence search and clustering suite"
-
-extra:
-  identifiers:
-    - doi:10.1038/nbt.3988
-    - doi:10.1038/s41467-018-04964-5
-    - doi:10.1093/bioinformatics/bty1057
-    - doi:10.1101/2020.11.27.401018
-    - biotools:mmseqs2
-    - biotools:linclust
-  additional-platforms:
-    - linux-aarch64
+name: mmseq2
+channels:
+  - cruizperez
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - _libgcc_mutex=0.1=conda_forge
+  - _openmp_mutex=4.5=2_gnu
+  - aria2=1.36.0=h1e4e653_3
+  - bzip2=1.0.8=h7f98852_4
+  - c-ares=1.18.1=h7f98852_0
+  - ca-certificates=2022.12.7=ha878542_0
+  - gawk=5.1.0=h7f98852_0
+  - gettext=0.21.1=h27087fc_0
+  - icu=70.1=h27087fc_0
+  - libgcc-ng=12.2.0=h65d4601_19
+  - libgomp=12.2.0=h65d4601_19
+  - libiconv=1.17=h166bdaf_0
+  - libidn2=2.3.4=h166bdaf_0
+  - libnsl=2.0.0=h7f98852_0
+  - libsqlite=3.40.0=h753d276_0
+  - libssh2=1.10.0=hf14f497_3
+  - libstdcxx-ng=12.2.0=h46fd767_19
+  - libunistring=0.9.10=h7f98852_0
+  - libxml2=2.10.3=h7463322_0
+  - libzlib=1.2.13=h166bdaf_4
+  - mmseqs2=14.7e284=pl5321hf1761c0_0
+  - openssl=3.0.8=h0b41bf4_0
+  - perl=5.32.1=2_h7f98852_perl5
+  - wget=1.20.3=ha35d2d1_1
+  - xz=5.2.6=h166bdaf_0
+  - zlib=1.2.13=h166bdaf_4
