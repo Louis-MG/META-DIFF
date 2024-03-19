@@ -45,7 +45,7 @@ microbeannotator_db_path: /path/to/MicrobeAnnotator_DB
 Get your taxonomic database ready by looking at [mmseqs documentation](https://github.com/soedinglab/MMseqs2/wiki) (look at the module `createdb`). Again, just a few lines and fasta files.
 Copy the path to your mmseqs-formated taxonomic database in the the `snakemake/config.yaml` file:
 ```text
-taxonomic_db_path: /path/to/mmseqs_DB
+taxonomic_db_path: /path/to/mmseqs_DB/DB
 ```
 
 # Usage
@@ -73,9 +73,9 @@ WARNING: depending of the denomination of your files for paired ends (_R1 and _R
 Add the last path to `./snakemake/config.yaml`:
 ```bash
 # path to the file of correpsondance between seq headers and the genome name (strain etc)
-seq_to_genome: /path/to/ref
+seq_to_genome: /path/to/ref.tsv
 # path to the file of correpsondance between seq headers and the species
-seq_to_species: /path/to/retailed_ref
+seq_to_species: /path/to/detailed_ref.tsv
 # path to this repo, "META-DIFF/" inclueded:
 src_path: /path/to/META-DIFF/
 # where your results will be
@@ -84,6 +84,10 @@ project_path: /path/to/your/project/
 fof: /path/to/your/fof.txt
 ```
 
+Finally, start the pipeline:
+```bash
+snakemake --cores X
+```
 
 # Issues
 

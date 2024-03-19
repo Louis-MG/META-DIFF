@@ -14,7 +14,7 @@ rule kmdiff_count:
     shell:
         """
         ulimit -n 10000
-	rm -dr {params.output_folder}
+	rm -d {params.output_folder}
         kmdiff count -f {input} -d {params.output_folder} -t {threads} --nb-partitions 40
         """
 
