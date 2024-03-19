@@ -16,12 +16,11 @@ The workflow is described by the following figure :
 
 The output is divided in several key files:
  - case/control alignement summaries.
- - case/control funcitonal annotation in the form of a barplot, table and a heatmap of pathways detected.
- - performance of a classification model based on glmnet and the kmer counts of the most significant unclassified sequences. 
-
-Plots:
+ - case/control functional annotation in the form of a barplot, table and a heatmap of pathways detected:
 
 ![Barplot](/figures/metabolic_summary__barplot.png?raw=true "Example of a barplot of pathways complete at 90%") ![Heatmap](/figures/metabolic_summary__heatmap.png?raw=true "Example of a heatmap of pathways complete at 90%")
+
+ - performance of a classification model based on glmnet and the kmer counts of the most significant unclassified sequences:
 
 `best_model.txt`:
 ```
