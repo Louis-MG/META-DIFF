@@ -23,7 +23,7 @@ ruleorder: kmdiff_count > kmdiff_diff > kmdiff_dump > bcalm > mmseqs_bdd > mmseq
 # revoir syntax
 rule all:
     input:
-        expand(config["project_path"] + "pipeline_output/kmdiff_output/{condition}_kmers.fasta", condition = config["condition"]),
+        expand(config["project_path"] + "pipeline_output/kmdiff_output/{condition}_kmers.fasta", condition = ["case", "control"]),
         config["project_path"] + "pipeline_output/kmdiff_output/significant_kmers_matrix.txt",
         expand(config["project_path"] + "pipeline_output/kmdiff_output/{condition}_kmers.unitigs.fa", condition = config["condition"]),
         expand(config['project_path'] + "pipeline_output/RESULTS_DB/{condition}_results.m8", condition = config["condition"]),
