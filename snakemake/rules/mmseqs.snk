@@ -12,7 +12,6 @@ rule mmseqs_bdd:
         config["src_path"] + "/env/mmseqs.yaml"
     shell:
         """
-        mkdir {params.output_dir}
         mmseqs createdb {input} {output} --dbtype 2
         """
 
@@ -29,7 +28,7 @@ rule mmseqs_search:
         config["src_path"] + "/env/mmseqs.yaml"
     shell:
         """
-        mmseqs search {input} {output} {params.temp_folder} -t {threads} --max-seq-len 100000 -a --search-type 3 --start-sens 1 --sens-steps 3 -s 7
+        mmseqs search {input} {output} {params.temp_folder} --threads {threads} --max-seq-len 100000 -a --search-type 3 --start-sens 1 --sens-steps 3 -s 7
         """
 
 rule mmseqs_convert:
@@ -42,7 +41,7 @@ rule mmseqs_convert:
         config["src_path"] + "/env/mmseqs.yaml"
     shell:
         """
-        mmseqs convertalis {input} {output} -t {threads} --format-output query,target,fident,alnlen,mismatch,gapopen,qstart,qend,tstart,tend,evalue,bits,qset
+        mmseqs convertalis {input} {output} --threads {threads} --format-output query,target,fident,alnlen,mismatch,gapopen,qstart,qend,tstart,tend,evalue,bits,qset
         """
 
 rule mmseqs_sep:
