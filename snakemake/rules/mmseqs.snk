@@ -20,7 +20,7 @@ rule mmseqs_search:
     input:
         config["project_path"] + "pipeline_output/QUERY_UNITIGS_DB/unitigsDB", config["taxonomic_db_path"]   
     output:
-        config["project_path"] + "pipeline_output/RESULTS_DB/resultsDB"
+        config["project_path"] + "pipeline_output/RESULTS_DB/resultsDB.index"
     params:
         temp_folder = config["project_path"] + "pipeline_output/temp/"
     threads: config["threads"]
@@ -33,15 +33,18 @@ rule mmseqs_search:
 
 rule mmseqs_convert:
     input:
-        config["project_path"] + "pipeline_output/QUERY_UNITIGS_DB/unitigsDB", config["taxonomic_db_path"], config["project_path"] + "pipeline_output/RESULTS_DB/resultsDB"
+        unitigs = config["project_path"] + "pipeline_output/QUERY_UNITIGS_DB/unitigsDB",
+        taxo_db = config["taxonomic_db_path"]
     output:
         config["project_path"] + "pipeline_output/RESULTS_DB/results.m8"
     threads: config["threads"]
+    params:
+        results_db = config["project_path"] + "pipeline_output/RESULTS_DB/resultsDB"
     conda :
         config["src_path"] + "/env/mmseqs.yaml"
     shell:
         """
-        mmseqs convertalis {input} {output} --threads {threads} --format-output query,target,fident,alnlen,mismatch,gapopen,qstart,qend,tstart,tend,evalue,bits,qset
+        mmseqs convertalis {input.unitigs} {input.taxo_db} {params.results_db} {output} --threads {threads} --format-output query,target,fident,alnlen,mismatch,gapopen,qstart,qend,tstart,tend,evalue,bits,qset
         """
 
 rule mmseqs_sep:
