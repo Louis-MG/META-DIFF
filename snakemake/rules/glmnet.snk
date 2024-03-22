@@ -25,7 +25,7 @@ rule glmnet_pval_agg:
     params:
         output = config["project_path"] + "pipeline_output/glmnet/"
     conda:
-        config["src_path"] + "/env/python.3.10.yaml"
+        config["src_path"] + "env/python.3.10.yaml"
     shell:
         """
         python3 /scripts/pvalues_agg.py -k {input.kmers} -u {input.unitigs} -o {params.output}
@@ -58,7 +58,7 @@ rule glmnet_class:
         output_folder = config["project_path"] + "pipeline_output/glmnet/",
         split = 0.75
     conda:
-        config["src_path"] + "/env/glmnet.yaml"
+        config["src_path"] + "env/glmnet.yaml"
     shell:
         """
         nb_control=$(grep -c -F "case" {input.fof})

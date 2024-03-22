@@ -10,7 +10,7 @@ rule bcalm:
         outfile = config["project_path"] + "pipeline_output/kmdiff_output/{condition}_kmers"
     threads: config["threads"]
     conda :
-        config["src_path"] + "/env/bcalm.yaml"
+        config["src_path"] + "env/bcalm.yaml"
     shell:
         """
         bcalm -in {input} -out {params.outfile} -nb-cores {threads} -abundance-min 1 -max-memory {params.memory}

@@ -9,7 +9,7 @@ rule mmseqs_bdd:
     params:
         output_dir = config["project_path"] + "pipeline_output/QUERY_UNITIGS_DB/"
     conda :
-        config["src_path"] + "/env/mmseqs.yaml"
+        config["src_path"] + "env/mmseqs.yaml"
     shell:
         """
         mmseqs createdb {input} {output} --dbtype 2
@@ -18,30 +18,32 @@ rule mmseqs_bdd:
 
 rule mmseqs_search:
     input:
-        config["project_path"] + "pipeline_output/QUERY_UNITIGS_DB/unitigsDB", config["taxonomic_db_path"]   
+        config["project_path"] + "pipeline_output/QUERY_UNITIGS_DB/unitigsDB", config["taxonomic_db_path"]
     output:
         config["project_path"] + "pipeline_output/RESULTS_DB/resultsDB.index"
     params:
+        true_output = config["project_path"] + "pipeline_output/RESULTS_DB/resultsDB",
         temp_folder = config["project_path"] + "pipeline_output/temp/"
     threads: config["threads"]
     conda :
-        config["src_path"] + "/env/mmseqs.yaml"
+        config["src_path"] + "env/mmseqs.yaml"
     shell:
         """
-        mmseqs search {input} {output} {params.temp_folder} --threads {threads} --max-seq-len 100000 -a --search-type 3 --start-sens 1 --sens-steps 3 -s 7
+        mmseqs search {input} {params.true_output} {params.temp_folder} --threads {threads} --max-seq-len 100000 -a --search-type 3 --start-sens 1 --sens-steps 3 -s 7
         """
 
 rule mmseqs_convert:
     input:
         unitigs = config["project_path"] + "pipeline_output/QUERY_UNITIGS_DB/unitigsDB",
-        taxo_db = config["taxonomic_db_path"]
+        taxo_db = config["taxonomic_db_path"],
+	just_to_check = config["project_path"] + "pipeline_output/RESULTS_DB/resultsDB.index"
     output:
         config["project_path"] + "pipeline_output/RESULTS_DB/results.m8"
     threads: config["threads"]
     params:
         results_db = config["project_path"] + "pipeline_output/RESULTS_DB/resultsDB"
     conda :
-        config["src_path"] + "/env/mmseqs.yaml"
+        config["src_path"] + "env/mmseqs.yaml"
     shell:
         """
         mmseqs convertalis {input.unitigs} {input.taxo_db} {params.results_db} {output} --threads {threads} --format-output query,target,fident,alnlen,mismatch,gapopen,qstart,qend,tstart,tend,evalue,bits,qset

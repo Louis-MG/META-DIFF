@@ -8,7 +8,7 @@ rule annot_extract_candidates:
     params:
         length = config["unitig_length"]
     conda:
-        config["src_path"] + "/env/seqkit.yaml"
+        config["src_path"] + "env/seqkit.yaml"
     shell:
         """
         seqkit seq --min-len {params.length} -i {input} > {output} 
@@ -25,7 +25,7 @@ rule prodigal:
         coords = config["project_path"] + "pipeline_output/functional_annotation/{condition}_coords.gbk",
         translation = config["project_path"] + "pipeline_output/functional_annotation/{condition}_protein_translation.faa",
     conda:
-        config["src_path"] + "/env/prodigal.yaml"
+        config["src_path"] + "env/prodigal.yaml"
     shell:
         """
         prodigal -p meta -i {input} -o {params.coords} -a {params.translation}
@@ -41,7 +41,7 @@ rule microbeannotator:
         process = 1,
         database = config["microbeannotator_db_path"]
     conda:
-        config["src_path"] + "/env/microbeannotator.yaml"
+        config["src_path"] + "env/microbeannotator.yaml"
     shell:
         """
         microbeannotator  -p {params.process} -t {threads} -m diamond --database {params.database} --clusters rows -i {input}
