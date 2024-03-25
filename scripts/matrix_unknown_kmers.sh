@@ -66,3 +66,4 @@ seqkit sliding --window 31 --step 1 "$output"/tmp.txt > "$output"/top_unknown_km
 grep '^[^>]' "$output"/top_unknown_kmers.fa > "$output"/tmp.txt
 nbr_match=$(cat "$output"/tmp.txt | wc -l)
 zgrep -m "$nbr_match" -F -f "$output"/tmp.txt "$matrix" > "$output"/top_unknown_matrix.txt
+rm "$output"/tmp.txt

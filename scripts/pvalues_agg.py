@@ -18,6 +18,8 @@ def getArgs() :
 		    help = 'Path to the unitigs fasta file.' )
 	parser.add_argument('-o', '--output', type=str, dest = 'output_path', action = 'store', required=True,
 		    help = 'Path to the output directory.')
+	parser.add_argument('-p', '--prefix', type=str, dest = 'prefix', action = 'store', required=True,
+                    help = 'String for the output file prefix.')
 	args = parser.parse_args()
 	return(args)
 
@@ -35,7 +37,7 @@ def verif_input(path: Union[str, bytes, os.PathLike]) :
 		sys.exit()
 
 
-def verif_output(path: Union[str, bytes, os.PathLike]) :
+def verif_output(path: Union[str, bytes, os.PathLike], prefix: str) :
 	"""
 	Checks that the output directorory exists and that no file with output name exists already.
 	path : string or path-like object.
@@ -46,17 +48,17 @@ def verif_output(path: Union[str, bytes, os.PathLike]) :
 	else :
 		print(f"ERROR: folder {path} not found.")
 		sys.exit()
-	if os.path.isfile(path+"/unitigs.aggregated_pvalues.fa") :
-		print(f"ERROR: folder {path} contains a 'unitigs.aggregated_pvalues.fa' file already.")
+	if os.path.isfile(path+"/"+prefix+"_unclassified.aggregated.fa") :
+		print(f"ERROR: folder {path} contains a '{prefix}_unclassified.aggregated.fa' file already.")
 		sys.exit()
 
 
-def write_output(path: Union[str, bytes, os.PathLike], list_unitigs: list[object]):
+def write_output(path: Union[str, bytes, os.PathLike], list_unitigs: list[object], prefix: str):
 	"""
 	Writes output.
 	path : string or path-like object.
 	"""
-	with open(path+"unitigs.aggregated_pvalues.fa", 'w') as f:
+	with open(path+"/"+prefix+"_unclassified.aggregated.fa", 'w') as f:
 		for i in range(0, len(list_unitigs)):
 			f.write( ">unitig_"+str(i)+"_pval="+str(list_unitigs[i].pvalue))
 			f.write("\n"+list_unitigs[i].sequence)
@@ -170,18 +172,18 @@ def CCT(unitig: object) -> object :
 #	return list_modified_unitigs
 
 
-def main(kmdiff_input_path: Union[str, bytes, os.PathLike], unitigs_input_path: Union[str, bytes, os.PathLike], output_path: Union[str, bytes, os.PathLike]):
+def main(kmdiff_input_path: Union[str, bytes, os.PathLike], unitigs_input_path: Union[str, bytes, os.PathLike], output_path: Union[str, bytes, os.PathLike], prefix: str):
 	verif_input(kmdiff_input_path)
 	verif_input(unitigs_input_path)
-	verif_output(output_path)
+	verif_output(output_path, prefix)
 	kmer_dict = load_pvalue_dict(kmdiff_input_path)
 	list_unitigs_with_pvalues = load_unitigs(unitigs_input_path, kmer_dict)
 	#list_unitigs_with_pvalues = aggregate_pvalues(list_unitigs) si marche pas remettre et la ligne au dessus est juste list_unitigs, et enlever la ligne en dessous
 	list_unitigs_with_pvalues.sort(key = lambda x: (x.pvalue, len(x.sequence)))
-	write_output(output_path, list_unitigs_with_pvalues)
+	write_output(output_path, list_unitigs_with_pvalues, prefix)
 	print("Aggregation done !")
 
 
 if __name__ == "__main__" :
 	args = getArgs()
-	main(args.kmdiff_input_path, args.unitigs_input_path, args.output_path)
+	main(args.kmdiff_input_path, args.unitigs_input_path, args.output_path, args.prefix)

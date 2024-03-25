@@ -1,5 +1,3 @@
-###############
-
 rule glmnet_extract:
     input:
         m8 = config["project_path"] + "pipeline_output/RESULTS_DB/{condition}_results.m8",
@@ -8,30 +6,29 @@ rule glmnet_extract:
         config["project_path"] + "pipeline_output/glmnet/{condition}_unclassified.unitigs.fa"
     params:
         output = config["project_path"] + "pipeline_output/glmnet/",
-        script_path = config['src_path'] + "scripts/find_unaligned.sh"
+        script_path = config['src_path'] + "scripts/find_unaligned.sh",
+	condition_name = lambda wildcards: wildcards.condition
     shell:
         """
-        bash {params.script_path} --fasta {input.fasta} --m8 {input.m8} --output {params.output}
-        mv {params.output}/unclassified.unitigs.fa {output}
+        bash {params.script_path} --fasta {input.fasta} --m8 {input.m8} --output {params.output} --prefix {params.condition_name}
         """
 
 
-############## RENOMMER LES FICHIERS DE SORTIE POUR QUE CA CORRESPONDE
 rule glmnet_pval_agg:
     input:
-        unitigs = config["project_path"] + "pipeline_output/kmdiff_output/{condition}_unclassified.unitigs.fa",
+        unitigs = config["project_path"] + "pipeline_output/glmnet/{condition}_unclassified.unitigs.fa",
         kmers = config["project_path"] + "pipeline_output/kmdiff_output/{condition}_kmers.fasta"
     output:
         config["project_path"] + "pipeline_output/glmnet/{condition}_unclassified.aggregated.fa"
     params:
         output = config["project_path"] + "pipeline_output/glmnet/",
-        script_path = config['src_path'] + "scripts/pvalues_agg.py"
+        script_path = config['src_path'] + "scripts/pvalues_agg.py",
+        condition_name = lambda wildcards: wildcards.condition
     conda:
         config["src_path"] + "env/python.3.10.yaml"
     shell:
         """
-        python3 {params.script_path} -k {input.kmers} -u {input.unitigs} -o {params.output}
-        mv {params.output}/unitigs.aggregated_pvalues.fa {output}
+        python3 {params.script_path} -k {input.kmers} -u {input.unitigs} -o {params.output} -p {params.condition_name}
         """
 
 rule glmnet_matrix:
@@ -40,7 +37,7 @@ rule glmnet_matrix:
         control = config["project_path"] + "pipeline_output/glmnet/control_unclassified.aggregated.fa",
         matrix = config["project_path"] + "pipeline_output/kmdiff_output/significant_kmers_matrix.txt"
     output:
-        config["project_path"] + "pipeline_output/glmnet/top_kmers.tsv"
+        config["project_path"] + "pipeline_output/glmnet/top_unknown_kmers.fa", config["project_path"] + "pipeline_output/glmnet/top_unknown_matrix.txt"
     params:
         output = config["project_path"] + "pipeline_output/glmnet/",
         script_path = config['src_path'] + "scripts/matrix_unknown_kmers.sh"
@@ -52,11 +49,11 @@ rule glmnet_matrix:
 
 rule glmnet_class:
     input:
-        matrix = config["project_path"] + "pipeline_output/glmnet/top_kmers.tsv",
+        matrix = config["project_path"] + "pipeline_output/glmnet/top_unknown_matrix.txt",
         fof = config["fof"] 
     output:
         config["project_path"] + "pipeline_output/glmnet/best_model.txt", config["project_path"] + "pipeline_output/glmnet/heatmap.pdf", config["project_path"] + "pipeline_output/glmnet/accuracy.txt", config["project_path"] + "pipeline_output/glmnet/matrix.tsv"
-    threads: 30
+    threads: config["threads"]
     params:
         output_folder = config["project_path"] + "pipeline_output/glmnet/",
         split = 0.75,
@@ -67,5 +64,5 @@ rule glmnet_class:
         """
         nb_control=$(grep -c -F "case" {input.fof})
         nb_case=$(grep -c -F "control" {input.fof})
-        Rscript {params.script_path} -i {input.matrix} - {threads} --case "$nb_case" --control "$nb_control" --output {params.output_folder} -y {params.split}
+        Rscript {params.script_path} -i {input.matrix} -t {threads} --case "$nb_case" --control "$nb_control" --output {params.output_folder} -y {params.split}
         """

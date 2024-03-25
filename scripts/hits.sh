@@ -10,11 +10,12 @@ This script summerises the blast results of unitigs. Its arguments are :
 	-o --output <PATH> path to the output directory.
 	-r --reference <PATH> path to the file of sequenceID_to_species.tsv correspondance.
 	-d --detailed <PATH> path to the file of sequenceID_to_genomes.tsv correspondance.
+	-p --prefix <STRING> prefix for the output file name
 	-h --help displays this help message and exits.
 
 Output :
-	- alignment_summary.txt
-	- alignment_summary_detailed.txt
+	- {prefix}_alignment_summary.txt
+	- {prefix}_alignment_summary_detailed.txt
 
 "
 }
@@ -38,6 +39,8 @@ do
 	-r | --reference) ref="$2"
 	shift 2;;
 	-d | --detailed) detailed="$2"
+	shift 2;;
+	-p | --prefix) prefix="$2"
 	shift 2;;
 	-h | --help) Help; exit 0;;
 	-* | --*) unknown="$1"; echo "Unknown option: ${unknown}"; Help; exit 1;;
@@ -80,23 +83,23 @@ fi
 
 # fait un array associatif des noms de sequences a leur espece a partir du fichier de ref; parcours ensuite le fichier d'input pour prendre les noms de sp associes aux seq et imprime longueur d alignement \t sp
 
-awk -F'\t' 'FNR==NR {seq_to_sp[$1]=$2;next} {print $4, seq_to_sp[">"$2]}' "$detailed" "$input" > "$output"/tmp.txt
+awk -F'\t' 'FNR==NR {seq_to_sp[$1]=$2;next} {print $4, seq_to_sp[">"$2]}' "$detailed" "$input" > "$output"/"$prefix"_tmp.txt
 #premier fichier: FNR==NR, puis quand FNR!=NR
-awk -F'\t' 'FNR==NR {seq_to_sp[$1]=$2;next} {print $4, seq_to_sp[">"$2]}' "$ref" "$input" > "$output"/tmp_simple.txt
+awk -F'\t' 'FNR==NR {seq_to_sp[$1]=$2;next} {print $4, seq_to_sp[">"$2]}' "$ref" "$input" > "$output"/"$prefix"_tmp_simple.txt
 
-sed -i 's/ /\t/1' "$output"/tmp.txt
-sed -i 's/ /\t/1' "$output"/tmp_simple.txt
+sed -i 's/ /\t/1' "$output"/"$prefix"_tmp.txt
+sed -i 's/ /\t/1' "$output"/"$prefix"_tmp_simple.txt
 
 #sort les lignes par especes
-sort -T /mnt/ssd/LM/tmp/ -k2 -t $'\t'  "$output"/tmp.txt > "$output"/tmp_sorted.txt
-sort -T /mnt/ssd/LM/tmp/ -k2 -t $'\t'  "$output"/tmp_simple.txt > "$output"/tmp_sorted_simple.txt
+sort -T /mnt/ssd/LM/tmp/ -k2 -t $'\t'  "$output"/"$prefix"_tmp.txt > "$output"/"$prefix"_tmp_sorted.txt
+sort -T /mnt/ssd/LM/tmp/ -k2 -t $'\t'  "$output"/"$prefix"_tmp_simple.txt > "$output"/"$prefix"_tmp_sorted_simple.txt
 
 #addition des longueurs d'alignement si $2 = prev
-awk -F'\t' 'BEGIN {sum = 0; prev=""; OFS="\t"} ($2 == prev){sum+=$1}  ($2 != prev){print sum, prev; sum = $1; prev = $2} END {print sum, prev}' "$output"/tmp_sorted.txt > "$output"/tmp1.txt
-awk -F'\t' 'BEGIN {sum = 0; prev=""; OFS="\t"} ($2 == prev){sum+=$1}  ($2 != prev){print sum, prev; sum = $1; prev = $2} END {print sum, prev}' "$output"/tmp_sorted_simple.txt > "$output"/tmp1_simple.txt
+awk -F'\t' 'BEGIN {sum = 0; prev=""; OFS="\t"} ($2 == prev){sum+=$1}  ($2 != prev){print sum, prev; sum = $1; prev = $2} END {print sum, prev}' "$output"/"$prefix"_tmp_sorted.txt > "$output"/"$prefix"_tmp1.txt
+awk -F'\t' 'BEGIN {sum = 0; prev=""; OFS="\t"} ($2 == prev){sum+=$1}  ($2 != prev){print sum, prev; sum = $1; prev = $2} END {print sum, prev}' "$output"/"$prefix"_tmp_sorted_simple.txt > "$output"/"$prefix"_tmp1_simple.txt
 
 #ordonne par score
-sort -T /mnt/ssd/LM/tmp/ -k1 -r -g -t $'\t' "$output"/tmp1.txt > "$output"/alignment_summary_detailed.txt
-sort -T /mnt/ssd/LM/tmp/ -k1 -r -g -t $'\t' "$output"/tmp1_simple.txt > "$output"/alignment_summary.txt
+sort -T /mnt/ssd/LM/tmp/ -k1 -r -g -t $'\t' "$output"/"$prefix"_tmp1.txt > "$output"/"$prefix"_alignment_summary_detailed.txt
+sort -T /mnt/ssd/LM/tmp/ -k1 -r -g -t $'\t' "$output"/"$prefix"_tmp1_simple.txt > "$output"/"$prefix"_alignment_summary.txt
 
-rm "$output"/tmp*
+rm "$output"/"$prefix"_tmp*
