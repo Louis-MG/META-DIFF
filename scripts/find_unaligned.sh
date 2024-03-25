@@ -54,4 +54,4 @@ fi
 echo "Obtaining indexes of aligned unitigs to get unaligned unitgs, this is gonna take  a while ..."
 #awk -F '\t' 'BEGIN {OFS="\n"} FNR == NR {index_seq=($1+1)*2; index_header=2*($1+1)-1; to_delete[index_header]++; to_delete[index_seq]++} FNR != NR && !(FNR in to_delete) {print $0 }' "$output"/tmp.txt "$fasta" > "$output"/unaligned.unitigs.fa
 
-awk -F '\t' 'BEGIN {OFS="\n"} FNR == NR {index_seq=($1+1)*2; index_header=2*($1+1)-1; to_delete[index_header]++; to_delete[index_seq]++} FNR != NR && !(FNR in to_delete) {print $0 }' "$m8" "$fasta" > "$output"/unaligned.unitigs.fa
+awk -F '\t' 'BEGIN {OFS="\n"} FNR == NR {index_seq=($1+1)*2; index_header=2*($1+1)-1; to_delete[index_header]++; to_delete[index_seq]++} FNR != NR && !(FNR in to_delete) {print $0 }' "$m8" "$fasta" > "$output"/unclassified.unitigs.fa
