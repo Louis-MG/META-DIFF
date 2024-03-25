@@ -44,13 +44,13 @@ git clone https://github.com/Louis-MG/META-DIFF.git
 Get your functional database ready by following instructions at [MicrobeAnnotator](https://github.com/cruizperez/MicrobeAnnotator). Dont worry, it's jusst a few lines that take a while.
 Copy the path to the MicrobeAnnotator_DB in the `snakemake/config.yaml` file:
 ```text
-microbeannotator_db_path: /path/to/MicrobeAnnotator_DB
+microbeannotator_db_path: "/path/to/MicrobeAnnotator_DB/"
 ```
 
 Get your taxonomic database ready by looking at [mmseqs documentation](https://github.com/soedinglab/MMseqs2/wiki) (look at the module `createdb`). Again, just a few lines and fasta files.
 Copy the path to your mmseqs-formated taxonomic database in the the `snakemake/config.yaml` file:
 ```text
-taxonomic_db_path: /path/to/mmseqs_DB/DB
+taxonomic_db_path: "/path/to/mmseqs_DB/DB"
 ```
 
 # Usage
@@ -78,15 +78,15 @@ WARNING: depending of the denomination of your files for paired ends (_R1 and _R
 Add the last paths to `./snakemake/config.yaml`:
 ```bash
 # path to the file of correpsondance between seq headers and the genome name (strain etc)
-seq_to_genome: /path/to/ref.tsv
+seq_to_genome: "/path/to/ref.tsv"
 # path to the file of correpsondance between seq headers and the species
-seq_to_species: /path/to/detailed_ref.tsv
+seq_to_species: "/path/to/detailed_ref.tsv"
 # path to this repo, "META-DIFF/" inclueded:
-src_path: /path/to/META-DIFF/
+src_path: "/path/to/META-DIFF/"
 # where your results will be
-project_path: /path/to/your/project/
+project_path: "/path/to/your/project/"
 # path to your file of file:
-fof: /path/to/your/fof.txt
+fof: "/path/to/your/fof.txt"
 ```
 
 Finally, start the pipeline:
