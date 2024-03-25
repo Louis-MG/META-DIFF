@@ -5,47 +5,50 @@ rule glmnet_extract:
         m8 = config["project_path"] + "pipeline_output/RESULTS_DB/{condition}_results.m8",
         fasta = config["project_path"] + "pipeline_output/kmdiff_output/{condition}_kmers.unitigs.fa"
     output:
-        config["project_path"] + "pipeline_output/glmnet/{condition}_unclassified.fa"
+        config["project_path"] + "pipeline_output/glmnet/{condition}_unclassified.unitigs.fa"
     params:
-        output = config["project_path"] + "pipeline_output/glmnet/"
+        output = config["project_path"] + "pipeline_output/glmnet/",
+        script_path = config['src_path'] + "scripts/find_unaligned.sh"
     shell:
         """
-        bash /scripts/find_unaligned.sh --fasta {input.fasta} --m8 {input.m8} --output {params.output}
-        mv {params.output}/unclassified.fa {output}
+        bash {params.script_path} --fasta {input.fasta} --m8 {input.m8} --output {params.output}
+        mv {params.output}/unclassified.unitigs.fa {output}
         """
 
 
 ############## RENOMMER LES FICHIERS DE SORTIE POUR QUE CA CORRESPONDE
 rule glmnet_pval_agg:
     input:
-        unitigs = config["project_path"] + "pipeline_output/kmdiff_output/{condition}_kmers.unitigs.fa",
+        unitigs = config["project_path"] + "pipeline_output/kmdiff_output/{condition}_unclassified.unitigs.fa",
         kmers = config["project_path"] + "pipeline_output/kmdiff_output/{condition}_kmers.fasta"
     output:
         config["project_path"] + "pipeline_output/glmnet/{condition}_unclassified.aggregated.fa"
     params:
-        output = config["project_path"] + "pipeline_output/glmnet/"
+        output = config["project_path"] + "pipeline_output/glmnet/",
+        script_path = config['src_path'] + "scripts/pvalues_agg.py"
     conda:
         config["src_path"] + "env/python.3.10.yaml"
     shell:
         """
-        python3 /scripts/pvalues_agg.py -k {input.kmers} -u {input.unitigs} -o {params.output}
-        mv {params.output}/unclassified.fa {output}
+        python3 {params.script_path} -k {input.kmers} -u {input.unitigs} -o {params.output}
+        mv {params.output}/unitigs.aggregated_pvalues.fa {output}
         """
 
-# revoir j"ai mal ecrit
 rule glmnet_matrix:
     input:
-        case = config["project_path"] + "pipeline_output/kmdiff_output/case_kmers.fasta",
-        control = config["project_path"] + "pipeline_output/kmdiff_output/control_kmers.fasta",
+        case = config["project_path"] + "pipeline_output/glmnet/case_unclassified.aggregated.fa",
+        control = config["project_path"] + "pipeline_output/glmnet/control_unclassified.aggregated.fa",
         matrix = config["project_path"] + "pipeline_output/kmdiff_output/significant_kmers_matrix.txt"
     output:
         config["project_path"] + "pipeline_output/glmnet/top_kmers.tsv"
     params:
-        output = config["project_path"] + "pipeline_output/glmnet/"
+        output = config["project_path"] + "pipeline_output/glmnet/",
+        script_path = config['src_path'] + "scripts/matrix_unknown_kmers.sh"
     shell:
         """
-        bash /scripts/matrix_unknown_kmers.sh -i {input.case},{input.control} -m {input.matrix} -o {params.output}
+        bash {params.script_path} -i {input.case},{input.control} -m {input.matrix} -o {params.output}
         """
+
 
 rule glmnet_class:
     input:
@@ -56,12 +59,13 @@ rule glmnet_class:
     threads: 30
     params:
         output_folder = config["project_path"] + "pipeline_output/glmnet/",
-        split = 0.75
+        split = 0.75,
+        script_path = config['src_path'] + "scripts/elasticNet_and_heatmap.R"
     conda:
         config["src_path"] + "env/glmnet.yaml"
     shell:
         """
         nb_control=$(grep -c -F "case" {input.fof})
         nb_case=$(grep -c -F "control" {input.fof})
-        Rscript /scripts/elasticNet_and_heatmap.R -i {input.matrix} - {threads} --case "$nb_case" --control "$nb_control" --output {params.output_folder} -y {params.split}
+        Rscript {params.script_path} -i {input.matrix} - {threads} --case "$nb_case" --control "$nb_control" --output {params.output_folder} -y {params.split}
         """
