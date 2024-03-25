@@ -9,7 +9,7 @@
 
 suppressWarnings(suppressPackageStartupMessages({
 	library(pheatmap)
-	source("pheatmap.2.R")
+	source("scripts/pheatmap.2.R")
 	library("tidyverse")
 	library(RColorBrewer)
 	library(ggplot2)
@@ -22,6 +22,7 @@ suppressWarnings(suppressPackageStartupMessages({
 	library(compositions)
 }))
 
+
 ########################################################
 #
 #	ARGS
@@ -31,7 +32,7 @@ suppressWarnings(suppressPackageStartupMessages({
 
 option_list = list(
   make_option(c("-i", "--input"), type="character", default=NULL,
-              help="ko enrichment name", metavar="character"),
+              help="kmer count matrix file", metavar="character"),
   make_option(c("-o", "--output"), type="character", default=NULL,
               help="output directory for elasticnet signature  table, matrix, heatmap, accuracy and best model ", metavar="character"),
   make_option(c("--case"), type="numeric", default=NULL,
