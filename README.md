@@ -91,7 +91,7 @@ project_path: "/path/to/your/project/"
 fof: "/path/to/your/fof.txt"
 ```
 
-Finally, start the pipeline:
+Finally, ssssstart the pipeline :snake::
 ```bash
 snakemake --cores X --use-conda
 ```
