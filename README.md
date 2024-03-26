@@ -4,7 +4,7 @@ This is the repository of the pipeline META-DIFF, which detects sequences in dif
 
 # Motivation
 
-Metagenomics becomes increasingly important in building our knowledge about microbes. Links between microbiome perturbations and diseases are regularily uncovered. Using kmer-based methods, this pipeline allows its users to quickly find microbial DNA sequences in differential abundances between two conditions (e.g. healthy and not healthy), and annotate them taxonomicaly and functionaly. The pipline also isolates unclassified sequences and builds a predictive model based on the most significant unitigs' kmers abundances. 
+Metagenomics becomes increasingly important in building our knowledge about microbes. Links between microbiome perturbations and diseases are regularily uncovered. Using kmer-based methods, this pipeline allows its users to quickly find microbial DNA sequences in differential abundances between two conditions (e.g. healthy and not healthy), and annotate them taxonomicaly and functionaly. The pipeline also isolates unclassified sequences and builds a predictive model based on the most significant unitigs' kmers abundances. 
 
 :exclamation: Important note: the pipeline can predict genes and annotate functions for prokaryotes only. :exclamation: 
 
@@ -43,7 +43,7 @@ Clone the repository:
 git clone https://github.com/Louis-MG/META-DIFF.git
 ```
 
-Get your functional database ready by following instructions at [MicrobeAnnotator](https://github.com/cruizperez/MicrobeAnnotator). Dont worry, it's just a few lines that take a while.
+Get your functional database ready by following instructions at [MicrobeAnnotator](https://github.com/cruizperez/MicrobeAnnotator). Don't worry, it's just a few lines that take a while.
 Copy the path to the MicrobeAnnotator_DB in the `snakemake/config.yaml` file:
 ```
 microbeannotator_db_path: "/path/to/MicrobeAnnotator_DB/"
