@@ -5,6 +5,7 @@ This is the repository of the pipeline META-DIFF, which detects sequences in dif
 # Motivation
 
 Metagenomics becomes increasingly important in building our knowledge about microbes. Links between microbiome perturbations and diseases are regularily uncovered. Using kmer-based methods, this pipeline allows its users to quickly find microbial DNA sequences in differential abundances between two conditions (e.g. healthy and not healthy), and annotate them taxonomicaly and functionaly. The pipline also isolates unclassified sequences and builds a predictive model based on the most significant unitigs' kmers abundances. 
+Important note: the pipeline can predict genes and annotate functions for prokaryotes only.
 
 # Workflow
 
@@ -41,15 +42,15 @@ Clone the repository:
 git clone https://github.com/Louis-MG/META-DIFF.git
 ```
 
-Get your functional database ready by following instructions at [MicrobeAnnotator](https://github.com/cruizperez/MicrobeAnnotator). Dont worry, it's jusst a few lines that take a while.
+Get your functional database ready by following instructions at [MicrobeAnnotator](https://github.com/cruizperez/MicrobeAnnotator). Dont worry, it's just a few lines that take a while.
 Copy the path to the MicrobeAnnotator_DB in the `snakemake/config.yaml` file:
-```text
+```
 microbeannotator_db_path: "/path/to/MicrobeAnnotator_DB/"
 ```
 
 Get your taxonomic database ready by looking at [mmseqs documentation](https://github.com/soedinglab/MMseqs2/wiki) (look at the module `createdb`). Again, just a few lines and fasta files.
 Copy the path to your mmseqs-formated taxonomic database in the the `snakemake/config.yaml` file:
-```text
+```
 taxonomic_db_path: "/path/to/mmseqs_DB/DB"
 ```
 
