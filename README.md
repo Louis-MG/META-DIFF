@@ -1,11 +1,12 @@
-# META-DIFF
+# META-DIFF :microbe:
 
 This is the repository of the pipeline META-DIFF, which detects sequences in differential abundance between two conditions, and annotates them taxonomicaly and functionaly.
 
 # Motivation
 
 Metagenomics becomes increasingly important in building our knowledge about microbes. Links between microbiome perturbations and diseases are regularily uncovered. Using kmer-based methods, this pipeline allows its users to quickly find microbial DNA sequences in differential abundances between two conditions (e.g. healthy and not healthy), and annotate them taxonomicaly and functionaly. The pipline also isolates unclassified sequences and builds a predictive model based on the most significant unitigs' kmers abundances. 
-Important note: the pipeline can predict genes and annotate functions for prokaryotes only.
+
+:exclamation: Important note: the pipeline can predict genes and annotate functions for prokaryotes only. :exclamation: 
 
 # Workflow
 
@@ -29,9 +30,9 @@ alpha	lambda	Accuracy	Kappa	AccuracySD	KappaSD
 1	0.012233193439917463	0.8071428571428572	0.6136666666666667	0.1277013475448753	0.2566471854078626
 ```
 
-# Requirements
+# Requirements 
 
-Your CPU needs to support the instruction set `avx2` (to parallelise jobs). You can check this by using the command `lscpu | grep -F 'avx2'`. If it yields the `Flags` section with a bunch of abreviations such as `fpu vme de pse tsc msr`, you passed this requirements.
+Your CPU needs to support the instruction set `avx2` (to parallelise jobs). You can check this by using the command `lscpu | grep -F 'avx2'`. If it yields the `Flags` section with a bunch of abreviations such as `fpu vme de pse tsc msr`, you passed this requirements :white_check_mark: !
 Memory (RAM) needed will depend on the size of your alignment database.
 Disk space required mostly depends on the size of your dataset and databases. The number of kmers for 3To of CRC fasta files reached hundreds of millions, wich is about 500G of fasta files for the first step. Other steps will use less disk. The database of `MicrobeAnnotator` is about 690G.
 
