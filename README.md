@@ -49,8 +49,8 @@ Copy the path to the MicrobeAnnotator_DB in the `snakemake/config.yaml` file:
 microbeannotator_db_path: "/path/to/MicrobeAnnotator_DB/"
 ```
 
-Get your taxonomic database ready by looking at [mmseqs documentation](https://github.com/soedinglab/MMseqs2/wiki) (look at the module `createdb`). Again, just a few lines and fasta files.
-Copy the path to your mmseqs-formated taxonomic database in the the `snakemake/config.yaml` file:
+Get your taxonomic database ready by looking at [MMseqs2 documentation](https://github.com/soedinglab/MMseqs2/wiki) (look at the module `createdb`). Again, just a few lines and fasta files.
+Copy the path to your MMseqs2-formated taxonomic database in the the `snakemake/config.yaml` file:
 ```
 taxonomic_db_path: "/path/to/mmseqs_DB/DB"
 ```
@@ -79,9 +79,9 @@ WARNING: depending of the denomination of your files for paired ends (_R1 and _R
 
 Add the last paths to `./snakemake/config.yaml`:
 ```bash
-# path to the file of correpsondance between seq headers and the genome name (strain etc)
+# path to the file of correpsondance between seq headers and the genome name (strain etc): see wiki
 seq_to_genome: "/path/to/ref.tsv"
-# path to the file of correpsondance between seq headers and the species
+# path to the file of correpsondance between seq headers and the species: see wiki
 seq_to_species: "/path/to/detailed_ref.tsv"
 # path to this repo, "META-DIFF/" inclueded:
 src_path: "/path/to/META-DIFF/"
@@ -100,5 +100,7 @@ snakemake --cores X --use-conda
 
 If you have any issues, let me know in the Issues space, with an informative title and description.
 
-# Citations
+# Citations 
+
+Coming soon ! :mortar_board:
 
