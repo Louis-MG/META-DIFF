@@ -14,6 +14,8 @@ The workflow is described by the following figure :
 
 ![Schematic of the META-DIFF pipeline](/figures/pipelinev3.png?raw=true "Pipeline Overview")
 
+Learn more about each step by reading the [wiki](https://github.com/Louis-MG/META-DIFF/wiki) ! :books:
+
 # Output
 
 The output is divided in several key files:
@@ -93,7 +95,7 @@ WARNING: depending of the denomination of your files for paired ends (_R1 and _R
 ```
 
 Add the last paths to `./snakemake/config.yaml`:
-```bash
+```
 # path to the file of correpsondance between seq headers and the genome name (strain etc): see wiki
 seq_to_genome: "/path/to/ref.tsv"
 # path to the file of correpsondance between seq headers and the species: see wiki
