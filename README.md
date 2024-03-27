@@ -17,10 +17,24 @@ The workflow is described by the following figure :
 # Output
 
 The output is divided in several key files:
- - case/control alignement summaries.
+ - case/control alignement summaries:
+
+```
+37594334	Bacteroides ovatus strain 3725 D1 iv chromosome, complete genome
+37565498	Bacteroides ovatus strain BFG-107 chromosome, complete genome
+35771365	Bacteroides xylanisolvens strain CL11T00C03 chromosome, complete genome
+35482957	Bacteroides xylanisolvens strain funn3 chromosome, complete genome
+35106788	Bacteroides ovatus strain 2789STDY5834943, whole genome shotgun sequence
+34744737	Bacteroides xylanisolvens strain H207 chromosome, complete genome
+34093107	Bacteroides ovatus strain CL06T03C20 chromosome, complete genome
+34079552	Bacteroides xylanisolvens strain CL11T00C41 chromosome, complete genome
+33805332	Bacteroides ovatus strain FDAARGOS_733 chromosome, complete genome
+33714506	Bacteroides ovatus isolate MGYG-HGUT-01378, whole genome shotgun sequence
+```
+
  - case/control functional annotation in the form of a barplot, table and a heatmap of pathways detected:
 
-![Barplot](/figures/metabolic_summary__barplot.png?raw=true "Example of a barplot of pathways complete at 90%") ![Heatmap](/figures/metabolic_summary__heatmap.png?raw=true "Example of a heatmap of pathways complete at 90%")
+![Heatmap](/figures/metabolic_summary__heatmap.png?raw=true "Example of a heatmap of pathways complete at 90%")
 
  - performance of a classification model based on glmnet and the kmer counts of the most significant unclassified sequences:
 
@@ -29,6 +43,7 @@ The output is divided in several key files:
 alpha	lambda	Accuracy	Kappa	AccuracySD	KappaSD
 1	0.012233193439917463	0.8071428571428572	0.6136666666666667	0.1277013475448753	0.2566471854078626
 ```
+![Heatmap](/figures/heatmap.pdf "Exemmple of a classification heatmap with unclassified k-mers")
 
 # Requirements 
 
