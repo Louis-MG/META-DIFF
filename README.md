@@ -43,7 +43,7 @@ The output is divided in several key files:
 alpha	lambda	Accuracy	Kappa	AccuracySD	KappaSD
 1	0.012233193439917463	0.8071428571428572	0.6136666666666667	0.1277013475448753	0.2566471854078626
 ```
-![Heatmap](/figures/heatmap.pdf "Exemmple of a classification heatmap with unclassified k-mers")
+![Heatmap](/figures/heatmap.png "Exemple of a classification heatmap with unclassified k-mers")
 
 # Requirements 
 
