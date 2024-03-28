@@ -39,13 +39,11 @@ rule microbeannotator:
     threads: config["threads"]
     params:
         process = 1,
-        database = config["microbeannotator_db_path"]
+        database = config["microbeannotator_db_path"],
+        output_folder = config["project_path"] + "pipeline_output/functional_annotation/"
     conda:
         config["src_path"] + "env/microbeannotator.yaml"
     shell:
         """
-        microbeannotator  -p {params.process} -t {threads} -m diamond --database {params.database} --clusters rows -i {input}
+        microbeannotator  -p {params.process} -t {threads} -m diamond --database {params.database} --cluster rows -o {params.output_folder} -i {input}
         """
-
-
-
