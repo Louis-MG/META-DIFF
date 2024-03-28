@@ -35,7 +35,7 @@ rule microbeannotator:
     input:
         expand(config["project_path"] + "pipeline_output/functional_annotation/{prefix}_protein_translation.faa", prefix = ["case", "control"])
     output:
-        config["project_path"] + "pipeline_output/functional_annotation/metabolic_summary__heatmap.pdf", config["project_path"] + "pipeline_output/functional_annotation/metabolic_summary__barplot.pdf", config["project_path"] + "pipeline_output/functional_annotation/metabolic_summary__module_completeness.pdf"
+        config["project_path"] + "pipeline_output/functional_annotation/metabolic_summary__heatmap.pdf", config["project_path"] + "pipeline_output/functional_annotation/metabolic_summary__barplot.pdf", config["project_path"] + "pipeline_output/functional_annotation/metabolic_summary__module_completeness.tab"
     threads: config["threads"]
     params:
         process = 1,
