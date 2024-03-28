@@ -14,7 +14,7 @@ The workflow is described by the following figure :
 
 ![Schematic of the META-DIFF pipeline](/figures/pipelinev3.png?raw=true "Pipeline Overview")
 
-Learn more about each step by reading the [wiki](https://github.com/Louis-MG/META-DIFF/wiki) ! :books:
+# [wiki](https://github.com/Louis-MG/META-DIFF/wiki) ! :books:
 
 # Output
 
