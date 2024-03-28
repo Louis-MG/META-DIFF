@@ -1,7 +1,3 @@
-resources:
-     mmseqs:
-          mem: 300 # Go
-
 condition:
      - case
      - control
@@ -12,7 +8,7 @@ seq_to_genomes: "/home/guelou01/seqid_in_all_seq.fna.txt"
 seq_to_species: "/home/guelou01/seqid_in_all_seq.fna_simplified_.txt"
 src_path: "/mnt/projects_tn03/KMER_analysis/META-DIFF/"
 project_path: "/mnt/ssd/LM/"
-fof: "/mnt/projects_tn03/KMER_analysis/META-DIFF/fof.txt"
+fof: "/mnt/projects_tn03/KMER_analysis/DATA/AcneData/fof.txt"
 
 threads: 120
 unitig_length: 1000
