@@ -1,16 +1,15 @@
 #!/bin/python3
 
 import argparse
-import numpy as np
 import os
 import sys
 import re
-from typing import List, Dict, Union
+from typing import Union
 from math import tan, pi
 from scipy.stats import cauchy
 
 
-def getArgs() :
+def getArgs():
 	parser = argparse.ArgumentParser(description='Aggregates pvalues from kmdiff to a single p-value per unitig.')
 	parser.add_argument('-k', '--kmdiff', type=str, dest = 'kmdiff_input_path', action = 'store', required=True,
                     help = 'Path to the kmdiff fasta file.')
@@ -24,10 +23,12 @@ def getArgs() :
 	return(args)
 
 
-def verif_input(path: Union[str, bytes, os.PathLike]) :
+def verif_input(path: Union[str, bytes, os.PathLike]):
 	"""
-	Checks that the input file exists.
-	path : string or path-like object.
+	Verifies that the input path is valid.
+	:param
+	path: Path to the input file.
+	:return: nothing
 	"""
 	path = str(path)
 	if os.path.isfile(path):
@@ -37,9 +38,10 @@ def verif_input(path: Union[str, bytes, os.PathLike]) :
 		sys.exit()
 
 
-def verif_output(path: Union[str, bytes, os.PathLike], prefix: str) :
+def verif_output(path: Union[str, bytes, os.PathLike], prefix: str):
 	"""
 	Checks that the output directorory exists and that no file with output name exists already.
+	:param
 	path : string or path-like object.
 	"""
 	path = str(path)
@@ -89,19 +91,19 @@ def load_pvalue_dict(path: Union[str, bytes, os.PathLike]) -> dict[str, float]:
 
 
 def reverse_complement(kmer: str):
-        """
-        Reverse complement a kmer.
-        kmer: string
-        """
-        rev_compl_kmer = ""
-        rev_kmer = kmer[::-1]
-        dict_reverse_nucleotides = {"A":"T", "T":"A", "C":"G", "G":"C"}
-        for i in range(0, len(kmer)) :
-                rev_compl_kmer += dict_reverse_nucleotides[rev_kmer[i]]
-        return rev_compl_kmer
+	"""
+	Reverse complement a kmer.
+	kmer: string
+	"""
+	rev_compl_kmer = ""
+	rev_kmer = kmer[::-1]
+	dict_reverse_nucleotides = {"A":"T", "T":"A", "C":"G", "G":"C"}
+	for i in range(0, len(kmer)) :
+			rev_compl_kmer += dict_reverse_nucleotides[rev_kmer[i]]
+	return rev_compl_kmer
 
 
-class Unitig(object) :
+class Unitig(object):
 	"""
 	Object representing a unitig, with its sequence and aggregated pvalue.
 	"""
@@ -114,12 +116,13 @@ class Unitig(object) :
 		self.kmer_pvalues = kmer_pvalues
 
 
-def make_unitig(sequence: str, kmer_dict: dict[str, float]) -> object :
+def make_unitig(sequence: str, kmer_dict: dict[str, float]) -> object:
 	"""
 	Takes a sequence and/or a pvalue to build and return an object of class unitig.
 	sequence : string
 	pvalue : float
 	kmer_pvalues : list of floats
+	:return: an object of class Unitig
 	"""
 	list_kmer_pvalues = []
 	for i in range(0, len(sequence)-31):
@@ -151,10 +154,11 @@ def load_unitigs(path: Union[str, bytes, os.PathLike], kmer_dict: dict[str, floa
 	return list_unitigs
 
 
-def CCT(unitig: object) -> object :
+def CCT(unitig: object) -> object:
 	"""
-	Cauchy Combination Test application.
-	pvalues: list of floats
+	Calculates the CCT of a unitig.
+	:param unitig: an object of class Unitig
+	:return: object of class Unitig
 	"""
 	cauchy_values = [tan((0.5-x)*pi) for x in unitig.kmer_pvalues]
 	cauchy_stat = sum(cauchy_values)/len(cauchy_values)
@@ -173,6 +177,9 @@ def CCT(unitig: object) -> object :
 
 
 def main(kmdiff_input_path: Union[str, bytes, os.PathLike], unitigs_input_path: Union[str, bytes, os.PathLike], output_path: Union[str, bytes, os.PathLike], prefix: str):
+	"""
+	Main function for running pvalues aggregation on unitigs.
+	"""
 	verif_input(kmdiff_input_path)
 	verif_input(unitigs_input_path)
 	verif_output(output_path, prefix)
@@ -184,6 +191,6 @@ def main(kmdiff_input_path: Union[str, bytes, os.PathLike], unitigs_input_path: 
 	print("Aggregation done !")
 
 
-if __name__ == "__main__" :
+if __name__ == "__main__":
 	args = getArgs()
 	main(args.kmdiff_input_path, args.unitigs_input_path, args.output_path, args.prefix)
