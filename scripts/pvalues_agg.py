@@ -26,14 +26,13 @@ def getArgs():
 def verif_input(path: Union[str, bytes, os.PathLike]):
 	"""
 	Verifies that the input path is valid.
-	:param
-	path: Path to the input file.
+	:param path: Path to the input file.
 	:return: nothing
 	"""
 	path = str(path)
 	if os.path.isfile(path):
 		pass
-	else :
+	else:
 		print(f"ERROR: file {path} does not exist or is not a file.")
 		sys.exit()
 
@@ -41,13 +40,14 @@ def verif_input(path: Union[str, bytes, os.PathLike]):
 def verif_output(path: Union[str, bytes, os.PathLike], prefix: str):
 	"""
 	Checks that the output directorory exists and that no file with output name exists already.
-	:param
-	path : string or path-like object.
+	:param path : string or path-like object to the output directory.
+	:param prefix : string for the output file prefix.
+	:return: nothing
 	"""
 	path = str(path)
 	if os.path.isdir(path) :
 		pass
-	else :
+	else:
 		print(f"ERROR: folder {path} not found.")
 		sys.exit()
 	if os.path.isfile(path+"/"+prefix+"_unclassified.aggregated.fa") :
@@ -58,18 +58,22 @@ def verif_output(path: Union[str, bytes, os.PathLike], prefix: str):
 def write_output(path: Union[str, bytes, os.PathLike], list_unitigs: list[object], prefix: str):
 	"""
 	Writes output.
-	path : string or path-like object.
+	:param path : string or path-like object to the output directory.
+	:param list_unitigs : list of unitigs.
+	:param prefix : string for the output file prefix.
+	:return: nothing
 	"""
 	with open(path+"/"+prefix+"_unclassified.aggregated.fa", 'w') as f:
 		for i in range(0, len(list_unitigs)):
-			f.write( ">unitig_"+str(i)+"_pval="+str(list_unitigs[i].pvalue))
+			f.write(">unitig_"+str(i)+"_pval="+str(list_unitigs[i].pvalue))
 			f.write("\n"+list_unitigs[i].sequence)
 
 
 def load_pvalue_dict(path: Union[str, bytes, os.PathLike]) -> dict[str, float]:
 	"""
-	Loads the fasta file from kmdiff output as a dictionnary :  {'sequence':'p-value'} and returns the dictionnary.
-	path: string or path-like object.
+	Loads the fasta file from kmdiff output as a dictionary :  {'sequence':'p-value'} and returns the dictionnary.
+	:param path: string or path-like object.
+	:return: A dictionary containing kmers and their pvalues.
 	"""
 	kmer_2_pvalue = dict()
 	with open(path) as f :
@@ -93,7 +97,8 @@ def load_pvalue_dict(path: Union[str, bytes, os.PathLike]) -> dict[str, float]:
 def reverse_complement(kmer: str):
 	"""
 	Reverse complement a kmer.
-	kmer: string
+	:param kmer: string
+	:return: reversed complement string of the kmer.
 	"""
 	rev_compl_kmer = ""
 	rev_kmer = kmer[::-1]
@@ -139,7 +144,9 @@ def make_unitig(sequence: str, kmer_dict: dict[str, float]) -> object:
 def load_unitigs(path: Union[str, bytes, os.PathLike], kmer_dict: dict[str, float]) -> list[object]:
 	"""
 	Loads unitigs as objects from the unitigs fasta file.
-	path : string or path-like object.
+	:param path : string or path-like object.
+	:param kmer_dict : dictionary of kmers and their corresponding pvalues.
+	:return: list of objects of class Unitig with aggregated pvalues.
 	"""
 	list_unitigs = []
 	with open(path) as f :
@@ -158,7 +165,7 @@ def CCT(unitig: object) -> object:
 	"""
 	Calculates the CCT of a unitig.
 	:param unitig: an object of class Unitig
-	:return: object of class Unitig
+	:return: object of class Unitig with aggregated pvalues.
 	"""
 	cauchy_values = [tan((0.5-x)*pi) for x in unitig.kmer_pvalues]
 	cauchy_stat = sum(cauchy_values)/len(cauchy_values)
