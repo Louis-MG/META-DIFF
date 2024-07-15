@@ -13,3 +13,4 @@ fof: "/mnt/projects_tn03/KMER_analysis/DATA/AcneData/fof.txt"
 threads: 120
 unitig_length: 1000
 bcalm_memory: 20000
+partitions: 30

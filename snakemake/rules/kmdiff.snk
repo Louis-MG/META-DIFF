@@ -9,13 +9,14 @@ rule kmdiff_count:
     threads: config["threads"]
     params:
         output_folder = config["project_path"] + "pipeline_output/kmdiff_output/"
+        partitions = config["partitions"]
     conda:
         config["src_path"] + "env/kmdiff.yaml"
     shell:
         """
         ulimit -n 10000
 	rm -d {params.output_folder}
-        kmdiff count -f {input} -d {params.output_folder} -t {threads} --nb-partitions 40
+        kmdiff count -f {input} -d {params.output_folder} -t {threads} --nb-partitions {params.partitions}
         """
 
 ########### diff
