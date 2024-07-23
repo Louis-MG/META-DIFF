@@ -9,7 +9,7 @@ rule mmseqs_bdd:
     params:
         output_dir = config["project_path"] + "pipeline_output/QUERY_UNITIGS_DB/"
     conda :
-        config["src_path"] + "env/mmseqs.yaml"
+        "../../env/mmseqs.yaml"
     shell:
         """
         mmseqs createdb {input} {output} --dbtype 2
@@ -26,7 +26,7 @@ rule mmseqs_search:
         temp_folder = config["project_path"] + "pipeline_output/temp/"
     threads: config["threads"]
     conda :
-        config["src_path"] + "env/mmseqs.yaml"
+        "../../env/mmseqs.yaml"
     shell:
         """
         mmseqs search {input} {params.true_output} {params.temp_folder} --threads {threads} --max-seq-len 100000 -a --search-type 3 --start-sens 1 --sens-steps 3 -s 7
@@ -43,7 +43,7 @@ rule mmseqs_convert:
     params:
         results_db = config["project_path"] + "pipeline_output/RESULTS_DB/resultsDB"
     conda :
-        config["src_path"] + "env/mmseqs.yaml"
+        "../../env/mmseqs.yaml"
     shell:
         """
         mmseqs convertalis {input.unitigs} {input.taxo_db} {params.results_db} {output} --threads {threads} --format-output query,target,fident,alnlen,mismatch,gapopen,qstart,qend,tstart,tend,evalue,bits,qset
@@ -73,7 +73,7 @@ rule mmseqs_sumup:
     params:
         condition_name = lambda wildcards: wildcards.condition,
         output = config["project_path"] + "pipeline_output/taxonomy",
-        script_path = config["src_path"] + "scripts/hits.sh",
+        script_path = "../../scripts/hits.sh",
     shell:
         #va falloir donner l"exemple du fichier de conversion
         """
