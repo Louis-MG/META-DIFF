@@ -8,7 +8,7 @@ rule kmdiff_count:
         config["project_path"] + "pipeline_output/kmdiff_output/run_infos.txt"
     threads: config["threads"]
     params:
-        output_folder = config["project_path"] + "pipeline_output/kmdiff_output/"
+        output_folder = config["project_path"] + "pipeline_output/kmdiff_output/",
         partitions = config["partitions"]
     conda:
         config["src_path"] + "env/kmdiff.yaml"
