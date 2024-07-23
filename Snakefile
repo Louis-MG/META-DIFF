@@ -12,7 +12,7 @@ from subprocess import Popen, PIPE
 import pandas as pd
 from pathlib import Path
 
-configfile: "config.yaml"
+configfile: "./config.yaml"
 ruleorder: kmdiff_count > kmdiff_diff > kmdiff_dump > bcalm > mmseqs_bdd > mmseqs_search > mmseqs_convert > mmseqs_sep > mmseqs_sumup > annot_extract_candidates > glmnet_extract > glmnet_pval_agg > glmnet_matrix > glmnet_class > prodigal > microbeannotator
 
 

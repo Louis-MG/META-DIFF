@@ -11,7 +11,7 @@ rule kmdiff_count:
         output_folder = config["project_path"] + "pipeline_output/kmdiff_output/",
         partitions = config["partitions"]
     conda:
-        config["src_path"] + "env/kmdiff.yaml"
+        "../../env/kmdiff.yaml"
     shell:
         """
         ulimit -n 10000
@@ -31,7 +31,7 @@ rule kmdiff_diff:
         output_folder = config["project_path"] + "pipeline_output/kmdiff_output/"
     threads: config["threads"]
     conda:
-        config["src_path"] + "env/kmdiff.yaml"
+        "../../env/kmdiff.yaml"
     shell:
         """
         ulimit -n 10000
@@ -49,7 +49,7 @@ rule kmdiff_dump:
     params:
         input_folder = config["project_path"] + "pipeline_output/kmdiff_output/"
     conda :
-        config["src_path"] + "env/kmtricks.yaml"
+        "../../env/kmtricks.yaml"
     shell:
         """
         kmtricks aggregate --run-dir {params.input_folder}/positive_kmer_matrix --matrix kmer --cpr-in > {output}

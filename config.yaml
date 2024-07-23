@@ -6,7 +6,7 @@ microbeannotator_db_path: "/mnt/scratch/LM/KMER/MicrobeAnnotator_DB/"
 taxonomic_db_path: "/mnt/scratch/LM/KMER/ncbi_database/NCBI_ALL_DB"
 seq_to_genomes: "/home/guelou01/seqid_in_all_seq.fna.txt"
 seq_to_species: "/home/guelou01/seqid_in_all_seq.fna_simplified_.txt"
-src_path: "./"
+src_path: "/path/to/META-DIFF/"
 project_path: "/mnt/ssd/LM/"
 fof: "/mnt/projects_tn03/KMER_analysis/DATA/AcneData/fof.txt"
 

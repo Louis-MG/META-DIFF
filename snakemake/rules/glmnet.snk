@@ -25,7 +25,7 @@ rule glmnet_pval_agg:
         script_path = config['src_path'] + "scripts/pvalues_agg.py",
         condition_name = lambda wildcards: wildcards.condition
     conda:
-        config["src_path"] + "env/python.3.10.yaml"
+        "../../env/python.3.10.yaml"
     shell:
         """
         python3 {params.script_path} -k {input.kmers} -u {input.unitigs} -o {params.output} -p {params.condition_name}
@@ -59,7 +59,7 @@ rule glmnet_class:
         split = 0.75,
         script_path = config['src_path'] + "scripts/elasticNet_and_heatmap.R"
     conda:
-        config["src_path"] + "env/glmnet.yaml"
+        "../../env/glmnet.yaml"
     shell:
         """
         nb_control=$(grep -c -F "case" {input.fof})
