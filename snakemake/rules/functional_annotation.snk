@@ -4,7 +4,7 @@ rule annot_extract_candidates:
     input:
         config["project_path"] + "pipeline_output/kmdiff_output/{condition}_kmers.unitigs.fa"
     output:
-        config["project_path"] + "pipeline_output/functional_annotation/{condition}_unitigs.1000.fa"
+        config["project_path"] + "pipeline_output/functional_annotation/{condition}_unitigs.filtered.fa"
     params:
         length = config["unitig_length"]
     conda:
@@ -17,7 +17,7 @@ rule annot_extract_candidates:
 
 rule prodigal:
     input:
-        config["project_path"] + "pipeline_output/functional_annotation/{condition}_unitigs.1000.fa"
+        config["project_path"] + "pipeline_output/functional_annotation/{condition}_unitigs.filtered.fa"
     output:
         config["project_path"] + "pipeline_output/functional_annotation/{condition}_protein_translation.faa", config["project_path"] + "pipeline_output/functional_annotation/{condition}_coords.gbk"
     threads : config["threads"]
