@@ -73,7 +73,7 @@ rule mmseqs_sumup:
     params:
         condition_name = lambda wildcards: wildcards.condition,
         output = config["project_path"] + "pipeline_output/taxonomy",
-        script_path = "../../scripts/hits.sh",
+        script_path = "scripts/hits.sh",
     shell:
         #va falloir donner l"exemple du fichier de conversion
         """
