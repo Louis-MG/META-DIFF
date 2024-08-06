@@ -6,7 +6,7 @@ rule glmnet_extract:
         config["project_path"] + "pipeline_output/glmnet/{condition}_unclassified.unitigs.fa"
     params:
         output = config["project_path"] + "pipeline_output/glmnet/",
-        script_path = config['src_path'] + "scripts/find_unaligned.sh",
+        script_path = "scripts/find_unaligned.sh",
 	condition_name = lambda wildcards: wildcards.condition
     shell:
         """
@@ -22,7 +22,7 @@ rule glmnet_pval_agg:
         config["project_path"] + "pipeline_output/glmnet/{condition}_unclassified.aggregated.fa"
     params:
         output = config["project_path"] + "pipeline_output/glmnet/",
-        script_path = config['src_path'] + "scripts/pvalues_agg.py",
+        script_path = "scripts/pvalues_agg.py",
         condition_name = lambda wildcards: wildcards.condition
     conda:
         "../../env/python.3.10.yaml"
@@ -40,7 +40,7 @@ rule glmnet_matrix:
         config["project_path"] + "pipeline_output/glmnet/top_unknown_kmers.fa", config["project_path"] + "pipeline_output/glmnet/top_unknown_matrix.txt"
     params:
         output = config["project_path"] + "pipeline_output/glmnet/",
-        script_path = config['src_path'] + "scripts/matrix_unknown_kmers.sh"
+        script_path = "scripts/matrix_unknown_kmers.sh"
     shell:
         """
         bash {params.script_path} -i {input.case},{input.control} -m {input.matrix} -o {params.output}
@@ -57,7 +57,7 @@ rule glmnet_class:
     params:
         output_folder = config["project_path"] + "pipeline_output/glmnet/",
         split = 0.75,
-        script_path = config['src_path'] + "scripts/elasticNet_and_heatmap.R"
+        script_path = "scripts/elasticNet_and_heatmap.R"
     conda:
         "../../env/glmnet.yaml"
     shell:
