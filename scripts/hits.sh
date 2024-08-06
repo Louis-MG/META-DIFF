@@ -91,15 +91,16 @@ sed -i 's/ /\t/1' "$output"/"$prefix"_tmp.txt
 sed -i 's/ /\t/1' "$output"/"$prefix"_tmp_simple.txt
 
 #sort les lignes par especes
-sort -T /mnt/ssd/LM/tmp/ -k2 -t $'\t'  "$output"/"$prefix"_tmp.txt > "$output"/"$prefix"_tmp_sorted.txt
-sort -T /mnt/ssd/LM/tmp/ -k2 -t $'\t'  "$output"/"$prefix"_tmp_simple.txt > "$output"/"$prefix"_tmp_sorted_simple.txt
+mkdir "$output"/tmp/
+sort -T "$output"/temp/ -k2 -t $'\t'  "$output"/"$prefix"_tmp.txt > "$output"/"$prefix"_tmp_sorted.txt
+sort -T "$output"/temp/ -k2 -t $'\t'  "$output"/"$prefix"_tmp_simple.txt > "$output"/"$prefix"_tmp_sorted_simple.txt
 
 #addition des longueurs d'alignement si $2 = prev
 awk -F'\t' 'BEGIN {sum = 0; prev=""; OFS="\t"} ($2 == prev){sum+=$1}  ($2 != prev){print sum, prev; sum = $1; prev = $2} END {print sum, prev}' "$output"/"$prefix"_tmp_sorted.txt > "$output"/"$prefix"_tmp1.txt
 awk -F'\t' 'BEGIN {sum = 0; prev=""; OFS="\t"} ($2 == prev){sum+=$1}  ($2 != prev){print sum, prev; sum = $1; prev = $2} END {print sum, prev}' "$output"/"$prefix"_tmp_sorted_simple.txt > "$output"/"$prefix"_tmp1_simple.txt
 
 #ordonne par score
-sort -T /mnt/ssd/LM/tmp/ -k1 -r -g -t $'\t' "$output"/"$prefix"_tmp1.txt > "$output"/"$prefix"_alignment_summary_detailed.txt
-sort -T /mnt/ssd/LM/tmp/ -k1 -r -g -t $'\t' "$output"/"$prefix"_tmp1_simple.txt > "$output"/"$prefix"_alignment_summary.txt
+sort -T "$output"/temp/ -k1 -r -g -t $'\t' "$output"/"$prefix"_tmp1.txt > "$output"/"$prefix"_alignment_summary_detailed.txt
+sort -T "$output"/temp/ -k1 -r -g -t $'\t' "$output"/"$prefix"_tmp1_simple.txt > "$output"/"$prefix"_alignment_summary.txt
 
 rm "$output"/"$prefix"_tmp*
