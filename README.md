@@ -49,6 +49,7 @@ alpha	lambda	Accuracy	Kappa	AccuracySD	KappaSD
 
 # Requirements 
 
+Check the wiki first, section `Required files format`. Wiki will soon contain information (like a script or something) to help building the files.
 Memory (RAM) needed will depend on the size of your alignment database.
 Disk space required mostly depends on the size of your dataset and databases. The number of kmers for 3To of CRC fasta files reached hundreds of millions, wich is about 500G of fasta files for the first step. Other steps will use less disk. The database of `MicrobeAnnotator` is about 690G.
 
