@@ -57,13 +57,13 @@ def get_unitigs_dict(unitigs_path: Union[str, bytes, os.PathLike]) -> Dict[str, 
     """
     unitigs_dict = {}
     for record in SeqIO.parse(unitigs_path, "fasta"):
-        unitigs_dict[record.id] = record.seq
+        unitigs_dict[record.id.split(" ")[0]] = record.seq
     return unitigs_dict
 
 def write_output(path_output: Union[str, bytes, os.PathLike], gene_header_to_gene_function_dict: Dict[str, List[str]], unitigs_dict: Dict[str, str], gene_header_to_gene_seq_dict):
     """
     Writes tab-separated output file to the output directory. Format is gene header, gene translated sequence, corresponding
-    unitig header, unitig sequence, KO umber, gene function.
+    unitig header, unitig sequence, KO number, gene function.
     :param path_output: path to output file.
     :param gene_header_to_gene_function_dict: dictionary of gene headers to their KO number and function.
     :param unitigs_dict: dictionary of unitigs headers and their sequence.
@@ -72,7 +72,10 @@ def write_output(path_output: Union[str, bytes, os.PathLike], gene_header_to_gen
     with open(path_output, "w") as f:
         f.write(f"{'gene_header'}\t{'gene_translated_seq'}\t{'unitig_header'}\t{'unitig_seq'}\t{'gene_KO'}\t{'gene_function'}\n")
         for gene in gene_header_to_gene_seq_dict.keys():
-            f.write(f"{gene}\t{gene_header_to_gene_seq_dict[gene]}\t{gene.rstrip('_')}\t{unitigs_dict[gene.rstrip('_')]}\t{gene_header_to_gene_function_dict[gene][1]}\t{gene_header_to_gene_function_dict[gene][2]}\n")
+            try:
+                f.write(f"{gene}\t{gene_header_to_gene_seq_dict[gene]}\t{gene.split('_')[0]}\t{unitigs_dict['>'+gene.split('_')[0]]}\t{gene_header_to_gene_function_dict[gene][1]}\t{gene_header_to_gene_function_dict[gene][2]}\n")
+            except KeyError:
+                print(f"{gene} has no annotation.") #TODO: mettre ca dans un fichier de sortie comme gene_no_annotation.txt
     print(f"Output written to {path_output}")
 
 def main():
