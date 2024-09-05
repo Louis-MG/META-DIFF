@@ -47,3 +47,16 @@ rule microbeannotator:
         """
         microbeannotator  -p {params.process} -t {threads} -m diamond --database {params.database} --cluster rows -o {params.output_folder} -i {input}
         """
+
+rule summary_table:
+    input:
+        expand(config["project_path"] + "pipeline_output/functional_annotation/{condition}_protein_translation.faa"),
+        expand(config["project_path"] + "pipeline_output/kmdifff_output/{condition}_unitigs.filtered.fa"),
+    output:
+    params:
+        script_path = "scripts/pvalues_agg.py"
+    conda: "../../env/python.3.10.yaml"
+    shell:
+        """
+	python3 unitigs_to_functions.py -a -g -o -u
+        """
