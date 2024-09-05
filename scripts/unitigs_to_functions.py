@@ -70,7 +70,7 @@ def write_output(path_output: Union[str, bytes, os.PathLike], gene_header_to_gen
     :param gene_header_to_gene_seq_dict: dictionary of gene headers to their translated sequence.
     """
     with open(path_output, "w") as f:
-        f.write(f"{'gene_header'}\t{'gene_seq'}\t{'unitig_header'}\t{'unitig_seq'}\t{'gene_KO'}\t{'gene_function'}\n")
+        f.write(f"{'gene_header'}\t{'gene_translated_seq'}\t{'unitig_header'}\t{'unitig_seq'}\t{'gene_KO'}\t{'gene_function'}\n")
         for gene in gene_header_to_gene_seq_dict.keys():
             f.write(f"{gene}\t{gene_header_to_gene_seq_dict[gene]}\t{gene.rstrip('_')}\t{unitigs_dict[gene.rstrip('_')]}\t{gene_header_to_gene_function_dict[gene][1]}\t{gene_header_to_gene_function_dict[gene][2]}\n")
     print(f"Output written to {path_output}")
@@ -78,7 +78,7 @@ def write_output(path_output: Union[str, bytes, os.PathLike], gene_header_to_gen
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-a', '--annot', required=True, type=str, help='Genes annotation file.')
-    parser.add_argument('-g', '--gene_seq', required=True, type=str, help='Gene translation file.')
+    parser.add_argument('-g', '--gene_translation_seq', required=True, type=str, help='Gene translation file.')
     parser.add_argument('-o', '--output', required=True, type=str, help='Output folder.')
     parser.add_argument('-u', '--unitigs', required=True, type=str, help='Unitigs file.')
     parser.add_argument('-c', '--case', required=True, type=str, help='Case or Control condition.')
