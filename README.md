@@ -47,6 +47,12 @@ alpha	lambda	Accuracy	Kappa	AccuracySD	KappaSD
 ```
 ![Heatmap](/figures/heatmap.png "Exemple of a classification heatmap with unclassified k-mers")
 
+ - table of unitigs to functions by condition. Each unitig is linked to the genes it contains and their funciton, KO number.
+
+| Unitig ID     | Unitig seq      | Gene ID | Gene seq | Gene funciton | KO |
+| ------------- | ------------- | ------------- | ------------- | ------------- | ------------- |
+| Unitig1 | ACGTCGCT | Gene1 | ACGT | Glucose transferas | K00001 | 
+
 # Requirements 
 
 Check the wiki first, section `Required files format`. Wiki will soon contain information (like a script or something) to help building the files.
