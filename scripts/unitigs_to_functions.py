@@ -81,6 +81,7 @@ def main():
     parser.add_argument('-g', '--gene_seq', required=True, type=str, help='Gene translation file.')
     parser.add_argument('-o', '--output', required=True, type=str, help='Output folder.')
     parser.add_argument('-u', '--unitigs', required=True, type=str, help='Unitigs file.')
+    parser.add_argument('-c', '--case', required=True, type=str, help='Case or Control condition.')
     args = parser.parse_args()
 
     check_input(args.annot, args.gene_seq, args.unitigs)
@@ -90,7 +91,7 @@ def main():
     gene_header_to_gene_seq = get_gene_header_to_gene_seq_dict(args.gene_seq)
     unitigs = get_unitigs_dict(args.unitigs)
 
-    output_file_path = args.output + "/unitigs_to_gene_functions.tsv"
+    output_file_path = args.output + "/" + args.case + "_unitigs_to_gene_functions.tsv"
     write_output(output_file_path, gene_header_to_gene_function_dict=gene_header_to_gene_function, unitigs_dict=unitigs, gene_header_to_gene_seq_dict=gene_header_to_gene_seq)
 
 
