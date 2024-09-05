@@ -12,7 +12,7 @@ Metagenomics becomes increasingly important in building our knowledge about micr
 
 The workflow is described by the following figure :
 
-![Schematic of the META-DIFF pipeline](/figures/pipelinev3.png?raw=true "Pipeline Overview")
+![Schematic of the META-DIFF pipeline](/figures/pipeline.png?raw=true "Pipeline Overview")
 
 # [wiki](https://github.com/Louis-MG/META-DIFF/wiki) ! :books:
 
