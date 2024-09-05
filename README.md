@@ -51,7 +51,9 @@ alpha	lambda	Accuracy	Kappa	AccuracySD	KappaSD
 
 | Unitig ID     | Unitig seq      | Gene ID | Gene seq | Gene funciton | KO |
 | ------------- | ------------- | ------------- | ------------- | ------------- | ------------- |
-| Unitig1 | ACGTCGCT | Gene1 | ACGT | Glucose transferas | K00001 | 
+| Unitig1 | ACGTCGCT | Gene1 | ACGT | Glucose transferase | K00001 | 
+| Unitig1 | ACGTCGCT | Gene2 | GCT | Protease | K00004 |
+| Unitig2 | GTCGATCATG | Gene1 | CGATCA | Oxydase | K00761 |
 
 # Requirements 
 
