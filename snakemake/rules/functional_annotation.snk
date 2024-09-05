@@ -50,13 +50,17 @@ rule microbeannotator:
 
 rule summary_table:
     input:
-        expand(config["project_path"] + "pipeline_output/functional_annotation/{condition}_protein_translation.faa"),
-        expand(config["project_path"] + "pipeline_output/kmdifff_output/{condition}_unitigs.filtered.fa"),
+        config["project_path"] + "pipeline_output/functional_annotation/{condition}_protein_translation.faa"
     output:
+        config["project_path"] + "pipeline_output/functional_annotation/{condition}_unitigs_to_gene_functions.tsv"
     params:
-        script_path = "scripts/pvalues_agg.py"
-    conda: "../../env/python.3.10.yaml"
+        unitigs = config["project_path"] + "pipeline_output/kmdifff_output/{condition}_unitigs.filtered.fa",
+        annot = config["project_path"] + "pipeline_output/functional_annotation/{condition}_protein_translation.faa.annot,
+        output = config["project_path"] + "pipeline_output/functional_annotation/",
+        script_path = "scripts/summary_table.py"
+    conda: 
+        "../../env/python.3.10.yaml"
     shell:
         """
-	python3 unitigs_to_functions.py -a -g -o -u
+	python3 {params.script_path} -a {params.annot} -g {input} -o {params.output} -u {params.unitigs} -c {condition}
         """
