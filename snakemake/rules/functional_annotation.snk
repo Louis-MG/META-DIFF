@@ -55,7 +55,7 @@ rule summary_table:
         config["project_path"] + "pipeline_output/functional_annotation/{condition}_unitigs_to_gene_functions.tsv"
     params:
         unitigs = config["project_path"] + "pipeline_output/kmdifff_output/{condition}_unitigs.filtered.fa",
-        annot = config["project_path"] + "pipeline_output/functional_annotation/{condition}_protein_translation.faa.annot,
+        annot = config["project_path"] + "pipeline_output/functional_annotation/{condition}_protein_translation.faa.annot",
         output = config["project_path"] + "pipeline_output/functional_annotation/",
         script_path = "scripts/summary_table.py"
     conda: 
