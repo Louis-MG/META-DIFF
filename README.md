@@ -49,11 +49,11 @@ alpha	lambda	Accuracy	Kappa	AccuracySD	KappaSD
 
  - table of unitigs to functions by condition. Each unitig is linked to the genes it contains and their funciton, KO number.
 
-| Unitig ID     | Unitig seq      | Gene ID | Gene seq | Gene funciton | KO |
+| Unitig ID     | Unitig seq      | Gene ID | Translated Gene seq | Gene funciton | KO |
 | ------------- | ------------- | ------------- | ------------- | ------------- | ------------- |
-| Unitig1 | ACGTCGCT | Gene1 | ACGT | Glucose transferase | K00001 | 
-| Unitig1 | ACGTCGCT | Gene2 | GCT | Protease | K00004 |
-| Unitig2 | GTCGATCATG | Gene1 | CGATCA | Oxydase | K00761 |
+| Unitig1 | ACGTCGCT | Gene1 | ARDENE | Glucose transferase | K00001 | 
+| Unitig1 | ACGTCGCT | Gene2 | WPH | Protease | K00004 |
+| Unitig2 | GTCGATCATG | Gene1 | IFPSY | Oxydase | K00761 |
 
 # Requirements 
 
