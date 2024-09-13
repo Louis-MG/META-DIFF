@@ -50,17 +50,18 @@ rule microbeannotator:
 
 rule summary_table:
     input:
-        config["project_path"] + "pipeline_output/functional_annotation/{condition}_protein_translation.faa"
+        translation = config["project_path"] + "pipeline_output/functional_annotation/{condition}_protein_translation.faa",
+        unitigs = config["project_path"] + "pipeline_output/kmdifff_output/{condition}_unitigs.filtered.fa",
+        annot = config["project_path"] + "pipeline_output/functional_annotation/{condition}_protein_translation.faa.annot"
     output:
         config["project_path"] + "pipeline_output/functional_annotation/{condition}_unitigs_to_gene_functions.tsv"
     params:
-        unitigs = config["project_path"] + "pipeline_output/kmdifff_output/{condition}_unitigs.filtered.fa",
-        annot = config["project_path"] + "pipeline_output/functional_annotation/{condition}_protein_translation.faa.annot",
         output = config["project_path"] + "pipeline_output/functional_annotation/",
-        script_path = "scripts/summary_table.py"
+        script_path = "scripts/summary_table.py",
+	condition = {condition}
     conda: 
         "../../env/python.3.10.yaml"
     shell:
         """
-	python3 {params.script_path} -a {params.annot} -g {input} -o {params.output} -u {params.unitigs} -c {condition}
+	python3 {params.script_path} -a {input.annot} -g {input.translation} -o {params.output} -u {input.unitigs} -c {params.condition}
         """
