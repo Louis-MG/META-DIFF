@@ -58,10 +58,10 @@ rule summary_table:
     params:
         output = config["project_path"] + "pipeline_output/functional_annotation/",
         script_path = "scripts/summary_table.py",
-	condition = {condition}
+        condition_name = lambda wildcards: wildcards.condition
     conda: 
         "../../env/python.3.10.yaml"
     shell:
         """
-	python3 {params.script_path} -a {input.annot} -g {input.translation} -o {params.output} -u {input.unitigs} -c {params.condition}
+	python3 {params.script_path} -a {input.annot} -g {input.translation} -o {params.output} -u {input.unitigs} -c {params.condition_name}
         """
