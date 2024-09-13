@@ -33,8 +33,9 @@ def get_gene_header_to_gene_function_dict(annot_path: Union[str, bytes, os.PathL
     """
     gene_to_function_dict = {}
     with open(annot_path, "r") as f:
+        print("dict gene_header_to_gene_function_dict")
         for line in f:
-            gene_to_function_dict[line.strip().split("\t")[1]] = [line.strip().split("\t")[4], line.strip().split("\t")[5]]
+            gene_to_function_dict[line.strip().split("\t")[0]] = [line.strip().split("\t")[4], line.strip().split("\t")[5]]
     return gene_to_function_dict
 
 def get_gene_header_to_gene_seq_dict(gene_seq_path: Union[str, bytes, os.PathLike]) -> Dict[str, str]:
@@ -45,6 +46,7 @@ def get_gene_header_to_gene_seq_dict(gene_seq_path: Union[str, bytes, os.PathLik
     """
     gene_header_to_gene_seq_dict = {}
     with open(gene_seq_path, "r") as f:
+        print("dict gene_header_to_gene_seq_dict")
         for record in SeqIO.parse(gene_seq_path, "fasta"):
             gene_header_to_gene_seq_dict[record.id.rstrip('#')] = record.seq
     return gene_header_to_gene_seq_dict
@@ -73,7 +75,7 @@ def write_output(path_output: Union[str, bytes, os.PathLike], gene_header_to_gen
         f.write(f"{'gene_header'}\t{'gene_translated_seq'}\t{'unitig_header'}\t{'unitig_seq'}\t{'gene_KO'}\t{'gene_function'}\n")
         for gene in gene_header_to_gene_seq_dict.keys():
             try:
-                f.write(f"{gene}\t{gene_header_to_gene_seq_dict[gene]}\t{gene.split('_')[0]}\t{unitigs_dict['>'+gene.split('_')[0]]}\t{gene_header_to_gene_function_dict[gene][1]}\t{gene_header_to_gene_function_dict[gene][2]}\n")
+                f.write(f"{gene}\t{gene_header_to_gene_seq_dict[gene]}\t{gene.split('_')[0]}\t{unitigs_dict[gene.split('_')[0]]}\t{gene_header_to_gene_function_dict[gene][0]}\t{gene_header_to_gene_function_dict[gene][1]}\n")
             except KeyError:
                 print(f"{gene} has no annotation.") #TODO: mettre ca dans un fichier de sortie comme gene_no_annotation.txt
     print(f"Output written to {path_output}")
