@@ -51,13 +51,13 @@ rule microbeannotator:
 rule summary_table:
     input:
         translation = config["project_path"] + "pipeline_output/functional_annotation/{condition}_protein_translation.faa",
-        unitigs = config["project_path"] + "pipeline_output/kmdifff_output/{condition}_unitigs.filtered.fa",
+        unitigs = config["project_path"] + "pipeline_output/functional_annotation/{condition}_unitigs.filtered.fa",
         annot = config["project_path"] + "pipeline_output/functional_annotation/annotation_results/{condition}_protein_translation.faa.annot"
     output:
         config["project_path"] + "pipeline_output/functional_annotation/{condition}_unitigs_to_gene_functions.tsv"
     params:
         output = config["project_path"] + "pipeline_output/functional_annotation/",
-        script_path = "scripts/summary_table.py",
+        script_path = "scripts/unitigs_to_functions.py",
         condition_name = lambda wildcards: wildcards.condition
     conda: 
         "../../env/python.3.10.yaml"
