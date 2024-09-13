@@ -91,7 +91,7 @@ def main():
     check_output(args.output)
 
     gene_header_to_gene_function = get_gene_header_to_gene_function_dict(args.annot)
-    gene_header_to_gene_seq = get_gene_header_to_gene_seq_dict(args.gene_seq)
+    gene_header_to_gene_seq = get_gene_header_to_gene_seq_dict(args.gene_translation_seq)
     unitigs = get_unitigs_dict(args.unitigs)
 
     output_file_path = args.output + "/" + args.case + "_unitigs_to_gene_functions.tsv"
