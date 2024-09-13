@@ -87,7 +87,7 @@ def main():
     parser.add_argument('-c', '--case', required=True, type=str, help='Case or Control condition.')
     args = parser.parse_args()
 
-    check_input(args.annot, args.gene_seq, args.unitigs)
+    check_input(args.annot, args.gene_translation_seq, args.unitigs)
     check_output(args.output)
 
     gene_header_to_gene_function = get_gene_header_to_gene_function_dict(args.annot)
