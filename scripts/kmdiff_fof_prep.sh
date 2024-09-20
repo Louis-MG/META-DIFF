@@ -8,6 +8,7 @@ This script generates the file of file (fof.txt) for kmdiff. Its arguments are:
 	--cases -c <PATH> path to the directory of cases samples.
 	--controls -C <PATH> path to the directory of control samples.
 	--output -o <PATH> path to where the fof should be.
+	-R1 <STRING> -R2 <STRING> strings to determine forward and reverse reads.
 	--help -h displays this help message and exits.
 
 Output is :
@@ -37,6 +38,10 @@ do
 	shift 2;;
 	-o | --output) output="$2"
 	shift 2;;
+	-1) R1="$2"
+	shift 2;;
+	-2)  R2="$2"
+	shift 2;;
 	-h | --help) Help; exit;;
 	-* | --*) unknown="$1"; echo -e "Unknown option: ${unknown}"; Help; exit;;
 	*) shift;
@@ -57,13 +62,13 @@ number_cases=$(("${number_cases}" / 2))
 seq -f 'control%g:' 1 "${number_controls}" > tempcol1
 seq -f 'case%g:' 1 "${number_cases}" >> tempcol1
 
-readlink -f ${controls}*_R1* > tempcol2
-readlink -f ${cases}*_R1* >> tempcol2
+readlink -f ${controls}*"$R1"* > tempcol2
+readlink -f ${cases}*"$R1"* >> tempcol2
 
 paste tempcol1 tempcol2 > temp
 
-readlink -f ${controls}*_R2* > tempcol3
-readlink -f ${cases}*_R2* >> tempcol3
+readlink -f ${controls}*"$R2"* > tempcol3
+readlink -f ${cases}*"$R2"* >> tempcol3
 
 sum=$(("$number_controls" + "$number_cases"))
 printf ";%0.s\n" $(seq 1 $sum) > tempsep
