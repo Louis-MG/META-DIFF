@@ -66,5 +66,5 @@ rule summary_table:
     shell:
         """
 	    python3 {params.script_path} -a {input.annot} -g {input.translation} -o {params.output} -u {input.unitigs} -c {params.condition_name}
-        mv {params.output}/{params.condition}_clades.tsv config["project_path"] + "pipeline_output/taxonomy/
+        mv {params.output}/{params.condition_name}_clades.tsv config["project_path"] + "pipeline_output/taxonomy/
         """
