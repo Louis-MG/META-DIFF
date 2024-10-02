@@ -13,7 +13,7 @@ import pandas as pd
 from pathlib import Path
 
 configfile: "./config.yaml"
-ruleorder: kmdiff_count > kmdiff_diff > kmdiff_dump > bcalm > kraken_assign > annot_extract_candidates > glmnet_extract > glmnet_pval_agg > glmnet_matrix > glmnet_class > prodigal > microbeannotator > summary_table
+ruleorder: kmdiff_count > kmdiff_diff > kmdiff_dump > bcalm > kraken_assign > annot_extract_candidates > glmnet_pval_agg > glmnet_matrix > glmnet_class > prodigal > microbeannotator > summary_table
 
 
 ##########################################################
