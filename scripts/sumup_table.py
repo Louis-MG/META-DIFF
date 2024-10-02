@@ -1,7 +1,10 @@
 import argparse
+
 from Bio import SeqIO
-from typing import Dict, Union, List
+from typing import Dict, Union, List, Tuple
 import os
+
+
 
 def check_output(path: Union[str, bytes, os.PathLike]):
     """
@@ -51,6 +54,24 @@ def get_gene_header_to_gene_seq_dict(gene_seq_path: Union[str, bytes, os.PathLik
             gene_header_to_gene_seq_dict[record.id.rstrip('#')] = record.seq
     return gene_header_to_gene_seq_dict
 
+def get_clade_and_unitigs(kraken_output_path: Union[str, bytes, os.PathLike]) -> Tuple[dict[str, str], dict[str, int]]:
+    """
+    Builds a dictionary of unitigs to the clade they were assigned to by Kraken2
+    :param kraken_output_path: path to the .output kraken output file
+    """
+    clade_align_base = {}
+    unitigs_to_clade = {}
+    with (open(kraken_output_path, "r")) as f:
+        for line in f:
+            if line.startswith("U"):
+                unitigs_to_clade[line.split("\t")[1]] = "Unclassified"
+                clade_align_base["Unclassified"] += len(line.strip().split("\t")[3])
+            else :
+                unitigs_to_clade[line.split("\t")[1]] = line.split("\t")[2]
+                clade_align_base[line.split("\t")[2]] += line.split("\t")[3]
+    return unitigs_to_clade, clade_align_base
+
+
 def get_unitigs_dict(unitigs_path: Union[str, bytes, os.PathLike]) -> Dict[str, str]:
     """
     Builds the dictionary of unitigs header and their sequence.
@@ -62,7 +83,7 @@ def get_unitigs_dict(unitigs_path: Union[str, bytes, os.PathLike]) -> Dict[str, 
         unitigs_dict[record.id.split(" ")[0]] = record.seq
     return unitigs_dict
 
-def write_output(path_output: Union[str, bytes, os.PathLike], gene_header_to_gene_function_dict: Dict[str, List[str]], unitigs_dict: Dict[str, str], gene_header_to_gene_seq_dict):
+def write_output_gene_table(path_output: Union[str, bytes, os.PathLike], gene_header_to_gene_function_dict: Dict[str, List[str]], unitigs_dict: Dict[str, str], gene_header_to_gene_seq_dict, unitigs_to_clade_dict: Dict[str, str]):
     """
     Writes tab-separated output file to the output directory. Format is gene header, gene translated sequence, corresponding
     unitig header, unitig sequence, KO number, gene function.
@@ -72,13 +93,26 @@ def write_output(path_output: Union[str, bytes, os.PathLike], gene_header_to_gen
     :param gene_header_to_gene_seq_dict: dictionary of gene headers to their translated sequence.
     """
     with open(path_output, "w") as f:
-        f.write(f"{'gene_header'}\t{'gene_translated_seq'}\t{'unitig_header'}\t{'unitig_seq'}\t{'gene_KO'}\t{'gene_function'}\n")
+        f.write(f"{'gene_header'}\t{'gene_translated_seq'}\t{'unitig_header'}\t{'unitig_seq'}\t{'gene_KO'}\t{'gene_function'}\t{'unitig_clade'}\n")
         for gene in gene_header_to_gene_seq_dict.keys():
             try:
-                f.write(f"{gene}\t{gene_header_to_gene_seq_dict[gene]}\t{gene.split('_')[0]}\t{unitigs_dict[gene.split('_')[0]]}\t{gene_header_to_gene_function_dict[gene][0]}\t{gene_header_to_gene_function_dict[gene][1]}\n")
+                unitig_header = gene.split('_')[0]
+                f.write(f"{gene}\t{gene_header_to_gene_seq_dict[gene]}\t{unitig_header}\t{unitigs_dict[unitig_header]}\t{gene_header_to_gene_function_dict[gene][0]}\t{gene_header_to_gene_function_dict[gene][1]}\t{unitigs_to_clade_dict[unitig_header]}\n")
             except KeyError:
-                print(f"{gene} has no annotation.") #TODO: mettre ca dans un fichier de sortie comme gene_no_annotation.txt
+                f.write(f"{gene}\t{gene_header_to_gene_seq_dict[gene]}\t{unitig_header}\t{unitigs_dict[unitig_header]}\t{'Unknown'}\t{'Unknown'}\t{unitigs_to_clade_dict[unitig_header]}\n")
     print(f"Output written to {path_output}")
+
+def write_output_clades_ordered(path_output: Union[str, bytes, os.PathLike], clades_to_align_length_dict: Dict[str, int]):
+    """
+    Writes the output with clades ordered by total alignment length of unitigs.
+    :param path_output: path to output directory.
+    :param clades_to_align_length_dict: dictionary of clades to their alignment length.
+    """
+    output_file_path = path_output + '/' + 'most_aligned_clades.tsv'
+    with open(output_file_path, "w") as f:
+        sorted_clades = sorted(clades_to_align_length_dict.items(), key=lambda x: x[1], reverse=True)
+        for clade in sorted_clades:
+            f.write(f"{clade[0]}\t{clade[1]}\n")
 
 def main():
     parser = argparse.ArgumentParser()
@@ -87,17 +121,20 @@ def main():
     parser.add_argument('-o', '--output', required=True, type=str, help='Output folder.')
     parser.add_argument('-u', '--unitigs', required=True, type=str, help='Unitigs file.')
     parser.add_argument('-c', '--case', required=True, type=str, help='Case or Control condition.')
+    parser.add_argument('-k', '--kraken_output', required=True, type=str, help='Kraken2 classification output file.')
     args = parser.parse_args()
 
     check_input(args.annot, args.gene_translation_seq, args.unitigs)
     check_output(args.output)
 
+
     gene_header_to_gene_function = get_gene_header_to_gene_function_dict(args.annot)
     gene_header_to_gene_seq = get_gene_header_to_gene_seq_dict(args.gene_translation_seq)
     unitigs = get_unitigs_dict(args.unitigs)
+    unitigs_to_clade, clade_base_align = get_clade_and_unitigs(args.kraken_output)
 
     output_file_path = args.output + "/" + args.case + "_unitigs_to_gene_functions.tsv"
-    write_output(output_file_path, gene_header_to_gene_function_dict=gene_header_to_gene_function, unitigs_dict=unitigs, gene_header_to_gene_seq_dict=gene_header_to_gene_seq)
+    write_output_gene_table(output_file_path, gene_header_to_gene_function_dict=gene_header_to_gene_function, unitigs_dict=unitigs, gene_header_to_gene_seq_dict=gene_header_to_gene_seq, unitigs_to_clade_dict=unitigs_to_clade)
 
 
 if __name__ == '__main__':
