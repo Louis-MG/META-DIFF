@@ -66,13 +66,13 @@ def get_clade_and_unitigs(kraken_output_path: Union[str, bytes, os.PathLike]) ->
             if line.startswith("U"):
                 unitigs_to_clade[line.split("\t")[1]] = "Unclassified"
                 try:
-                    clade_align_base["Unclassified"] += line.strip().split("\t")[3]
+                    clade_align_base["Unclassified"] = clade_align_base["Unclassified"] + line.strip().split("\t")[3]
                 except KeyError:
                     clade_align_base["Unclassified"] = line.strip().split("\t")[3]
             else :
                 unitigs_to_clade[line.split("\t")[1]] = line.split("\t")[2]
                 try :
-                    clade_align_base[line.split("\t")[2]] += line.split("\t")[3]
+                    clade_align_base[line.split("\t")[2]] = clade_align_base[line.split("\t")[2]] + line.split("\t")[3]
                 except KeyError:
                     clade_align_base[line.split("\t")[2]] = line.split("\t")[3]
     return unitigs_to_clade, clade_align_base
