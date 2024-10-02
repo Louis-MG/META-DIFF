@@ -1,0 +1,18 @@
+############### UNITIG TAXONOMY ASSIGNEMENT
+
+rule kraken_assign:
+    input:
+        config["project_path"] + "pipeline_output/kmdiff_output/{condition}_kmers.unitigs.fa"
+    output:
+        report = config["project_path"] + "pipeline_output/taxonomy/kraken_{condition}.report",
+        ouptut = config["project_path"] + "pipeline_output/taxonomy/kraken_{condition}.output"
+    threads: config["threads"]
+    params:
+        output_dir = config["project_path"] + "pipeline_output/taxonomy/"
+        database = config["kraken_database_path"]
+    conda :
+        "../../env/kraken2.yaml"
+    shell:
+        """
+        kraken2 --output {output.output} --report {output.report} --threads {threads} --db {params.database} --use-names --unclassified-out {params.output_dir}/{condition}_unclassified.unitigs.fa {input}
+        """

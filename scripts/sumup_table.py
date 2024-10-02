@@ -102,14 +102,13 @@ def write_output_gene_table(path_output: Union[str, bytes, os.PathLike], gene_he
                 f.write(f"{gene}\t{gene_header_to_gene_seq_dict[gene]}\t{unitig_header}\t{unitigs_dict[unitig_header]}\t{'Unknown'}\t{'Unknown'}\t{unitigs_to_clade_dict[unitig_header]}\n")
     print(f"Output written to {path_output}")
 
-def write_output_clades_ordered(path_output: Union[str, bytes, os.PathLike], clades_to_align_length_dict: Dict[str, int]):
+def write_output_clades_ordered(path_output: Union[str, bytes, os.PathLike], clades_to_align_length_dict: Dict[str, int], condition: str):
     """
     Writes the output with clades ordered by total alignment length of unitigs.
     :param path_output: path to output directory.
     :param clades_to_align_length_dict: dictionary of clades to their alignment length.
     """
-    output_file_path = path_output + '/' + 'most_aligned_clades.tsv'
-    with open(output_file_path, "w") as f:
+    with open(path_output, "w") as f:
         sorted_clades = sorted(clades_to_align_length_dict.items(), key=lambda x: x[1], reverse=True)
         for clade in sorted_clades:
             f.write(f"{clade[0]}\t{clade[1]}\n")
@@ -133,9 +132,10 @@ def main():
     unitigs = get_unitigs_dict(args.unitigs)
     unitigs_to_clade, clade_base_align = get_clade_and_unitigs(args.kraken_output)
 
-    output_file_path = args.output + "/" + args.case + "_unitigs_to_gene_functions.tsv"
-    write_output_gene_table(output_file_path, gene_header_to_gene_function_dict=gene_header_to_gene_function, unitigs_dict=unitigs, gene_header_to_gene_seq_dict=gene_header_to_gene_seq, unitigs_to_clade_dict=unitigs_to_clade)
-
+    output_table_path = args.output + "/" + args.case + "_unitigs_to_clade_and_gene_functions.tsv"
+    output_clades_path = args.output + "/" + args.case + "_clades.tsv"
+    write_output_gene_table(output_table_path, gene_header_to_gene_function_dict=gene_header_to_gene_function, unitigs_dict=unitigs, gene_header_to_gene_seq_dict=gene_header_to_gene_seq, unitigs_to_clade_dict=unitigs_to_clade)
+    write_output_clades_ordered(output_clades_path, clades_to_align_length_dict=clade_base_align, condition=args.case)
 
 if __name__ == '__main__':
     main()
