@@ -37,10 +37,10 @@ rule all:
         config["project_path"] + "pipeline_output/glmnet/matrix.tsv",
         expand(config['project_path'] + "pipeline_output/functional_annotation/{condition}_protein_translation.faa", condition = config["condition"]),
         config["project_path"] + "pipeline_output/functional_annotation/metabolic_summary__heatmap.pdf",
-	    expand(config["project_path"] + "pipeline_output/functional_annotation/{condition}_unitigs_to_clade_and_gene_functions.tsv", condition = ['case', 'control']),
-	    expand(config["project_path"] + "pipeline_output/taxonomy/kraken_{condition}.output, condition = ['case', 'control']"),
-	    expand(config["project_path"] + "pipeline_output/taxonomy/kraken_{condition}.report, condition = ['case', 'control']"),
-	    expand(config["project_path"] + "pipeline_output/taxonomy/{condition}_clades.tsv, condition = ['case', 'control']")
+        expand(config["project_path"] + "pipeline_output/functional_annotation/{condition}_unitigs_to_clade_and_gene_functions.tsv", condition = ['case', 'control']),
+        expand(config["project_path"] + "pipeline_output/taxonomy/kraken_{condition}.output", condition = ['case', 'control']),
+        expand(config["project_path"] + "pipeline_output/taxonomy/kraken_{condition}.report", condition = ['case', 'control']),
+        expand(config["project_path"] + "pipeline_output/taxonomy/{condition}_clades.tsv", condition = ['case', 'control'])
 
 ##########################################################
 ###########            OTHER RULES            ############

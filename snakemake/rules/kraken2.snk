@@ -8,7 +8,7 @@ rule kraken_assign:
         ouptut = config["project_path"] + "pipeline_output/taxonomy/kraken_{condition}.output"
     threads: config["threads"]
     params:
-        output_dir = config["project_path"] + "pipeline_output/taxonomy/"
+        output_dir = config["project_path"] + "pipeline_output/taxonomy/",
         database = config["kraken_database_path"]
     conda :
         "../../env/kraken2.yaml"
