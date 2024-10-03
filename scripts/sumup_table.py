@@ -109,7 +109,7 @@ def write_output_gene_table(path_output: Union[str, bytes, os.PathLike], gene_he
                 unitig_header = gene.split('_')[0]
                 f.write(f"{gene}\t{gene_header_to_gene_seq_dict[gene]}\t{unitig_header}\t{unitigs_dict[unitig_header]}\t{gene_header_to_gene_function_dict[gene][0]}\t{gene_header_to_gene_function_dict[gene][1]}\t{unitigs_to_clade_dict[unitig_header]}\n")
             except KeyError:
-                f.write(f"{gene}\t{gene_header_to_gene_seq_dict[gene]}\t{unitig_header}\t{unitigs_dict[unitig_header]}\t{'Unknown'}\t{'Unknown'}\t{unitigs_to_clade_dict[unitig_header]}\n")
+                f.write(f"{gene}\t{gene_header_to_gene_seq_dict[gene]}\t{unitig_header}\t{unitigs_dict[unitig_header]}\t{'NA'}\t{'NA'}\t{unitigs_to_clade_dict[unitig_header]}\n")
     print(f"Output written to {path_output}")
 
 def write_output_clades_ordered(path_output: Union[str, bytes, os.PathLike], clades_to_align_length_dict: Dict[str, int], condition: str):
