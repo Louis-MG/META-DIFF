@@ -16,6 +16,7 @@ def check_output(path: Union[str, bytes, os.PathLike]):
     else:
         os.makedirs(path)
 
+
 def check_input(annot_path: Union[str, bytes, os.PathLike], gene_seq_path: Union[str, bytes, os.PathLike], unitigs_path: Union[str, bytes, os.PathLike]):
     """
     Checks if input files exist.
@@ -28,6 +29,7 @@ def check_input(annot_path: Union[str, bytes, os.PathLike], gene_seq_path: Union
             print(f"ERROR: input file {i} does not exist.")
             exit(1)
 
+
 def get_gene_header_to_gene_function_dict(annot_path: Union[str, bytes, os.PathLike]) -> Dict[str, List[str]]:
     """
     Builds the dictionary of gene headers to their KO number and function.
@@ -38,8 +40,9 @@ def get_gene_header_to_gene_function_dict(annot_path: Union[str, bytes, os.PathL
     with open(annot_path, "r") as f:
         print("dict gene_header_to_gene_function_dict")
         for line in f:
-            gene_to_function_dict[line.strip().split("\t")[0]] = [line.strip().split("\t")[4], line.strip().split("\t")[5]]
+            gene_to_function_dict[line.strip().split("\t")[0]] = [line.strip().split("\t")[3], line.strip().split("\t")[4]]
     return gene_to_function_dict
+
 
 def get_gene_header_to_gene_seq_dict(gene_seq_path: Union[str, bytes, os.PathLike]) -> Dict[str, str]:
     """
@@ -54,6 +57,7 @@ def get_gene_header_to_gene_seq_dict(gene_seq_path: Union[str, bytes, os.PathLik
             gene_header_to_gene_seq_dict[record.id.rstrip('#')] = record.seq
     return gene_header_to_gene_seq_dict
 
+
 def get_clade_and_unitigs(kraken_output_path: Union[str, bytes, os.PathLike]) -> Tuple[dict[str, str], dict[str, int]]:
     """
     Builds a dictionary of unitigs to the clade they were assigned to by Kraken2
@@ -66,15 +70,15 @@ def get_clade_and_unitigs(kraken_output_path: Union[str, bytes, os.PathLike]) ->
             if line.startswith("U"):
                 unitigs_to_clade[line.split("\t")[1]] = "Unclassified"
                 try:
-                    clade_align_base["Unclassified"] = clade_align_base["Unclassified"] + line.strip().split("\t")[3]
+                    clade_align_base["Unclassified"] += int(line.strip().split("\t")[3])
                 except KeyError:
-                    clade_align_base["Unclassified"] = line.strip().split("\t")[3]
+                    clade_align_base["Unclassified"] = int(line.strip().split("\t")[3])
             else :
                 unitigs_to_clade[line.split("\t")[1]] = line.split("\t")[2]
                 try :
-                    clade_align_base[line.split("\t")[2]] = clade_align_base[line.split("\t")[2]] + line.split("\t")[3]
+                    clade_align_base[line.split("\t")[2]] += int(line.split("\t")[3])
                 except KeyError:
-                    clade_align_base[line.split("\t")[2]] = line.split("\t")[3]
+                    clade_align_base[line.split("\t")[2]] = int(line.split("\t")[3])
     return unitigs_to_clade, clade_align_base
 
 
