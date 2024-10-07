@@ -9,10 +9,11 @@ rule kraken_assign:
     threads: config["threads"]
     params:
         output_dir = config["project_path"] + "pipeline_output/taxonomy/",
+        glmnet_dir = config["project_path"] + "pipeline_output/glmnet/",
         database = config["kraken_database_path"]
     conda :
         "../../env/kraken2.yaml"
     shell:
         """
-        kraken2 --output {output.output} --report {output.report} --threads {threads} --db {params.database} --use-names --unclassified-out {params.output_dir}/{condition}_unclassified.unitigs.fa {input}
+        kraken2 --output {output.output} --report {output.report} --threads {threads} --db {params.database} --use-names --unclassified-out {params.glmnet_dir}/{condition}_unclassified.unitigs.fa {input}
         """
