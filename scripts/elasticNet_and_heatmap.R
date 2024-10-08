@@ -185,7 +185,7 @@ hm.parameters <- list((df_best_kmers_for_heatmap),
                       show_rownames = T, show_colnames = T,
                       main = "Full heatmap (Ward, Eucl, unsc)",
                       clustering_method = "ward.D2",
-                      cluster_rows = TRUE, cluster_cols = FALSE,
+                      cluster_rows = FALSE, cluster_cols = TRUE,
                       clustering_distance_rows = drows1, 
                       clustering_distance_cols = dcols1,
                       nstart=1000, angle_col = "90", hjust_col = 1, annotation_col = group)
