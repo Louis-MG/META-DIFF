@@ -19,19 +19,20 @@ The workflow is described by the following figure :
 # Output
 
 The output is divided in several key files:
- - case/control alignement summaries:
+ - kraken case/control taxonomic assignment output and report
+ - summary of the taxonomic assignment, with taxa (all levels) ordered by number of base assigned 
 
 ```
-37594334	Bacteroides ovatus strain 3725 D1 iv chromosome, complete genome
-37565498	Bacteroides ovatus strain BFG-107 chromosome, complete genome
-35771365	Bacteroides xylanisolvens strain CL11T00C03 chromosome, complete genome
-35482957	Bacteroides xylanisolvens strain funn3 chromosome, complete genome
-35106788	Bacteroides ovatus strain 2789STDY5834943, whole genome shotgun sequence
-34744737	Bacteroides xylanisolvens strain H207 chromosome, complete genome
-34093107	Bacteroides ovatus strain CL06T03C20 chromosome, complete genome
-34079552	Bacteroides xylanisolvens strain CL11T00C41 chromosome, complete genome
-33805332	Bacteroides ovatus strain FDAARGOS_733 chromosome, complete genome
-33714506	Bacteroides ovatus isolate MGYG-HGUT-01378, whole genome shotgun sequence
+Unclassified    512640685
+Bacteroides (taxid 816) 31310507
+Prevotella copri (taxid 165179) 15327700
+Phocaeicola plebeius (taxid 310297)     14988657
+Eubacteriales (taxid 186802)    14963744
+Enterobacteriaceae (taxid 543)  12643762
+Bacteroidales (taxid 171549)    11334934
+Klebsiella (taxid 570)  10345553
+Faecalibacterium prausnitzii (taxid 853)        10234613
+Bacteria (taxid 2)      10146249
 ```
 
  - case/control functional annotation in the form of a barplot, table and a heatmap of pathways detected:
@@ -49,15 +50,15 @@ alpha	lambda	Accuracy	Kappa	AccuracySD	KappaSD
 
  - table of unitigs to functions by condition. Each unitig is linked to the genes it contains and their funciton, KO number.
 
-| Unitig ID     | Unitig seq      | Gene ID | Translated Gene seq | Gene funciton | KO |
-| ------------- | ------------- | ------------- | ------------- | ------------- | ------------- |
-| Unitig1 | ACGTCGCT | Gene1 | ARDENE | Glucose transferase | K00001 | 
-| Unitig1 | ACGTCGCT | Gene2 | WPH | Protease | K00004 |
-| Unitig2 | GTCGATCATG | Gene1 | IFPSY | Oxydase | K00761 |
+| Gene ID     | Translated Gene seq      | Unitig ID | Unitig seq | Gene function | KO | CLade |
+| ------------- | ------------- | ------------- | ------------- | ------------- | ------------- | ----------- |
+| Gene1 | ARDENE | Unitig1 | ACGTCGCT | Glucose transferase | K00001 | Bacteroides |
+| Gene1 | WPH | Unitig2 | ACGTCGCT | Protease | K00004 | P. plebeius |
+| Gene2 | IFPSY | Unitig1 | GTCGATCATG | Oxydase | K00761 | E. coli |
 
 # Requirements 
 
-Check the wiki first, section `Required files format`. Wiki will soon contain information (like a script or something) to help building the files.
+Check the wiki first, section `Required files format`.
 Memory (RAM) needed will depend on the size of your alignment database.
 Disk space required mostly depends on the size of your dataset and databases. The number of kmers for 3To of CRC fasta files reached hundreds of millions, wich is about 500G of fasta files for the first step. Other steps will use less disk. The database of `MicrobeAnnotator` is about 690G.
 
@@ -104,12 +105,12 @@ WARNING: depending of the denomination of your files for paired ends (_R1 and _R
 
 Add the last paths to `./snakemake/config.yaml`:
 ```
-# path to the file of correpsondance between seq headers and the genome name (strain etc): see wiki
-seq_to_genome: "/path/to/ref.tsv"
-# path to the file of correpsondance between seq headers and the species: see wiki
-seq_to_species: "/path/to/detailed_ref.tsv"
-# path to this repo, "META-DIFF/" inclueded:
+# path to this repo, "META-DIFF/" included:
 src_path: "/path/to/META-DIFF/"
+#kraken db path:
+kraken_database_path: "/path/to/db"
+#microbeannotator db path:
+microbeannotator_db_path: "/path/to/db"
 # where your results will be
 project_path: "/path/to/your/project/"
 # path to your file of file:
