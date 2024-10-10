@@ -20,7 +20,7 @@ The workflow is described by the following figure :
 
 The output is divided in several key files:
  - kraken case/control taxonomic assignment output and report
- - summary of the taxonomic assignment, with taxa (all levels) ordered by number of base assigned 
+ - case/control summary of the taxonomic assignment, with taxa (all levels) ordered by number of base assigned 
 
 ```
 Unclassified    512640685
