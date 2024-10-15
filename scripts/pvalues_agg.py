@@ -59,14 +59,14 @@ def write_output(path: Union[str, bytes, os.PathLike], list_unitigs: list[object
 	"""
 	Writes output.
 	:param path : string or path-like object to the output directory.
-	:param list_unitigs : list of unitigs.
+	:param list_unitigs : list of objects Unitig.
 	:param prefix : string for the output file prefix.
 	:return: nothing
 	"""
 	with open(path+"/"+prefix+"_unclassified.aggregated.fa", 'w') as f:
-		for i in range(0, len(list_unitigs)):
-			f.write(">unitig_"+str(i)+"_pval="+str(list_unitigs[i].pvalue))
-			f.write("\n"+list_unitigs[i].sequence)
+		for i in list_unitigs:
+			f.write(i.header+"_pval="+str(i.pvalue))
+			f.write("\n"+i.sequence)
 
 
 def load_pvalue_dict(path: Union[str, bytes, os.PathLike]) -> dict[str, float]:
@@ -115,13 +115,15 @@ class Unitig(object):
 	sequence : ""
 	pvalue : 0
 	kmer_pvalues : []
-	def __init__(self, sequence, pvalue, kmer_pvalues) :
+	header : ""
+	def __init__(self, sequence, pvalue, kmer_pvalues, header) :
 		self.sequence = sequence
 		self.pvalue = pvalue
 		self.kmer_pvalues = kmer_pvalues
+		self.header = header
 
 
-def make_unitig(sequence: str, kmer_dict: dict[str, float]) -> object:
+def make_unitig(sequence: str, kmer_dict: dict[str, float], header: str) -> object:
 	"""
 	Takes a sequence and/or a pvalue to build and return an object of class unitig.
 	sequence : string
@@ -137,7 +139,7 @@ def make_unitig(sequence: str, kmer_dict: dict[str, float]) -> object:
 		except KeyError :
 			rev_compl_kmer = reverse_complement(kmer)
 			list_kmer_pvalues.append(kmer_dict[rev_compl_kmer])
-	unitig = Unitig(sequence, 0, list_kmer_pvalues)
+	unitig = Unitig(sequence, 0, list_kmer_pvalues, header)
 	return unitig
 
 
@@ -152,10 +154,10 @@ def load_unitigs(path: Union[str, bytes, os.PathLike], kmer_dict: dict[str, floa
 	with open(path) as f :
 		for line in f :
 			if line.startswith(">") :
-				pass
+				header = line.rstrip('\n')
 			else :
 				sequence = line
-				unitig = make_unitig(sequence, kmer_dict)
+				unitig = make_unitig(sequence=sequence, kmer_dict=kmer_dict, header=header)
 				unitig_CCT = CCT(unitig)
 				list_unitigs.append(unitig_CCT)
 	return list_unitigs
@@ -193,7 +195,7 @@ def main(kmdiff_input_path: Union[str, bytes, os.PathLike], unitigs_input_path: 
 	kmer_dict = load_pvalue_dict(kmdiff_input_path)
 	list_unitigs_with_pvalues = load_unitigs(unitigs_input_path, kmer_dict)
 	#list_unitigs_with_pvalues = aggregate_pvalues(list_unitigs) si marche pas remettre et la ligne au dessus est juste list_unitigs, et enlever la ligne en dessous
-	list_unitigs_with_pvalues.sort(key = lambda x: (x.pvalue, len(x.sequence)))
+	list_unitigs_with_pvalues.sort(key = lambda x: (x.pvalue, -len(x.sequence)))
 	write_output(output_path, list_unitigs_with_pvalues, prefix)
 	print("Aggregation done !")
 
