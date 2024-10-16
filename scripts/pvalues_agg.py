@@ -39,7 +39,7 @@ def verif_input(path: Union[str, bytes, os.PathLike]):
 
 def verif_output(path: Union[str, bytes, os.PathLike], prefix: str):
 	"""
-	Checks that the output directorory exists and that no file with output name exists already.
+	Checks that the output directory exists and that no file with output name exists already.
 	:param path : string or path-like object to the output directory.
 	:param prefix : string for the output file prefix.
 	:return: nothing
@@ -50,8 +50,8 @@ def verif_output(path: Union[str, bytes, os.PathLike], prefix: str):
 	else:
 		print(f"ERROR: folder {path} not found.")
 		sys.exit()
-	if os.path.isfile(path+"/"+prefix+"_unclassified.aggregated.fa") :
-		print(f"ERROR: folder {path} contains a '{prefix}_unclassified.aggregated.fa' file already.")
+	if os.path.isfile(path+"/"+prefix+"_unassigned.aggregated.fa") :
+		print(f"ERROR: folder {path} contains a '{prefix}_unassigned.aggregated.fa' file already.")
 		sys.exit()
 
 
@@ -63,7 +63,7 @@ def write_output(path: Union[str, bytes, os.PathLike], list_unitigs: list[object
 	:param prefix : string for the output file prefix.
 	:return: nothing
 	"""
-	with open(path+"/"+prefix+"_unclassified.aggregated.fa", 'w') as f:
+	with open(path+"/"+prefix+"_unassigned.aggregated.fa", 'w') as f:
 		for i in list_unitigs:
 			f.write(i.header+"_pval="+str(i.pvalue))
 			f.write("\n"+i.sequence)
@@ -71,7 +71,7 @@ def write_output(path: Union[str, bytes, os.PathLike], list_unitigs: list[object
 
 def load_pvalue_dict(path: Union[str, bytes, os.PathLike]) -> dict[str, float]:
 	"""
-	Loads the fasta file from kmdiff output as a dictionary :  {'sequence':'p-value'} and returns the dictionnary.
+	Loads the fasta file from kmdiff output as a dictionary :  {'sequence':'p-value'} and returns the dictionary.
 	:param path: string or path-like object.
 	:return: A dictionary containing kmers and their pvalues.
 	"""
