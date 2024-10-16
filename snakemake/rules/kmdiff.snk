@@ -41,18 +41,4 @@ rule kmdiff_diff:
         """
 
 
-rule kmdiff_dump:
-    input:        
-        expand(config["project_path"] + "pipeline_output/kmdiff_output/{prefix}_kmers.fasta", prefix = ["case", "control"])
-    output:
-        config["project_path"] + "pipeline_output/kmdiff_output/significant_kmers_matrix.txt"
-    params:
-        input_folder = config["project_path"] + "pipeline_output/kmdiff_output/"
-    conda :
-        "../../env/kmtricks.yaml"
-    shell:
-        """
-        kmtricks aggregate --run-dir {params.input_folder}/positive_kmer_matrix --matrix kmer --cpr-in > {output}
-        """
-
 

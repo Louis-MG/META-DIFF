@@ -1,9 +1,10 @@
 """
 Pipeline for META-DIFF
 """
+from sympy.strategies import condition
 
 configfile: "./config.yaml"
-ruleorder: kmdiff_count > kmdiff_diff > bcalm > kraken_assign > annot_extract_candidates > kmindex_build > kmindex_query > pval_agg > unitigs_matrix > classification > prodigal > microbeannotator > summary_table
+ruleorder: kmdiff_count > kmdiff_diff > bcalm > kraken_assign > annot_extract_candidates > kmindex_build > pval_agg > unitigs_matrix > kmindex_query > classification > prodigal > microbeannotator > summary_table
 
 
 ##########################################################
@@ -14,12 +15,10 @@ ruleorder: kmdiff_count > kmdiff_diff > bcalm > kraken_assign > annot_extract_ca
 rule all:
     input:
         expand(config["project_path"] + "pipeline_output/kmdiff_output/{condition}_kmers.fasta", condition = ["case", "control"]),
-        config["project_path"] + "pipeline_output/kmdiff_output/significant_kmers_matrix.txt",
         expand(config["project_path"] + "pipeline_output/kmdiff_output/{condition}_kmers.unitigs.fa", condition = config["condition"]),
         expand(config["project_path"] + "pipeline_output/functional_annotation/{condition}_unitigs.filtered.fa", condition = config["condition"]),
-        expand(config["project_path"] + "pipeline_output/glmnet/{condition}_unclassified.unitigs.fa", condition = config["condition"]),
-        expand(config["project_path"] + "pipeline_output/glmnet/{condition}_unclassified.aggregated.fa", condition = config["condition"]),
-        config['project_path'] + "pipeline_output/glmnet/top_unknown_kmers.fa",
+        expand(config["project_path"] + "pipeline_output/glmnet/{condition}_unassigned.unitigs.fa", condition = config["condition"]),
+        expand(config["project_path"] + "pipeline_output/glmnet/{condition}_unassigned.aggregated.fa", condition = config["condition"]),
         config['project_path'] + "pipeline_output/glmnet/top_unknown_matrix.txt",
         config["project_path"] + "pipeline_output/glmnet/best_model.txt",
         config["project_path"] + "pipeline_output/glmnet/heatmap.pdf", 
@@ -30,7 +29,8 @@ rule all:
         expand(config["project_path"] + "pipeline_output/functional_annotation/{condition}_unitigs_to_clade_and_gene_functions.tsv", condition = ['case', 'control']),
         expand(config["project_path"] + "pipeline_output/taxonomy/kraken_{condition}.output", condition = ['case', 'control']),
         expand(config["project_path"] + "pipeline_output/taxonomy/kraken_{condition}.report", condition = ['case', 'control']),
-        expand(config["project_path"] + "pipeline_output/taxonomy/{condition}_clades.tsv", condition = ['case', 'control'])
+        expand(config["project_path"] + "pipeline_output/taxonomy/{condition}_clades.tsv", condition = ['case', 'control']),
+        expand(config["project_path"] + "pipeline_output/biomarker/output_query_{condition_name}_unitigs/index.tsv", condition = ['case', 'control'])
 
 ##########################################################
 ###########            OTHER RULES            ############

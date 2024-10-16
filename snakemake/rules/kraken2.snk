@@ -15,5 +15,5 @@ rule kraken_assign:
         "../../env/kraken2.yaml"
     shell:
         """
-        kraken2 --output {output.output} --report {output.report} --threads {threads} --db {params.database} --use-names --unclassified-out {params.glmnet_dir}/{condition}_unclassified.unitigs.fa {input}
+        kraken2 --output {output.output} --report {output.report} --threads {threads} --db {params.database} --use-names --unclassified-out {params.glmnet_dir}/{condition}_unassigned.unitigs.fa {input}
         """
