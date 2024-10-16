@@ -2,18 +2,8 @@
 Pipeline for META-DIFF
 """
 
-from snakemake.utils import report
-from snakemake.utils import R
-from datetime import datetime
-import os
-import os.path
-import subprocess
-from subprocess import Popen, PIPE
-import pandas as pd
-from pathlib import Path
-
 configfile: "./config.yaml"
-ruleorder: kmdiff_count > kmdiff_diff > kmdiff_dump > bcalm > kraken_assign > annot_extract_candidates > glmnet_pval_agg > glmnet_matrix > glmnet_class > prodigal > microbeannotator > summary_table
+ruleorder: kmdiff_count > kmdiff_diff > bcalm > kraken_assign > annot_extract_candidates > kmindex_build > kmindex_query > pval_agg > unitigs_matrix > classification > prodigal > microbeannotator > summary_table
 
 
 ##########################################################
@@ -50,4 +40,5 @@ include: f"{config['src_path']}/snakemake/rules/kmdiff.snk"
 include: f"{config['src_path']}/snakemake/rules/bcalm.snk"
 include: f"{config['src_path']}/snakemake/rules/kraken2.snk"
 include: f"{config['src_path']}/snakemake/rules/glmnet.snk"
+include: f"{config['src_path']}/snakemake/rules/kmindex.snk"
 include: f"{config['src_path']}/snakemake/rules/functional_annotation.snk"

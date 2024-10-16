@@ -1,0 +1,74 @@
+rule pval_agg:
+    input:
+        unitigs = config["project_path"] + "pipeline_output/glmnet/{condition}_unclassified.unitigs.fa",
+        kmers = config["project_path"] + "pipeline_output/kmdiff_output/{condition}_kmers.fasta"
+    output:
+        config["project_path"] + "pipeline_output/biomarker/{condition}_unclassified.aggregated.fa"
+    params:
+        output = config["project_path"] + "pipeline_output/biomarker/",
+        script_path = "scripts/pvalues_agg.py",
+        condition_name = lambda wildcards: wildcards.condition
+    conda:
+        "../../env/python.3.10.yaml"
+    shell:
+        """
+        python3 {params.script_path} -k {input.kmers} -u {input.unitigs} -o {params.output} -p {params.condition_name}
+        """
+
+
+rule matrix:
+    input: #enlever le fait que ce sont des non assignes ? on reste dessus ?
+        case = config["project_path"] + "pipeline_output/biomarker/case_unclassified.aggregated.fa",
+        control = config["project_path"] + "pipeline_output/biomarker/control_unclassified.aggregated.fa",
+        matrix = config["project_path"] + "pipeline_output/biomarker/significant_kmers_matrix.txt"
+    output:
+        config["project_path"] + "pipeline_output/biomarker/top_unknown_kmers.fa", config["project_path"] + "pipeline_output/biomarker/top_unknown_matrix.txt"
+    params:
+        output = config["project_path"] + "pipeline_output/biomarker/",
+        script_path = "scripts/matrix_unknown_kmers.sh"
+    shell:
+        """
+        bash {params.script_path} -i {input.case},{input.control} -m {input.matrix} -o {params.output}
+        """
+
+rule class :
+    input:
+    output:
+    threads:
+    params:
+    shell:
+        """
+
+        """
+
+rule kmindex_build:
+    input:
+        fof: config["fof"]
+    output:
+        output = config["project_path"] + "pipeline_output/biomarker/"
+    threads: config["threads"]
+    params:
+        bloom_filter : config["bloom_filter"]
+        bitw: config["bitw"]
+    conda:
+        "../../env/kmindex.yaml"
+    shell:
+        """
+        kmindex build --fof {input.fof} --run-dir {output}/index_workdir --index {output}/index --register-as biomarkers --hard-min 1 --kmer-size 25 --bloom-size {params.bloom_filter}} --bitw {params.bitw}
+        """
+
+rule kmindex_query:
+    input:
+        unitigs = config["project_path"] + "pipeline_output/{condition}_kmers.unitigs.fa"
+    output:
+        output = config["project_path"] + "pipeline_output/biomarker/"
+    threads: config["threads"]
+    params:
+        condition_name = lambda wildcards: wildcards.condition
+    conda;
+        "../../env/kmindex.yaml"
+    shell:
+        """
+        kmindex query -i {output}/index -z 6 -o {output}/output_query_{condition_name}_unitigs --fastx {input.unitigs} --format matrix -a -t {threads}
+        """
+
