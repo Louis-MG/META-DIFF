@@ -1,17 +1,16 @@
 """
 Pipeline for META-DIFF
 """
-from sympy.strategies import condition
+from sympy.strategies import condition, expand
 
 configfile: "./config.yaml"
-ruleorder: kmdiff_count > kmdiff_diff > bcalm > kraken_assign > annot_extract_candidates > kmindex_build > pval_agg > unitigs_matrix > kmindex_query > classification > prodigal > microbeannotator > summary_table
+ruleorder: kmdiff_count > kmdiff_diff > bcalm > kraken_assign > annot_extract_candidates > kmindex_build > pval_agg > get_query > kmindex_query > classification > prodigal > microbeannotator > summary_table
 
 
 ##########################################################
 ############            MAIN RULE            #############
 ##########################################################
 
-# revoir syntax
 rule all:
     input:
         expand(config["project_path"] + "pipeline_output/kmdiff_output/{condition}_kmers.fasta", condition = ["case", "control"]),

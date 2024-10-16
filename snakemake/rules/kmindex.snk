@@ -60,7 +60,7 @@ rule kmindex_query:
         kmindex query -i {output}/index -z 6 -o {output}/output_query_unitigs --fastx {input.unitigs} --format matrix -a -t {threads}
         """
 
-rule class :
+rule classification :
     input:
         matrix: config["project_path"] + "pipeline_output/biomarker/output_query_unitigs/unitig_abundances.tsv"
     output:

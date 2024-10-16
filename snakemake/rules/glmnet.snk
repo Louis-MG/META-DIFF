@@ -1,36 +1,3 @@
-rule glmnet_pval_agg:
-    input:
-        unitigs = config["project_path"] + "pipeline_output/glmnet/{condition}_unclassified.unitigs.fa",
-        kmers = config["project_path"] + "pipeline_output/kmdiff_output/{condition}_kmers.fasta"
-    output:
-        config["project_path"] + "pipeline_output/glmnet/{condition}_unclassified.aggregated.fa"
-    params:
-        output = config["project_path"] + "pipeline_output/glmnet/",
-        script_path = "scripts/pvalues_agg.py",
-        condition_name = lambda wildcards: wildcards.condition
-    conda:
-        "../../env/python.3.10.yaml"
-    shell:
-        """
-        python3 {params.script_path} -k {input.kmers} -u {input.unitigs} -o {params.output} -p {params.condition_name}
-        """
-
-rule glmnet_matrix:
-    input:
-        case = config["project_path"] + "pipeline_output/glmnet/case_unclassified.aggregated.fa",
-        control = config["project_path"] + "pipeline_output/glmnet/control_unclassified.aggregated.fa",
-        matrix = config["project_path"] + "pipeline_output/kmdiff_output/significant_kmers_matrix.txt"
-    output:
-        config["project_path"] + "pipeline_output/glmnet/top_unknown_kmers.fa", config["project_path"] + "pipeline_output/glmnet/top_unknown_matrix.txt"
-    params:
-        output = config["project_path"] + "pipeline_output/glmnet/",
-        script_path = "scripts/matrix_unknown_kmers.sh"
-    shell:
-        """
-        bash {params.script_path} -i {input.case},{input.control} -m {input.matrix} -o {params.output}
-        """
-
-
 rule glmnet_class:
     input:
         matrix = config["project_path"] + "pipeline_output/glmnet/top_unknown_matrix.txt",
