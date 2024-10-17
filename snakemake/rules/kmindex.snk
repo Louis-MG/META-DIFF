@@ -33,18 +33,17 @@ rule kmindex_build:
 
 
 rule get_query:
-    input: #enlever le fait que ce sont des non assignes ? on reste dessus ?
+    input:
         case = config["project_path"] + "pipeline_output/biomarker/case_unassigned.aggregated.fa",
         control = config["project_path"] + "pipeline_output/biomarker/control_unassigned.aggregated.fa"
     output:
         query = config["project_path"] + "pipeline_output/biomarker/top_unitigs.fa"
     params:
-        output = config["project_path"] + "pipeline_output/biomarker/",
-        script_path = "scripts/matrix_unknown_kmers.sh"
+        top_unitigs = config["top_unitigs"]
     shell:
         """
-        #juste fiare un head des case/control_unitigs.fa
-        head -n 1000 {input.case} {input.control} >> {output.query}
+        head -n {params.top_unitigs} {input.case} > {output.query}
+        head -n {params.top_unitigs} {input.control} >> {output.query}
         """
 
 rule kmindex_query:
@@ -67,9 +66,11 @@ rule classification :
         output = config["project_path"] + "pipeline_output/biomarker/"
     threads: config["threads"]
     params:
+        script_path = "scripts/xgboost.py"
     conda:
         "../../env/sckit_learn.yaml"
     shell:
         """
-        python3 classification.py
+        sed -i 's/control[0-9]*/control/g;s/case[0-9]*/case/g' {input.matrix}
+        python3 {params.script_path}
         """
