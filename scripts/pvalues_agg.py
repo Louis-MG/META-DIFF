@@ -50,7 +50,7 @@ def verif_output(path: Union[str, bytes, os.PathLike], prefix: str):
 	else:
 		print(f"ERROR: folder {path} not found.")
 		sys.exit()
-	if os.path.isfile(path+"/"+prefix+"_unassigned.aggregated.fa") :
+	if os.path.isfile(path+"/"+prefix+".aggregated.fa") :
 		print(f"ERROR: folder {path} contains a '{prefix}_unassigned.aggregated.fa' file already.")
 		sys.exit()
 
