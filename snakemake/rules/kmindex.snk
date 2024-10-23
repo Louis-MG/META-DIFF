@@ -1,6 +1,6 @@
 rule pval_agg:
     input:
-        unitigs = config["project_path"] + "pipeline_output/glmnet/{condition}_unassigned.unitigs.fa",
+        unitigs = config["project_path"] + "pipeline_output/biomarker/{condition}_unassigned.unitigs.fa",
         kmers = config["project_path"] + "pipeline_output/kmdiff_output/{condition}_kmers.fasta"
     output:
         config["project_path"] + "pipeline_output/biomarker/{condition}_unassigned.aggregated.fa"
@@ -12,7 +12,7 @@ rule pval_agg:
         "../../env/python.3.10.yaml"
     shell:
         """
-        python3 {params.script_path} -k {input.kmers} -u {input.unitigs} -o {params.output} -p {params.condition_name}
+        python3 {params.script_path} -k {input.kmers} -u {input.unitigs} -o {params.output} -p {params.condition_name}_unassigned
         """
 
 rule kmindex_build:

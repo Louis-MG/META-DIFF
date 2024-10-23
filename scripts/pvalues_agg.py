@@ -63,7 +63,7 @@ def write_output(path: Union[str, bytes, os.PathLike], list_unitigs: list[object
 	:param prefix : string for the output file prefix.
 	:return: nothing
 	"""
-	with open(path+"/"+prefix+"_unassigned.aggregated.fa", 'w') as f:
+	with open(path+"/"+prefix+".aggregated.fa", 'w') as f:
 		for i in list_unitigs:
 			f.write(i.header+"_pval="+str(i.pvalue))
 			f.write("\n"+i.sequence)
