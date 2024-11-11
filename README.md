@@ -4,7 +4,7 @@ This is the repository of the pipeline META-DIFF, which detects sequences in dif
 
 # Motivation
 
-Metagenomics becomes increasingly important in building our knowledge about microbes. Links between microbiome perturbations and diseases are regularily uncovered. Using kmer-based methods, this pipeline allows its users to quickly find microbial DNA sequences in differential abundances between two conditions (e.g. healthy and not healthy), and annotate them taxonomicaly and functionaly. The pipeline also isolates unclassified sequences and builds a predictive model based on the most significant unitigs' kmers abundances. 
+Metagenomics becomes increasingly important in building our knowledge about microbes. Links between microbiome perturbations and diseases are regularily uncovered. Using kmer-based methods, this pipeline allows its users to quickly find microbial DNA sequences in differential abundances between two conditions (e.g. healthy and not healthy), and annotates them taxonomicaly and functionaly. The pipeline also builds several machine-learning models, optimizes hyper-parameters to get the best one, and then calculates the contribution of each feature used.
 
 :exclamation: Important note: the pipeline can predict genes and annotate functions for prokaryotes only. :exclamation: 
 
@@ -12,7 +12,7 @@ Metagenomics becomes increasingly important in building our knowledge about micr
 
 The workflow is described by the following figure :
 
-![Schematic of the META-DIFF pipeline](/figures/pipeline.jpg?raw=true "Pipeline Overview")
+![Schematic of the META-DIFF pipeline](/figures/pipeline.png?raw=true "Pipeline Overview")
 
 # [wiki](https://github.com/Louis-MG/META-DIFF/wiki) ! :books:
 
@@ -39,14 +39,9 @@ Bacteria (taxid 2)      10146249
 
 ![Heatmap](/figures/metabolic_summary__heatmap.png?raw=true "Example of a heatmap of pathways complete at 90%")
 
- - performance of a classification model based on glmnet and the kmer counts of the most significant unclassified sequences:
+ - Machine-learning models and their performance (as well as feature selection):
 
-`best_model.txt`:
-```
-alpha	lambda	Accuracy	Kappa	AccuracySD	KappaSD
-1	0.012233193439917463	0.8071428571428572	0.6136666666666667	0.1277013475448753	0.2566471854078626
-```
-![Heatmap](/figures/heatmap.png "Exemple of a classification heatmap with unclassified k-mers")
+![Heatmap](/figures/model_example.png "COnfusion matrix and Shap values example")
 
  - table of unitigs to functions by condition. Each unitig is linked to the genes it contains and their funciton, KO number.
 
@@ -58,7 +53,7 @@ alpha	lambda	Accuracy	Kappa	AccuracySD	KappaSD
 
 # Requirements 
 
-Check the wiki first, section `Required files format`.
+Check the wiki ! Ain't much, but it's honest work.
 Memory (RAM) needed will depend on the size of your alignment database.
 Disk space required mostly depends on the size of your dataset and databases. The number of kmers for 3To of CRC fasta files reached hundreds of millions, wich is about 500G of fasta files for the first step. Other steps will use less disk. The database of `MicrobeAnnotator` is about 690G.
 
@@ -75,10 +70,10 @@ Copy the path to the MicrobeAnnotator_DB in the `snakemake/config.yaml` file:
 microbeannotator_db_path: "/path/to/MicrobeAnnotator_DB/"
 ```
 
-Get your taxonomic database ready by looking at [MMseqs2 documentation](https://github.com/soedinglab/MMseqs2/wiki) (look at the module `createdb`). Again, just a few lines and fasta files.
-Copy the path to your MMseqs2-formated taxonomic database in the the `snakemake/config.yaml` file:
+Get a Kraken2 DB ready by checking the instructions at [Kraken2](https://github.com/DerrickWood/kraken2/wiki/Manual). 
+Copy the path to the `snakemake/config.yaml` file:
 ```
-taxonomic_db_path: "/path/to/mmseqs_DB/DB"
+kraken_database_path: "/path/to/krakenDB/db_name"
 ```
 
 # Usage
@@ -92,6 +87,7 @@ This script generates the file of file (fof.txt) for kmdiff. Its arguments are:
 	--controls -C <PATH> path to the directory of control samples.
 	--output -o <PATH> path to where the fof should be.
 	--help -h displays this help message and exits.
+	-1 -2 <STR> string for R1 and R2 files recognition.
 
 Output is :
 	- a fof.txt named after the output parameter. The file is tab separated, format:
@@ -99,8 +95,6 @@ Output is :
 		control2: /path/to/control2_read1.fastq ; /path/to/control2_read2.fastq
 		case1: /path/to/case1_read1.fastq ; /path/to/case1_read2.fastq
 		case2: /path/to/case2_read1.fastq ; /path/to/case2_read2.fastq
-
-WARNING: depending of the denomination of your files for paired ends (_R1 and _R2, _1 and _2 ...), you will have to modify lines 55-56 and 60-61. Yeah it's annoying. Add the single-end by hand.
 ```
 
 Add the last paths to `./snakemake/config.yaml`:
