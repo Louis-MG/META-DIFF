@@ -14,7 +14,7 @@ from utils import get_scaler, augment_data
 from skopt.plots import plot_convergence, plot_evaluations, plot_objective, plot_regret
 from skopt import gp_minimize
 
-# TODO NEED TO CHANGE THE ACTUAL KEY BY A GLOBAL VARIABLE
+# TODO : NEED TO CHANGE THIS INTO A ARGPARSE ARG, avec un arg pour passer a train et vide par defaut ?
 NEPTUNE_API_TOKEN = "eyJhcGlfYWRkcmVzcyI6Imh0dHBzOi8vYXBwLm5lcHR1bmUuYWkiLCJhcGlfdXJsIjoiaHR0cHM6Ly9hcHAubmVwdHVuZS5haSIsImFwaV9rZXkiOiJlZjRiZGUzYS1kNTJmLTRkNGItOWU1MS1iNDU3MGE1NjAyODAifQ=="
 NEPTUNE_PROJECT_NAME = "METAG/"
 NEPTUNE_MODEL_NAME = 'AC-'

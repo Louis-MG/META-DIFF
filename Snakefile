@@ -4,7 +4,7 @@ Pipeline for META-DIFF
 from sympy.strategies import condition, expand
 
 configfile: "./config.yaml"
-ruleorder: kmdiff_count > kmdiff_diff > bcalm > kraken_assign > annot_extract_candidates > kmindex_build > pval_agg > get_query > kmindex_query > classification > prodigal > microbeannotator > summary_table
+ruleorder: kmdiff_count > kmdiff_diff > bcalm > kraken_assign > annot_extract_candidates > kmindex_build > pval_agg > get_query > kmindex_query > prodigal > microbeannotator > summary_table > ml
 
 
 ##########################################################
@@ -25,7 +25,7 @@ rule all:
         expand(config["project_path"] + "pipeline_output/taxonomy/kraken_{condition}.report", condition = ['case', 'control']),
         expand(config["project_path"] + "pipeline_output/taxonomy/{condition}_clades.tsv", condition = ['case', 'control']),
         config["project_path"] + "pipeline_output/biomarker/top_unitigs.fa",
-        expand(config["project_path"] + "pipeline_output/biomarker/output_query_unitigs/index.tsv", condition = ['case', 'control'])
+        config["project_path"] + "pipeline_output/biomarker/output_query_unitigs/index.tsv"
 
 ##########################################################
 ###########            OTHER RULES            ############
@@ -36,3 +36,4 @@ include: f"{config['src_path']}/snakemake/rules/bcalm.snk"
 include: f"{config['src_path']}/snakemake/rules/kraken2.snk"
 include: f"{config['src_path']}/snakemake/rules/kmindex.snk"
 include: f"{config['src_path']}/snakemake/rules/functional_annotation.snk"
+inlcude: f"{config['src_path']}/snakemake/rules/ml.snk"

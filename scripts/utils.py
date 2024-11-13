@@ -1,5 +1,4 @@
 import torch
-import numpy as np
 import pandas as pd
 import numpy as np
 import seaborn as sns
@@ -9,7 +8,6 @@ from sklearn import metrics
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.preprocessing import RobustScaler
 from sklearn.preprocessing import StandardScaler
-from skopt import gp_minimize
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis, QuadraticDiscriminantAnalysis
 from sklearn.model_selection import train_test_split
 

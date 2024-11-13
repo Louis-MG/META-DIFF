@@ -3,14 +3,11 @@ import pandas as pd
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
-from IPython.display import display, Markdown, Latex
-from torch.nn import functional as F
-os.makedirs('results', exist_ok=True)
-from tqdm.notebook import tqdm as tqdm
+from IPython.display import display, Markdown
+#TODO: changer ca par un param
 from sklearn.feature_selection import mutual_info_classif
 
 np.random.seed(42)
-# from sklearn.preprocessing import OneHotEncoder
 
 from utils import get_clusters, save_figures, get_ordinations
 from models_configs import import_models
@@ -24,23 +21,27 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Run GP-CV')
     parser.add_argument('--n_features', type=int, default=-1, help='Number of features. For debugging only.')
     #TODO: retirer cet argument
-    parser.add_argument('--experiment_name', type=str, default='case_vs_controls', help='Experiment name')
     parser.add_argument('--use_mi', type=int, default=0, help='Use mutual information')
     parser.add_argument('--models_done', type=str, default='', help='')
     parser.add_argument('--n_calls', type=int, default=20, help='Number of calls')
     parser.add_argument('--n_splits', type=int, default=5, help='Number of splits')
-    parser.add_argument('--log_neptune', type=int, default=0, help='Log to neptune')
+    parser.add_argument('--log_neptune', type=int, default=0, help='Log to neptune') # TODO: changer par une string et si pas vide alors faire le log de neptune sinon non
     parser.add_argument('--log_shap', type=int, default=0, help='Log shap values')
-    parser.add_argument('--nk_input_features', type=int, default=0, help='Number of input features.')
-    parser.add_argument('--input', type=str, help='Paht to the input folder.')
+    parser.add_argument('--input', type=str, help='Path to the input file.')
+    parser.add_argument('--output', type=str, help='Path to the output folder.')
 
     args = parser.parse_args()
 
     models_done = args.models_done.split(',')
     #TODO: modifier cette ligne
-    df = pd.read_csv(f"data/{args.experiment_name}_{args.nk_input_features}k.tsv", sep="\t").transpose()
+    df = pd.read_csv(f"{args.input}", sep="\t").transpose()
     experiment_name = f'{args.experiment_name}_{args.n_features}features_mi{args.use_mi}'
-    os.makedirs(f"results/{experiment_name}", exist_ok=True)
+
+    #checks if output dir exists
+    if os.path.isdir(args.output):
+        pass
+    else:
+        os.mkdir(args.output)
 
     df.columns = df.iloc[0]
     df = df.drop(df.index[0])
@@ -48,7 +49,6 @@ if __name__ == '__main__':
 
     # Keep only the 1000 for testing
     df = df.iloc[:, :args.n_features]
-    # Import onehotencoder
 
     Y = np.array(df.index)
     # remove the dots and everything after control or case in Y
@@ -68,7 +68,7 @@ if __name__ == '__main__':
     # Make plots of the mutual information
     # make a progress bar
     sns.histplot(mi, bins=50)
-    plt.savefig(f"results/{experiment_name}/mi_hist.png")
+    plt.savefig(f"{args.output}/mi_hist.png")
     plt.close()
     # Sort the features by mutual information
     from operator import itemgetter
