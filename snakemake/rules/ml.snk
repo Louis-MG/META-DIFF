@@ -1,0 +1,16 @@
+rule machine-learning:
+    input:
+        matrix = config["project_path"] + "pipeline_output/biomarker/output_query/index.tsv"
+    output:
+        config["project_path"] + "pipeline_output/ML"
+    params:
+        neptune_key = config["neptune_key"],
+        script_path = "scripts/ml.py",
+        n_splits = config["n_splits"],
+        n_calls = config["n_calls"]
+    conda:
+        "../../env/python.3.10.yaml"
+    shell:
+        """
+        python3 {params.script_path} -i {input.matrix} -o {output} --log_neptune 1 --log_shap 1 --n_splits {params.n_splits} --n_calls {params.n_calls}
+        """
