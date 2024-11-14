@@ -35,7 +35,6 @@ if __name__ == '__main__':
     models_done = args.models_done.split(',')
     #TODO: modifier cette ligne
     df = pd.read_csv(f"{args.input}", sep="\t").transpose()
-    experiment_name = f'{args.experiment_name}_{args.n_features}features_mi{args.use_mi}'
 
     #checks if output dir exists
     if os.path.isdir(args.output):
@@ -76,10 +75,10 @@ if __name__ == '__main__':
     sorted_mi = [x[0] for x in sorted_mi]
     X_sorted = X.iloc[:, sorted_mi]
 
-    save_figures(X_sorted, Y, experiment_name)
+    save_figures(X_sorted, Y, "diff_abundance_ML", args.output)
     # get the clusters
     clusters = get_clusters(X_sorted)
-    get_ordinations(X_sorted, Y, experiment_name)
+    get_ordinations(X_sorted, Y, "diff_abundance_ML", args.output)
     # get the models
     models, hparam_names, spaces = import_models(models_done) 
 
@@ -90,7 +89,7 @@ if __name__ == '__main__':
         display(Markdown(f"##{name}"))
         print(f"### Processing {name}")
         # n_splits=5 serait mieux mais coince
-        table = process_model(model, data, mi, name, experiment_name,
+        table = process_model(model, data, mi, name, "diff_abundance_ML",
                               hparam_names[name], spaces[name], args) 
         fig = plt.figure()
 

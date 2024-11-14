@@ -12,8 +12,6 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis, QuadraticD
 from sklearn.model_selection import train_test_split
 
 
-from concurrent.futures import ThreadPoolExecutor
-
 def augment_data(X_train, y_train, n_aug, p=0, g=0):
     torch.manual_seed(42)
     X_train2 = X_train.copy()
@@ -49,7 +47,7 @@ def get_scaler(scaler):
     else:
         exit('Wrong scaler name')
         
-def save_figures(df, labels, experiment_name):
+def save_figures(df, labels, experiment_name, output):
     # Flatten the matrix to a 1D array for distribution plots
     labels = labels.values
     unique_labels = np.unique(labels)
@@ -61,7 +59,7 @@ def save_figures(df, labels, experiment_name):
     plt.title("Histogram of Matrix Values")
     plt.xlabel("Value")
     plt.ylabel("Frequency")
-    plt.savefig(f"results/{experiment_name}/histogram_allclasses.png")
+    plt.savefig(f"{output}/histogram_allclasses.png")
     plt.close()
     
     # Make superposed histograms for each class in the same graph
@@ -89,7 +87,7 @@ def save_figures(df, labels, experiment_name):
     sns.boxplot(data)
     plt.title("Box Plot of Matrix Values")
     plt.xlabel("Value")
-    plt.savefig(f"results/{experiment_name}/boxplot_allclasses.png")
+    plt.savefig(f"{output}/boxplot_allclasses.png")
     plt.close()
     
     # boxplot per class
@@ -107,7 +105,7 @@ def save_figures(df, labels, experiment_name):
     sns.violinplot(data)
     plt.title("Violin Plot of Matrix Values")
     plt.xlabel("Value")
-    plt.savefig(f"results/{experiment_name}/violinplot.png")
+    plt.savefig(f"{output}/violinplot.png")
     plt.close()
     
     # violin plot per class
@@ -124,7 +122,7 @@ def save_figures(df, labels, experiment_name):
     plt.figure(figsize=(8, 6))
     sns.heatmap(df.values, cmap="viridis")
     plt.title("Heatmap of Matrix")
-    plt.savefig(f"results/{experiment_name}/heatmap.png")
+    plt.savefig(f"{output}/heatmap.png")
     plt.close()
     
     # Heatmap per class
@@ -140,7 +138,7 @@ def save_figures(df, labels, experiment_name):
     plt.figure(figsize=(8, 6))
     sns.heatmap(df1.values, cmap="viridis")
     plt.title("Heatmap of Matrix")
-    plt.savefig(f"results/{experiment_name}/heatmap_binary.png")
+    plt.savefig(f"{output}/heatmap_binary.png")
     plt.close()
 
     # Make an histogram of the number of zeros per sample
@@ -148,7 +146,7 @@ def save_figures(df, labels, experiment_name):
     plt.xlabel('Number of zeros')
     plt.ylabel('Number of samples')
     plt.title('Histogram of the number of zeros per sample')
-    plt.savefig(f"results/{experiment_name}/histogram_zeros_per_sample_allclasses.png")
+    plt.savefig(f"{output}/histogram_zeros_per_sample_allclasses.png")
     plt.close()
     
     # Make an histogram of the number of zeros per sample per class superposed
@@ -166,7 +164,7 @@ def save_figures(df, labels, experiment_name):
     plt.xlabel('Number of zeros')
     plt.ylabel('Number of features')
     plt.title('Histogram of the number of zeros per feature')
-    plt.savefig(f"results/{experiment_name}/histogram_zeros_per_feature_allclasses.png")
+    plt.savefig(f"{output}/histogram_zeros_per_feature_allclasses.png")
     plt.close()
     
     # Make an histogram of the number of zeros per feature per class superposed
@@ -200,7 +198,7 @@ def get_clusters(X):
 
     return clusters
 
-def get_ordinations(X, Y, exp_name):
+def get_ordinations(X, Y, exp_name, output):
     # Ordinations
     # PCA
     from sklearn.decomposition import PCA
@@ -210,7 +208,7 @@ def get_ordinations(X, Y, exp_name):
     plt.xlabel('PCA1')
     plt.ylabel('PCA2')
     plt.title('PCA')
-    plt.savefig(f"results/{exp_name}/pca.png")
+    plt.savefig(f"{output}/pca.png")
     plt.close()
 
     # UMAP
@@ -221,7 +219,7 @@ def get_ordinations(X, Y, exp_name):
     plt.xlabel('UMAP1')
     plt.ylabel('UMAP2')
     plt.title('UMAP')
-    plt.savefig(f"results/{exp_name}/umap.png")
+    plt.savefig(f"{output}/umap.png")
     plt.close()
 
     # NMDS
@@ -232,7 +230,7 @@ def get_ordinations(X, Y, exp_name):
     plt.xlabel('MDS1')
     plt.ylabel('MDS2')
     plt.title('MDS')
-    plt.savefig(f"results/{exp_name}/mds.png")
+    plt.savefig(f"{output}/mds.png")
     plt.close()
 
     # USE LDA after splitting the data
@@ -243,7 +241,7 @@ def get_ordinations(X, Y, exp_name):
     plt.scatter(X_lda, np.zeros(X_lda.shape), c=y_train)
     plt.xlabel('LDA')
     plt.title('LDA')
-    plt.savefig(f"results/{exp_name}/lda.png")
+    plt.savefig(f"{output}/lda.png")
     plt.close()
 
     # Test scores with LDA
@@ -257,7 +255,7 @@ def get_ordinations(X, Y, exp_name):
     plt.scatter(valid_LDA, np.zeros(valid_LDA.shape), c=y_test)
     plt.xlabel('LDA')
     plt.title('LDA')
-    plt.savefig(f"results/{exp_name}/lda_test.png")
+    plt.savefig(f"{output}/lda_test.png")
     plt.close()
 
     # Test scores with QDA

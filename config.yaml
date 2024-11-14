@@ -16,3 +16,5 @@ bitw: 64
 bloom_filter: 1000000000
 top_unitigs: 5000
 neptune_key: ""
+n_splits: 5
+n_calls: 20
