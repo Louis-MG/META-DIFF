@@ -11,14 +11,14 @@ This script generates the file of file (fof.txt) for kmdiff. Its arguments are:
 	-R1 <STRING> -R2 <STRING> strings to determine forward and reverse reads.
 	--help -h displays this help message and exits.
 
+EX: bash kmdiff_fof_prep.txt --cases /path/to/cases/ --controls /path/to/controls/ --output /path/to/output/ -R1 _R1 -R1 _R2
+
 Output is :
 	- a fof.txt named after the output parameter. The file is tab separated, format:
 		control1: /path/to/control1_read1.fastq ; /path/to/control1_read2.fastq
 		control2: /path/to/control2_read1.fastq ; /path/to/control2_read2.fastq
 		case1: /path/to/case1_read1.fastq ; /path/to/case1_read2.fastq
 		case2: /path/to/case2_read1.fastq ; /path/to/case2_read2.fastq
-
-WARNING: depending of the denomination of your files for paired ends (R1 and R2, _1 and _2 ...), you will have to modify lines 55-56 and 60-61. Yeah it's annoying. Not yet suitable for single end.
 "
 
 }
@@ -67,8 +67,8 @@ readlink -f ${cases}*"$R1"* >> tempcol2
 
 paste tempcol1 tempcol2 > temp
 
-readlink -f ${controls}*"$R2"* > tempcol3
-readlink -f ${cases}*"$R2"* >> tempcol3
+readlink -f ${controls}/*"$R2"* > tempcol3
+readlink -f ${cases}/*"$R2"* >> tempcol3
 
 sum=$(("$number_controls" + "$number_cases"))
 printf ";%0.s\n" $(seq 1 $sum) > tempsep
