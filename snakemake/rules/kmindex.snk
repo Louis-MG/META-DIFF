@@ -66,9 +66,9 @@ rule classification :
         output = config["project_path"] + "pipeline_output/biomarker/"
     threads: config["threads"]
     params:
-        script_path = "scripts/xgboost.py"
+        script_path = "scripts/ml.py"
     conda:
-        "../../env/sckit_learn.yaml"
+        "../../env/python.3.10.yaml"
     shell:
         """
         sed -i 's/control[0-9]*/control/g;s/case[0-9]*/case/g' {input.matrix}
