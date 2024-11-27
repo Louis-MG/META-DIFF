@@ -52,7 +52,6 @@ rule summary_table:
     input:
         translation = config["project_path"] + "pipeline_output/functional_annotation/{condition}_protein_translation.faa",
         unitigs = config["project_path"] + "pipeline_output/functional_annotation/{condition}_unitigs.filtered.fa",
-        annot = config["project_path"] + "pipeline_output/functional_annotation/{condition}_protein_translation.faa.annot",
         kraken_output = config["project_path"] + "pipeline_output/taxonomy/kraken_{condition}.output"
     output:
         config["project_path"] + "pipeline_output/functional_annotation/{condition}_unitigs_to_clade_and_gene_functions.tsv",
@@ -60,11 +59,12 @@ rule summary_table:
     params:
         output = config["project_path"] + "pipeline_output/functional_annotation/",
         script_path = "scripts/sumup_table.py",
+        annot = config["project_path"] + "pipeline_output/functional_annotation/{condition}_protein_translation.faa.annot",
         condition_name = lambda wildcards: wildcards.condition
     conda: 
         "../../env/python.3.10.yaml"
     shell:
         """
-	    python3 {params.script_path} -a {input.annot} -g {input.translation} -o {params.output} -u {input.unitigs} -c {params.condition_name} -k {input.kraken_output}
+	    python3 {params.script_path} -a {params.annot} -g {input.translation} -o {params.output} -u {input.unitigs} -c {params.condition_name} -k {input.kraken_output}
         mv {params.output}/{params.condition_name}_clades.tsv  {params.output}/../taxonomy/
         """
