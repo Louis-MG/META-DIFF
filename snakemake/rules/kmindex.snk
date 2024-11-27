@@ -1,9 +1,9 @@
 rule pval_agg:
     input:
-        unitigs = config["project_path"] + "pipeline_output/biomarker/{condition}_unassigned.unitigs.fa",
+        unitigs = config["project_path"] + "pipeline_output/kmdiff_output/{condition}_kmers.unitigs.fa",
         kmers = config["project_path"] + "pipeline_output/kmdiff_output/{condition}_kmers.fasta"
     output:
-        config["project_path"] + "pipeline_output/biomarker/{condition}_unassigned.aggregated.fa"
+        config["project_path"] + "pipeline_output/biomarker/{condition}.aggregated.fa"
     params:
         output = config["project_path"] + "pipeline_output/biomarker/",
         script_path = "scripts/pvalues_agg.py",
@@ -12,18 +12,18 @@ rule pval_agg:
         "../../env/python.3.10.yaml"
     shell:
         """
-        python3 {params.script_path} -k {input.kmers} -u {input.unitigs} -o {params.output} -p {params.condition_name}_unassigned
+        python3 {params.script_path} -k {input.kmers} -u {input.unitigs} -o {params.output} -p {params.condition_name}
         """
 
 rule kmindex_build:
     input:
-        fof: config["fof"]
+        fof= config["fof"]
     output:
         output = config["project_path"] + "pipeline_output/biomarker/"
     threads: config["threads"]
     params:
-        bloom_filter : config["bloom_filter"]
-        bitw: config["bitw"]
+        bloom_filter= config["bloom_filter"],
+        bitw= config["bitw"]
     conda:
         "../../env/kmindex.yaml"
     shell:
@@ -34,8 +34,8 @@ rule kmindex_build:
 
 rule get_query:
     input:
-        case = config["project_path"] + "pipeline_output/biomarker/case_unassigned.aggregated.fa",
-        control = config["project_path"] + "pipeline_output/biomarker/control_unassigned.aggregated.fa"
+        case = config["project_path"] + "pipeline_output/biomarker/case.aggregated.fa",
+        control = config["project_path"] + "pipeline_output/biomarker/control.aggregated.fa"
     output:
         query = config["project_path"] + "pipeline_output/biomarker/top_unitigs.fa"
     params:
@@ -61,12 +61,12 @@ rule kmindex_query:
 
 rule classification :
     input:
-        matrix: config["project_path"] + "pipeline_output/biomarker/output_query_unitigs/unitig_abundances.tsv"
+        matrix= config["project_path"] + "pipeline_output/biomarker/output_query_unitigs/unitig_abundances.tsv"
     output:
         output = config["project_path"] + "pipeline_output/biomarker/"
     threads: config["threads"]
     params:
-        script_path = "scripts/ml.py"
+        script_path= "scripts/ml.py"
     conda:
         "../../env/python.3.10.yaml"
     shell:
