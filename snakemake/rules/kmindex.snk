@@ -50,13 +50,14 @@ rule kmindex_query:
     input:
         unitigs = config["project_path"] + "pipeline_output/biomarker/top_unitigs.fa"
     output:
-        output = config["project_path"] + "pipeline_output/biomarker/"
+        folder = config["project_path"] + "pipeline_output/biomarker/output_query_unitigs",
+        file = config["project_path"] + "pipeline_output/biomarker/output_query_unitigs/index.tsv"
     threads: config["threads"]
     conda:
         "../../env/kmindex.yaml"
     shell:
         """
-        kmindex query -i {output}/index -z 6 -o {output}/output_query_unitigs --fastx {input.unitigs} --format matrix -a -t {threads}
+        kmindex query -i {output}/index -z 6 -o {output.folder} --fastx {input.unitigs} --format matrix -a -t {threads}
         """
 
 rule classification :
