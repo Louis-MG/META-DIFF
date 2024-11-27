@@ -1,4 +1,4 @@
-rule machine-learning:
+rule machine_learning:
     input:
         matrix = config["project_path"] + "pipeline_output/biomarker/output_query/index.tsv"
     output:
