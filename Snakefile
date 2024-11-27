@@ -17,6 +17,7 @@ rule all:
         expand(config["project_path"] + "pipeline_output/kmdiff_output/{condition}_kmers.unitigs.fa", condition = config["condition"]),
         expand(config["project_path"] + "pipeline_output/functional_annotation/{condition}_unitigs.filtered.fa", condition = config["condition"]),
         expand(config['project_path'] + "pipeline_output/functional_annotation/{condition}_protein_translation.faa", condition = config["condition"]),
+        expand(config["project_path"] + "pipeline_output/functional_annotation/{condition}_coords.gbk", condition = config["condition"]),
         expand(config["project_path"] + "pipeline_output/biomarker/{condition}.aggregated.fa", condition = config["condition"]),
         config["project_path"] + "pipeline_output/functional_annotation/metabolic_summary__heatmap.pdf",
         expand(config["project_path"] + "pipeline_output/functional_annotation/{condition}_unitigs_to_clade_and_gene_functions.tsv", condition = config["condition"]),
