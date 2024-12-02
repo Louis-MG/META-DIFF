@@ -1,6 +1,5 @@
 name: bcalm
 channels:
-  - cruizperez
   - bioconda
   - conda-forge
   - defaults

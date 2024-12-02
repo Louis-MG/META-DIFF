@@ -1,6 +1,5 @@
 name: seqkit
 channels:
-  - cruizperez
   - bioconda
   - conda-forge
   - defaults

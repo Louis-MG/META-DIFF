@@ -1,6 +1,5 @@
 name: prodigal
 channels:
-  - cruizperez
   - bioconda
   - conda-forge
   - defaults

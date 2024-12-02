@@ -1,6 +1,5 @@
 name: kmtricks_env
 channels:
-  - cruizperez
   - bioconda
   - conda-forge
   - defaults

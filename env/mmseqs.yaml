@@ -1,6 +1,5 @@
 name: mmseq2
 channels:
-  - cruizperez
   - bioconda
   - conda-forge
   - defaults

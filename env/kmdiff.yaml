@@ -1,7 +1,6 @@
 name: kmdiff
 channels:
   - tlemane
-  - cruizperez
   - bioconda
   - conda-forge
   - defaults
