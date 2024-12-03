@@ -1,12 +1,12 @@
 # META-DIFF :microbe:
 
-This is the repository of the pipeline META-DIFF, which detects sequences in differential abundance between two conditions, and annotates them taxonomicaly and functionaly.
+This is the repository of the pipeline META-DIFF, which detects differentially abundant sequences between two conditions, and annotates them taxonomically and functionally.
 
 # Motivation
 
-Metagenomics becomes increasingly important in building our knowledge about microbes. Links between microbiome perturbations and diseases are regularily uncovered. Using kmer-based methods, this pipeline allows its users to quickly find microbial DNA sequences in differential abundances between two conditions (e.g. healthy and not healthy), and annotates them taxonomicaly and functionaly. The pipeline also builds several machine-learning models, optimizes hyper-parameters to get the best one, and then calculates the contribution of each feature used.
+Metagenomics becomes increasingly important in building our knowledge about microbes. Links between microbiome perturbations and diseases are regularly uncovered. Using kmer-based methods, this pipeline allows its users to quickly find microbial DNA sequences in differential abundances between two conditions (e.g. healthy and not healthy), and annotates them taxonomicaly and functionaly. The pipeline also builds several machine-learning models, optimizes hyper-parameters to get the best one, and then calculates the contribution of each feature used.
 
-:exclamation: Important note: the pipeline can predict genes and annotate functions for prokaryotes only. :exclamation: 
+:exclamation: Important note: the pipeline can predict genes and annotate functions for prokar  yotes only. :exclamation: 
 
 # Workflow
 
