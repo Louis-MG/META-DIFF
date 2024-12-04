@@ -5,7 +5,7 @@ rule kraken_assign:
         config["project_path"] + "pipeline_output/kmdiff_output/{condition}_kmers.unitigs.fa"
     output:
         report = config["project_path"] + "pipeline_output/taxonomy/kraken_{condition}.report",
-        ouptut = config["project_path"] + "pipeline_output/taxonomy/kraken_{condition}.output"
+        output = config["project_path"] + "pipeline_output/taxonomy/kraken_{condition}.output"
     threads: config["threads"]
     params:
         output_dir = config["project_path"] + "pipeline_output/taxonomy/",

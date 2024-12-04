@@ -4,9 +4,9 @@ This is the repository of the pipeline META-DIFF, which detects differentially a
 
 # Motivation
 
-Metagenomics becomes increasingly important in building our knowledge about microbes. Links between microbiome perturbations and diseases are regularly uncovered. Using kmer-based methods, this pipeline allows its users to quickly find microbial DNA sequences in differential abundances between two conditions (e.g. healthy and not healthy), and annotates them taxonomicaly and functionaly. The pipeline also builds several machine-learning models, optimizes hyper-parameters to get the best one, and then calculates the contribution of each feature used.
+Metagenomics becomes increasingly important in building our knowledge about microbes. Links between microbiome perturbations and diseases are regularly uncovered. Using kmer-based methods, this pipeline allows its users to quickly find microbial DNA sequences in differential abundances between two conditions (e.g. healthy and not healthy), and annotates them taxonomically and functionally. The pipeline also builds several machine-learning models, optimizes hyper-parameters to get the best one, and then calculates the contribution of each feature used.
 
-:exclamation: Important note: the pipeline can predict genes and annotate functions for prokar  yotes only. :exclamation: 
+:exclamation: Important note: the pipeline can predict genes and annotate functions for prokaryotes only. :exclamation: 
 
 # Workflow
 
@@ -43,7 +43,7 @@ Bacteria (taxid 2)      10146249
 
 ![Heatmap](/figures/model_example.png "COnfusion matrix and Shap values example")
 
- - table of unitigs to functions by condition. Each unitig is linked to the genes it contains and their funciton, KO number.
+ - table of unitigs to functions by condition. Each unitig is linked to the genes it contains and their function, KO number.
 
 | Gene ID     | Translated Gene seq      | Unitig ID | Unitig seq | Gene function | KO | CLade |
 | ------------- | ------------- | ------------- | ------------- | ------------- | ------------- | ----------- |
@@ -55,7 +55,7 @@ Bacteria (taxid 2)      10146249
 
 Check the wiki ! Ain't much, but it's honest work.
 Memory (RAM) needed will depend on the size of your alignment database.
-Disk space required mostly depends on the size of your dataset and databases. The number of kmers for 3To of CRC fasta files reached hundreds of millions, wich is about 500G of fasta files for the first step. Other steps will use less disk. The database of `MicrobeAnnotator` is about 690G.
+Disk space required mostly depends on the size of your dataset and databases. The number of kmers for 3To of CRC fasta files reached hundreds of millions, which is about 500G of fasta files for the first step. Other steps will use less disk. The database of `MicrobeAnnotator` is about 690G.
 
 # Installation
 
@@ -64,7 +64,7 @@ Clone the repository:
 git clone https://github.com/Louis-MG/META-DIFF.git
 ```
 
-Get your functional database ready by following instructions at [MicrobeAnnotator](https://github.com/cruizperez/MicrobeAnnotator). Don't worry, it's just a few lines that take a while.
+Get your functional database ready by following instructions at [MicrobeAnnotator](https://github.com/cruizperez/MicrobeAnnotator). Don't worry, it's just a few lines that take a while. Recommandation is the full database, and the pipeline uses the Diamond search.
 Copy the path to the MicrobeAnnotator_DB in the `snakemake/config.yaml` file:
 ```
 microbeannotator_db_path: "/path/to/MicrobeAnnotator_DB/"
