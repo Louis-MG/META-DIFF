@@ -15,7 +15,7 @@ rule kmdiff_count:
     shell:
         """
         ulimit -n 10000
-	rm -d {params.output_folder}
+        rm -d {params.output_folder}
         kmdiff count -f {input} -d {params.output_folder} -t {threads} --nb-partitions {params.partitions}
         """
 
@@ -24,7 +24,7 @@ rule kmdiff_count:
 rule kmdiff_diff:
     input:
         test_file = config["project_path"] + "pipeline_output/kmdiff_output/run_infos.txt",
-	fof = config["fof"]
+	    fof = config["fof"]
     output:
         expand(config["project_path"] + "pipeline_output/kmdiff_output/{prefix}_kmers.fasta", prefix = ["case", "control"])
     params:
