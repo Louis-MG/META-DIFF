@@ -118,6 +118,52 @@ Finally, ssssstart the pipeline :snake::
 snakemake --cores X --use-conda
 ```
 
+# Machine learning
+
+## Training data filenames
+The data files should be named like this: 
+
+## Training arguments
+`experiment_name`: 
+`n_features`: controls the number of features to be used for training. Only use in combination with `use_mi` or for debugging.
+
+
+## Neptune usage
+Users are recommended to use neptune.ai in order to track the results of all the models trained during hyperparameters optimization.
+If not using neptune, only the results from the best model are going to be saved
+
+## Results
+All the results are saved in the folder `results`, which is created automatically when training the first model.
+`results/{exp_name}_{n_features}features_mi{is_mi}/` <br\>
+where `exp_name` is the experiment name, `n_features` is the number of features used (the default value is -1, which uses all features). The parameter `is_mi` controls <br\>
+
+The following results are created: <br\>
+
+### Best model
+The best model weights, best hyperparameters and scores are saved in `results/{exp_name}_{n_features}features_mi{is_mi}/confusion_matrix/`
+
+### Confusion matrices
+The confusion matrices of the best model are saved in `results/{exp_name}_{n_features}features_mi{is_mi}/confusion_matrix/`.
+Three confusion matrices are saved for the `train`, `valid` and `test` sets. Each confusion matrices is saved in two formats: `csv` and `png`.
+
+### Data visualization plots
+All ordination plots for visualization are in `results/{exp_name}_{n_features}features_mi{is_mi}/ord/`. It includes:
+- MultiDimentional Scaling (MDS)
+- Principal Components Analysis (PCA)
+- Fisher's Linear Discriminant Analysis (LDA)
+- Uniform Manifold Approximation and Projection (UMAP)
+
+### Histograms
+Four different histograms are saved in `results/{exp_name}_{n_features}features_mi{is_mi}/histograms/`. <br\>
+
+The first histogram `allclasses.png` represents the distribution of values in the outputs from your best model, using 30 bins. The x-axis indicates the output values, and the y-axis represents the frequency of those values. <br\>
+
+The `histogram zeros_per_feature_allclasses.png`  illustrates the distribution of zeros across the features in the dataset. The x-axis represents the number of zeros per feature, while the y-axis indicates the count of features that fall within each range of zeros. <br\>
+
+The `histogram zeros_per_feature_allclasses.png`  illustrates the distribution of zeros across the samples in the dataset. The x-axis represents the number of zeros per sample, while the y-axis indicates the count of features that fall within each range of zeros. <br\>
+
+If using the option `use_mi`, the figure `mutual_info_gain.png` is saved.
+
 # Issues
 
 If you have any issues, let me know in the Issues space, with an informative title and description.
