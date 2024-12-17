@@ -1,4 +1,5 @@
 import copy
+import pickle
 import os
 import neptune
 import numpy as np
@@ -14,8 +15,11 @@ from utils import get_scaler, augment_data
 from skopt.plots import plot_convergence, plot_evaluations, plot_objective, plot_regret
 from skopt import gp_minimize
 
-# TODO : NEED TO CHANGE THIS INTO A ARGPARSE ARG, avec un arg pour passer a train et vide par defaut ?
-NEPTUNE_API_TOKEN = "eyJhcGlfYWRkcmVzcyI6Imh0dHBzOi8vYXBwLm5lcHR1bmUuYWkiLCJhcGlfdXJsIjoiaHR0cHM6Ly9hcHAubmVwdHVuZS5haSIsImFwaV9rZXkiOiJlZjRiZGUzYS1kNTJmLTRkNGItOWU1MS1iNDU3MGE1NjAyODAifQ=="
+# TODO NEED TO CHANGE THE ACTUAL KEY BY A GLOBAL VARIABLE
+if 'NEPTUNE_API_TOKEN' in os.environ:
+    NEPTUNE_API_TOKEN = os.environ['NEPTUNE_API_TOKEN']
+else:
+    NEPTUNE_API_TOKEN = None
 NEPTUNE_PROJECT_NAME = "METAG/"
 NEPTUNE_MODEL_NAME = 'AC-'
 
@@ -45,8 +49,8 @@ class Train:
         self.best_hparams = None
         self.n_calls = args.n_calls
         self.args = args
-        
-    def init_neptune(self, h_params):
+
+    def init_neptune(self, h_params_dict):
         run = neptune.init_run(
             project=f"{NEPTUNE_PROJECT_NAME}{self.exp_name.split('_')[0].upper()}",
             api_token=NEPTUNE_API_TOKEN,
@@ -58,22 +62,27 @@ class Train:
                             'log_shap.py',
                             ],
         )
-        h_params_dict = {
-            hparam: h_params[i] for i, hparam in enumerate(self.hparams_names)
-        }
         run["parameters"] = h_params_dict
         run['name'] = self.name
         run['use_mi'] = self.use_mi
         run['nk_input_features'] = self.nk_input_features
         run['n_splits'] = self.n_splits
         run['n_features'] = self.args.n_features
-        return run, h_params_dict
+        return run
 
 
     def train(self, h_params):
+        # Make a dict with hparams names
+        h_params_dict = {
+            hparam: h_params[i] for i, hparam in enumerate(self.hparams_names)
+        }
+
         if self.log_neptune:
             # Create a Neptune run object
-            run, h_params_dict = self.init_neptune(h_params)
+            run = self.init_neptune(h_params_dict)
+        else:
+            run = None
+        zeros_cutoff = 0
         self.iter += 1
         bag = 1
         features_cutoff = None
@@ -103,9 +112,7 @@ class Train:
             elif name == 'zeros_cutoff':
                 zeros_cutoff = param
             else:
-                param_grid[name] = param        
-        # print hparams and their names
-
+                param_grid[name] = param
         X = self.data['X'].copy()
         clusters = self.data['clusters']
         # Keep features with mi only up to features_cutoff. mis are ordered in descending order
@@ -155,7 +162,6 @@ class Train:
         ys_dict = {group: [] for group in ['train', 'valid', 'test']}
         h = 0
         while h < self.n_splits:                                
-            print(h)
             skf = StratifiedKFold(n_splits=self.n_splits, shuffle=True, random_state=42)
             train_nums = np.arange(0, len(self.data['y']))
             splitter = skf.split(train_nums, self.data['y'], self.data['clusters'])
@@ -262,25 +268,29 @@ class Train:
                                     run[f'{group}/{cluster_metric}'].log(scores[group][metric][cluster_metric][-1])
                                 except:
                                     pass
-            
+
             h += 1
 
         score = np.mean(scores['valid']['mcc']) 
 
         self.pbar.update(1)
-        if self.log_neptune:
-            self.log_stuff(run, h_params_dict, ys_dict, preds_dict, probas_dict_true, scores)
+        self.log_stuff(run, h_params_dict, ys_dict, preds_dict, probas_dict_true, scores)
         if score > self.best_score:
             self.best_model = copy.deepcopy(classifier)
             self.best_score = score
             self.best_scores = copy.deepcopy(scores)
             os.makedirs(f'results/{self.exp_name}', exist_ok=True)
-            np.save(f'results/{self.exp_name}/best_test_scores_{self.name}', scores['test']['mcc'])
+            np.save(f'results/{self.exp_name}/model/best_test_scores_{self.name}', scores['test']['mcc'])
             self.best_hparams = copy.deepcopy(h_params)
+            # Save the best model classifier
+            with open(f'results/{self.exp_name}/model/best_model_{self.name}.pkl', 'wb') as f:
+                pickle.dump(self.best_model, f)
         self.pbar.set_description("Best score: %s" % np.round(self.best_score, 3))
         print('Best score:', self.best_score)
         # Print groups mcc
-        print(f'Current mccs: train: {np.mean(scores["train"]["mcc"])}, valid: {np.mean(scores["valid"]["mcc"])}, test: {np.mean(scores["test"]["mcc"])}')
+        print(f'Current mccs: train: {np.mean(scores["train"]["mcc"])},' \
+              f'valid: {np.mean(scores["valid"]["mcc"])},' \
+              f'test: {np.mean(scores["test"]["mcc"])}')
 
         if self.log_neptune:
             run['log_shap'] = 0
@@ -288,9 +298,15 @@ class Train:
             # End the run
             run.stop()
         if self.iter == self.n_calls:
-            if self.log_neptune and self.log_shap:
-                run, h_params_dict = self.init_neptune(self.best_hparams)
-                run['log_shap'] = 1
+            if self.log_shap:
+                h_params_dict = {
+                    hparam: self.best_hparams[i] for i, hparam in enumerate(self.hparams_names)
+                }
+                if self.log_neptune:
+                    run, h_params_dict = self.init_neptune(self.best_hparams)
+                    run['log_shap'] = 1
+                else:
+                    run = None
 
                 features_cutoff = int(X.shape[1] * h_params_dict['features_cutoff'])
                 X = self.data['X'].copy()
@@ -322,14 +338,15 @@ class Train:
                     'labels': ys,
                     'model': self.best_model,
                     'model_name': self.name,
-                    'log_path': f'logs/{self.exp_name}',
+                    'exp_name': self.exp_name,
                 }
-                self.log_stuff(run, h_params_dict, ys_dict, preds_dict, probas_dict_true, scores)
+                self.log_stuff(run, h_params_dict, ys_dict, preds_dict, probas_dict_true, self.best_scores)
                 run = log_shap(run, args_dict)
-                run.stop()
+                if run is not None:
+                    run.stop()
 
         return -score
-    
+
     def log_stuff(self, run, h_params_dict, ys_dict, preds_dict, probas_dict_true, scores):
         # Change cluster_metrics only to remove a level of depth in the dict. for example, cluster_metrics[0] becomes cluster_metrics_0
         for group in ['train', 'valid', 'test']:
@@ -338,21 +355,26 @@ class Train:
                     scores[group][f'cluster_{cluster_metric}'] = scores[group]['cluster_metrics'][cluster_metric]
                 scores[group].pop('cluster_metrics')
 
+        # Create a directory to save the results if not exist
+        os.makedirs(f'results/{self.exp_name}/scores', exist_ok=True)
+        os.makedirs(f'results/{self.exp_name}/model', exist_ok=True)
+
         # Save what is in scores as a json
-        pd.DataFrame(scores).to_json(f'results/{self.exp_name}/scores_{self.name}.json')
+        pd.DataFrame(scores).to_json(f'results/{self.exp_name}/scores/scores_{self.name}.json')
         # Save what is in score, except for cluster_metrics, as a table in csv format
-        pd.DataFrame({k: v for k, v in scores.items()}).to_csv(f'results/{self.exp_name}/scores_{self.name}.csv')
+        pd.DataFrame({k: v for k, v in scores.items()}).to_csv(f'results/{self.exp_name}/scores/scores_{self.name}.csv')
         # Save scores after getting averages
         scores = {group: {k: np.mean(v) for k, v in scores[group].items()} for group in scores.keys()}
-        pd.DataFrame(scores).to_json(f'results/{self.exp_name}/scores_avg_{self.name}.json')
-        pd.DataFrame(scores).to_csv(f'results/{self.exp_name}/scores_avg_{self.name}.csv')
+        pd.DataFrame(scores).to_json(f'results/{self.exp_name}/scores/scores_avg_{self.name}.json')
+        pd.DataFrame(scores).to_csv(f'results/{self.exp_name}/scores/scores_avg_{self.name}.csv')
 
         # Save the best hparams to file
-        pd.DataFrame(h_params_dict, index=[0]).to_csv(f'results/{self.exp_name}/best_hparams_{self.name}.csv')
+        pd.DataFrame(h_params_dict, index=[0]).to_csv(f'results/{self.exp_name}/model/best_hparams_{self.name}.csv')
         # Save confusion matrices
+        os.makedirs(f'results/{self.exp_name}/confusion_matrix', exist_ok=True)
         for group in ['train', 'valid', 'test']:
             cm = confusion_matrix(ys_dict[group], preds_dict[group])
-            pd.DataFrame(cm).to_csv(f'results/{self.exp_name}/confusion_matrix_{group}_{self.name}.csv')
+            pd.DataFrame(cm).to_csv(f'results/{self.exp_name}/confusion_matrix/{group}_{self.name}.csv')
             labels = np.unique(ys_dict[group])
 
             # Plot de la matrice de confusion
@@ -363,57 +385,73 @@ class Train:
             plt.title(f"{group} mcc: {np.round(scores[group]['mcc'], 3)}, acc: {np.round(scores[group]['acc'], 3)}")
 
             # Sauvegarder le graphique dans un fichier
-            plt.savefig(f"results/{self.exp_name}/confusion_matrix_{group}_{self.name}.png")
+            plt.savefig(f"results/{self.exp_name}/confusion_matrix/{group}_{self.name}.png")
             plt.close()
 
             # Save scatter plot of the predictions, small dots.
             # Different colors for different ys
-            plt.figure(figsize=(8, 6))
-            
-            unique_labels = np.unique(ys_dict[group])
-            for label in unique_labels:
-                mask_true = ys_dict[group] == label
-                # Add jitter to x
-                x_jitter = np.array(preds_dict[group])[mask_true] + np.random.normal(0, 0.1, np.sum(mask_true))
-                plt.scatter(x=x_jitter,
-                            y=np.array(probas_dict_true[group])[mask_true],
-                            label=f'True {label}', s=1)
-            plt.legend()
-            plt.xlabel('True labels')
-            plt.ylabel('Probability labels')
-            plt.title(f'{group} predictions')
-            plt.savefig(f"results/{self.exp_name}/scatter_{group}_{self.name}.png")
-            plt.close()
-        
-        run[f"scores/{self.name}"].upload(f"results/{self.exp_name}/scores_{self.name}.csv")
-        run[f"scores_avg/{self.name}"].upload(f"results/{self.exp_name}/scores_avg_{self.name}.csv")
-        run[f"best_hparams/{self.name}"].upload(f"results/{self.exp_name}/best_hparams_{self.name}.csv")
-        
-        run[f"confusion_matrix_train/{self.name}"].upload(f"results/{self.exp_name}/confusion_matrix_train_{self.name}.csv")
-        run[f"confusion_matrix_valid/{self.name}"].upload(f"results/{self.exp_name}/confusion_matrix_valid_{self.name}.csv")
-        run[f"confusion_matrix_test/{self.name}"].upload(f"results/{self.exp_name}/confusion_matrix_test_{self.name}.csv")
-        
-        run[f"confusion_matrix_train/{self.name}"].upload(f"results/{self.exp_name}/confusion_matrix_train_{self.name}.png")
-        run[f"confusion_matrix_valid/{self.name}"].upload(f"results/{self.exp_name}/confusion_matrix_valid_{self.name}.png")
-        run[f"confusion_matrix_test/{self.name}"].upload(f"results/{self.exp_name}/confusion_matrix_test_{self.name}.png")
+            # plt.figure(figsize=(8, 6))
 
-        run[f"scatter_train/{self.name}"].upload(f"results/{self.exp_name}/scatter_train_{self.name}.png")
-        run[f"scatter_valid/{self.name}"].upload(f"results/{self.exp_name}/scatter_valid_{self.name}.png")
-        run[f"scatter_test/{self.name}"].upload(f"results/{self.exp_name}/scatter_test_{self.name}.png")
-        
-    def get_shap(self):
-        log_shap(self.best_model,
-                 self.name,
-                 self.data['X'], # TODO change log_shap to accept self.data
-                 self.data['y'], # TODO change log_shap to accept self.data
-                 self.data['X'].columns, # TODO change log_shap to accept self.data
-                 f'logs/{self.exp_name}')
+            # nique_labels = np.unique(ys_dict[group])
+            # or label in unique_labels:
+            #    mask_true = ys_dict[group] == label
+            #    # Add jitter to x
+            #    x_jitter = np.array(preds_dict[group])[mask_true] + np.random.normal(0, 0.1, np.sum(mask_true))
+            #    plt.scatter(x=x_jitter,
+            #                y=np.array(probas_dict_true[group])[mask_true],
+            #                label=f'True {label}', s=1)
+            # lt.legend()
+            # lt.xlabel('True labels')
+            # lt.ylabel('Probability labels')
+            # lt.title(f'{group} predictions')
+            # lt.savefig(f"results/{self.exp_name}/scatter_{group}_{self.name}.png")
+            # lt.close()
+
+        if self.log_neptune:
+            run[f"scores/{self.name}"].upload(
+                f"results/{self.exp_name}/scores_{self.name}.csv"
+                )
+            run[f"scores_avg/{self.name}"].upload(
+                f"results/{self.exp_name}/scores_avg_{self.name}.csv"
+                )
+            run[f"best_hparams/{self.name}"].upload(
+                f"results/{self.exp_name}/best_hparams_{self.name}.csv"
+                )
+
+            run[f"confusion_matrix_train/{self.name}"].upload(
+                f"results/{self.exp_name}/confusion_matrix/train_{self.name}.csv"
+                )
+            run[f"confusion_matrix_valid/{self.name}"].upload(
+                f"results/{self.exp_name}/confusion_matrix/valid_{self.name}.csv"
+                )
+            run[f"confusion_matrix_test/{self.name}"].upload(
+                f"results/{self.exp_name}/confusion_matrix/test_{self.name}.csv"
+                )
+
+            run[f"confusion_matrix_train/{self.name}"].upload(
+                f"results/{self.exp_name}/confusion_matrix/train_{self.name}.png"
+                )
+            run[f"confusion_matrix_valid/{self.name}"].upload(
+                f"results/{self.exp_name}/confusion_matrix/valid_{self.name}.png"
+                )
+            run[f"confusion_matrix_test/{self.name}"].upload(
+                f"results/{self.exp_name}/confusion_matrix/test_{self.name}.png"
+                )
+
+            # run[f"scatter_train/{self.name}"].upload(
+            #     f"results/{self.exp_name}/scatter_train_{self.name}.png"
+            #     )
+            # run[f"scatter_valid/{self.name}"].upload(
+            #     f"results/{self.exp_name}/scatter_valid_{self.name}.png"
+            #     )
+            # run[f"scatter_test/{self.name}"].upload(
+            #     f"results/{self.exp_name}/scatter_test_{self.name}.png"
+            #     )
+
 
 def process_model(model, data, mi, model_name, exp_name, hp, space, args):
     train = Train(model, model_name, exp_name, data, hp, mi, args)
     res = gp_minimize(train.train, space, n_calls=args.n_calls, random_state=41)
-
-    # train.get_shap()
 
     plot_convergence(res)
     plt.show()
@@ -432,15 +470,6 @@ def process_model(model, data, mi, model_name, exp_name, hp, space, args):
         plt.show()
     except:
         pass
-    
-    # param_grid = {}
-    # for name, param in zip(hp, res.x):
-    #     if name == 'n_aug':
-    #         n_aug = param
-    #     elif name == 'scaler':
-    #         scaler = param
-    #     else:
-    #         param_grid[name] = param
-    # scaler = get_scaler(scaler)()
+
     return res
    

@@ -1,4 +1,5 @@
 import torch
+import numpy as np
 import pandas as pd
 import numpy as np
 import seaborn as sns
@@ -8,9 +9,12 @@ from sklearn import metrics
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.preprocessing import RobustScaler
 from sklearn.preprocessing import StandardScaler
+from skopt import gp_minimize
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis, QuadraticDiscriminantAnalysis
 from sklearn.model_selection import train_test_split
+import os
 
+from concurrent.futures import ThreadPoolExecutor
 
 def augment_data(X_train, y_train, n_aug, p=0, g=0):
     torch.manual_seed(42)
@@ -46,12 +50,13 @@ def get_scaler(scaler):
         return MinMaxScaler
     else:
         exit('Wrong scaler name')
-        
-def save_figures(df, labels, experiment_name, output):
+
+def save_figures(df, experiment_name):
     # Flatten the matrix to a 1D array for distribution plots
-    labels = labels.values
-    unique_labels = np.unique(labels)
-    data = df.values.flatten()    
+    data = df.values.flatten()
+
+    # Create the directory to save the histograms
+    os.makedirs(f"results/{experiment_name}/histograms", exist_ok=True)
 
     # 1. Histogram
     plt.figure(figsize=(6, 4))
@@ -59,86 +64,7 @@ def save_figures(df, labels, experiment_name, output):
     plt.title("Histogram of Matrix Values")
     plt.xlabel("Value")
     plt.ylabel("Frequency")
-    plt.savefig(f"{output}/histogram_allclasses.png")
-    plt.close()
-    
-    # Make superposed histograms for each class in the same graph
-    # plt.figure(figsize=(6, 4))
-    # for label in unique_labels:
-    #     plt.hist(df[labels == label].values.flatten(), bins=30, alpha=0.7, label=f"Class {label}", edgecolor='black')
-    # plt.title("Histogram of Matrix Values")
-    # plt.xlabel("Value")
-    # plt.ylabel("Frequency")
-    # plt.legend()
-    # plt.savefig(f"results/{experiment_name}/histogram_perclass.png")
-    # plt.close()
-    
-
-    # 2. KDE Plot
-    # plt.figure(figsize=(6, 4))
-    # sns.kdeplot(data, bw_adjust=0.5)
-    # plt.title("KDE Plot of Matrix Values")
-    # plt.xlabel("Value")
-    # plt.ylabel("Density")
-    # plt.show()
-
-    # 3. Box Plot
-    plt.figure(figsize=(6, 4))
-    sns.boxplot(data)
-    plt.title("Box Plot of Matrix Values")
-    plt.xlabel("Value")
-    plt.savefig(f"{output}/boxplot_allclasses.png")
-    plt.close()
-    
-    # boxplot per class
-    # plt.figure(figsize=(6, 4))
-    # sns.boxplot(data=data, y=labels)
-    # plt.title("Box Plot of Matrix Values")
-    # plt.xlabel("Class")
-    # plt.ylabel("Value")
-    # plt.savefig(f"results/{experiment_name}/boxplot_perclass.png")
-    # plt.close()
-    
-
-    # 4. Violin Plot
-    plt.figure(figsize=(6, 4))
-    sns.violinplot(data)
-    plt.title("Violin Plot of Matrix Values")
-    plt.xlabel("Value")
-    plt.savefig(f"{output}/violinplot.png")
-    plt.close()
-    
-    # violin plot per class
-    # plt.figure(figsize=(6, 4))
-    # sns.violinplot(data=df, y=labels)
-    # plt.title("Violin Plot of Matrix Values")
-    # plt.xlabel("Class")
-    # plt.ylabel("Value")
-    # plt.savefig(f"results/{experiment_name}/violinplot_perclass.png")
-    # plt.close()
-    
-
-    # 5. Heatmap
-    plt.figure(figsize=(8, 6))
-    sns.heatmap(df.values, cmap="viridis")
-    plt.title("Heatmap of Matrix")
-    plt.savefig(f"{output}/heatmap.png")
-    plt.close()
-    
-    # Heatmap per class
-    # plt.figure(figsize=(8, 6))
-    # sns.heatmap(df.values, cmap="viridis", yticklabels=labels)
-    # plt.title("Heatmap of Matrix")
-    # plt.savefig(f"results/{experiment_name}/heatmap_perclass.png")
-    # plt.close()
-    
-    # binarize the data
-    df1 = df.applymap(lambda x: 1 if x > 0.5 else 0)
-    # 5. Heatmap
-    plt.figure(figsize=(8, 6))
-    sns.heatmap(df1.values, cmap="viridis")
-    plt.title("Heatmap of Matrix")
-    plt.savefig(f"{output}/heatmap_binary.png")
+    plt.savefig(f"results/{experiment_name}/histograms/allclasses.png")
     plt.close()
 
     # Make an histogram of the number of zeros per sample
@@ -146,39 +72,17 @@ def save_figures(df, labels, experiment_name, output):
     plt.xlabel('Number of zeros')
     plt.ylabel('Number of samples')
     plt.title('Histogram of the number of zeros per sample')
-    plt.savefig(f"{output}/histogram_zeros_per_sample_allclasses.png")
+    plt.savefig(f"results/{experiment_name}/histograms/zeros_per_sample_allclasses.png")
     plt.close()
-    
-    # Make an histogram of the number of zeros per sample per class superposed
-    # plt.figure(figsize=(6, 4))
-    # for label in unique_labels:
-    #     plt.hist(np.sum(df[labels == label] == 0, axis=1), bins=20, alpha=0.7, label=f"Class {label}", edgecolor='black')
-    # plt.xlabel('Number of zeros')
-    # plt.ylabel('Number of samples')
-    # plt.title('Histogram of the number of zeros per sample')
-    # plt.legend()
-    # plt.savefig(f"results/{experiment_name}/histogram_zeros_per_sample_perclass.png")
-    
-    # Make an histogram of the number of zeros per feature
+
     plt.hist(np.sum(df == 0, axis=0), bins=20)
     plt.xlabel('Number of zeros')
     plt.ylabel('Number of features')
     plt.title('Histogram of the number of zeros per feature')
-    plt.savefig(f"{output}/histogram_zeros_per_feature_allclasses.png")
+    plt.savefig(f"results/{experiment_name}/histograms/histogram_zeros_per_feature_allclasses.png")
     plt.close()
-    
-    # Make an histogram of the number of zeros per feature per class superposed
-    # plt.figure(figsize=(6, 4))
-    # for label in unique_labels:
-    #     plt.hist(np.sum(df[labels == label] == 0, axis=0), bins=20, alpha=0.7, label=f"Class {label}", edgecolor='black')
-    # plt.xlabel('Number of zeros')
-    # plt.ylabel('Number of features')
-    # plt.title('Histogram of the number of zeros per feature')
-    # plt.legend()
-    # plt.savefig(f"results/{experiment_name}/histogram_zeros_per_feature_perclass.png")
-    # plt.close()
-    
- 
+
+
 def get_clusters(X):
     # kmeans with 1 to 10 clusters
     from sklearn.cluster import KMeans
@@ -198,7 +102,16 @@ def get_clusters(X):
 
     return clusters
 
-def get_ordinations(X, Y, exp_name, output):
+def get_ordinations(X, Y, exp_name) -> None:
+    """
+    Funtion to create and save ordination plots for visualizing the data
+
+    Args:
+        X (_type_): _description_
+        Y (_type_): _description_
+        exp_name (_type_): _description_
+    """
+    os.makedirs(f"results/{exp_name}/ord", exist_ok=True)
     # Ordinations
     # PCA
     from sklearn.decomposition import PCA
@@ -208,7 +121,7 @@ def get_ordinations(X, Y, exp_name, output):
     plt.xlabel('PCA1')
     plt.ylabel('PCA2')
     plt.title('PCA')
-    plt.savefig(f"{output}/pca.png")
+    plt.savefig(f"results/{exp_name}/ord/pca.png")
     plt.close()
 
     # UMAP
@@ -219,7 +132,7 @@ def get_ordinations(X, Y, exp_name, output):
     plt.xlabel('UMAP1')
     plt.ylabel('UMAP2')
     plt.title('UMAP')
-    plt.savefig(f"{output}/umap.png")
+    plt.savefig(f"results/{exp_name}/ord/umap.png")
     plt.close()
 
     # NMDS
@@ -230,7 +143,7 @@ def get_ordinations(X, Y, exp_name, output):
     plt.xlabel('MDS1')
     plt.ylabel('MDS2')
     plt.title('MDS')
-    plt.savefig(f"{output}/mds.png")
+    plt.savefig(f"results/{exp_name}/ord/mds.png")
     plt.close()
 
     # USE LDA after splitting the data
@@ -241,7 +154,7 @@ def get_ordinations(X, Y, exp_name, output):
     plt.scatter(X_lda, np.zeros(X_lda.shape), c=y_train)
     plt.xlabel('LDA')
     plt.title('LDA')
-    plt.savefig(f"{output}/lda.png")
+    plt.savefig(f"results/{exp_name}/ord/lda.png")
     plt.close()
 
     # Test scores with LDA
@@ -255,7 +168,7 @@ def get_ordinations(X, Y, exp_name, output):
     plt.scatter(valid_LDA, np.zeros(valid_LDA.shape), c=y_test)
     plt.xlabel('LDA')
     plt.title('LDA')
-    plt.savefig(f"{output}/lda_test.png")
+    plt.savefig(f"results/{exp_name}/ord/lda_test.png")
     plt.close()
 
     # Test scores with QDA

@@ -30,124 +30,134 @@ def interactions_mean_matrix(shap_interactions, X, run, group):
     plt.close(f)
 
 
-def make_summary_plot(df, values, group, run, 
-                      log_path, category='explainer',
+def make_summary_plot(df, values, group, run,
+                      exp_name, category='explainer',
                       mlops='neptune'):
     shap.summary_plot(values, df, show=False)
     f = plt.gcf()
-    if mlops == 'neptune':
+    if mlops == 'neptune' and run is not None:
         run[f'shap/summary_{category}/{group}_values'].upload(f)
-
+    plt.savefig(f"results/{exp_name}/shap/{group}_summary.png")
     plt.close(f)
 
 
-def make_force_plot(df, values, features, group, run, log_path, category='explainer', mlops='neptune'):
-    shap.force_plot(df, values, features=features, show=False)
+def make_force_plot(df, values, features, group, run, exp_name, category='explainer', mlops='neptune'):
+    shap.plots.force(values, show=False)
     f = plt.gcf()
-    if mlops == 'neptune':
+    if mlops == 'neptune' and run is not None:
         run[f'shap/force_{category}/{group}_values'].upload(f)
-
+    plt.savefig(f"results/{exp_name}/shap/{group}_force.png")
     plt.close(f)
 
 
-def make_deep_beeswarm(df, values, group, run, log_path, category='explainer', mlops='neptune'):
+def make_deep_beeswarm(df, values, group, run, exp_name, category='explainer', mlops='neptune'):
     shap.summary_plot(values, feature_names=df.columns, features=df, show=False)
     f = plt.gcf()
-    if mlops == 'neptune':
+    if mlops == 'neptune' and run is not None:
         run[f'shap/beeswarm_{category}/{group}_values'].upload(f)
-
+    plt.savefig(f"results/{exp_name}/shap/{group}_beeswarm.png")
     plt.close(f)
 
 
-def make_decision_plot(df, values, misclassified, feature_names, group, run, log_path, category='explainer', mlops='neptune'):
+def make_decision_plot(df, values, misclassified, feature_names, group, run, exp_name, category='explainer', mlops='neptune'):
     # replace first column with base value
     values = np.c_[values.base_values, values.values]
     shap.decision_plot(df, values, feature_names=list(feature_names),
                        show=False, link='logit')
     f = plt.gcf()
-    if mlops == 'neptune':
+    if mlops == 'neptune' and run is not None:
         run[f'shap/decision_{category}/{group}_values'].upload(f)
-        run[f'shap/decision_{category}/{group}_values'].upload(f)
+    plt.savefig(f"results/{exp_name}/shap/{group}_decision.png")
     plt.close(f)
 
 
-def make_decision_deep(df, values, misclassified, feature_names, group, run, log_path, category='explainer', mlops='neptune'):
+def make_decision_deep(df, values, misclassified, feature_names, group, run, exp_name, category='explainer', mlops='neptune'):
     shap.decision_plot(df, values, feature_names=list(feature_names), show=False, link='logit', highlight=misclassified)
     f = plt.gcf()
-    if mlops == 'neptune':
+    if mlops == 'neptune' and run is not None:
         run[f'shap/decision_{category}/{group}_values'].upload(f)
-        run[f'shap/decision_{category}/{group}_values'].upload(f)
+    plt.savefig(f"results/{exp_name}/shap/{group}_decision.png")
     plt.close(f)
 
 
-def make_multioutput_decision_plot(df, values, group, run, log_path, category='explainer', mlops='neptune'):
+def make_multioutput_decision_plot(df, values, group, run, exp_name, category='explainer', mlops='neptune'):
     shap.multioutput_decision_plot(values, df, show=False)
     f = plt.gcf()
-    if mlops == 'neptune':
+    if mlops == 'neptune' and run is not None:
         run[f'shap/multioutput_decision_{category}/{group}_values'].upload(f)
+    plt.savefig(f"results/{exp_name}/shap/{group}_multioutput_decision.png")
     plt.close(f)
 
 
-def make_group_difference_plot(values, mask, group, run, log_path, category='explainer', mlops='neptune'):
+def make_group_difference_plot(values, mask, group, run, exp_name, category='explainer', mlops='neptune'):
     shap.group_difference_plot(values, mask, show=False)
     f = plt.gcf()
-    if mlops == 'neptune':
+    if mlops == 'neptune' and run is not None:
         # run[f'shap/gdiff_{category}/{group}'].upload(f)
         run[f'shap/gdiff_{category}/{group}'].upload(f)
+    plt.savefig(f"results/{exp_name}/shap/{group}_gdiff.png")
     plt.close(f)
 
 
-def make_beeswarm_plot(values, group, run, log_path, category='explainer', mlops='neptune'):
+def make_beeswarm_plot(values, group, run, exp_name, category='explainer', mlops='neptune'):
     shap.plots.beeswarm(values, max_display=20, show=False)
     f = plt.gcf()
-    if mlops == 'neptune':
+    if mlops == 'neptune' and run is not None:
         # run[f'shap/beeswarm_{category}/{group}'].upload(f)
         run[f'shap/beeswarm_{category}/{group}'].upload(f)
+    plt.savefig(f"results/{exp_name}/shap/{group}_beeswarm.png")
     plt.close(f)
 
 
-def make_heatmap(values, group, run, log_path, category='explainer', mlops='neptune'):
+def make_heatmap(values, group, run, exp_name, category='explainer', mlops='neptune'):
     shap.plots.heatmap(values, instance_order=values.values.sum(1).argsort(), max_display=20, show=False)
     f = plt.gcf()
-    if mlops == 'neptune':
+    if mlops == 'neptune' and run is not None:
         # run[f'shap/heatmap_{category}/{group}'].upload(f)
         run[f'shap/heatmap_{category}/{group}'].upload(f)
+    plt.savefig(f"results/{exp_name}/shap/{group}_heatmap.png")
     plt.close(f)
 
 
-def make_heatmap_deep(values, group, run, log_path, category='explainer', mlops='neptune'):
+def make_heatmap_deep(values, group, run, exp_name, category='explainer', mlops='neptune'):
 
     shap.plots.heatmap(pd.DataFrame(values), instance_order=values.sum(1).argsort(), max_display=20, show=False)
     f = plt.gcf()
-    if mlops == 'neptune':
+    if mlops == 'neptune' and run is not None:
         # run[f'shap/heatmap_{category}/{group}'].upload(f)
         run[f'shap/heatmap_{category}/{group}'].upload(f)
+    plt.savefig(f"results/{exp_name}/shap/{group}_heatmap_deep.png")
     plt.close(f)
 
 
-def make_barplot(df, y, values, group, run, log_path, category='explainer', mlops='neptune'):
+def make_barplot(df, y, values, group, run, exp_name, category='explainer', mlops='neptune'):
     clustering = shap.utils.hclust(df, y, metric='correlation')  # cluster_threshold=0.9
     # shap.plots.bar(values, max_display=20, show=False, clustering=clustering)
     shap.plots.bar(values, max_display=20, show=False, clustering=clustering, clustering_cutoff=0.5)
     f = plt.gcf()
-    if mlops == 'neptune':
+    if mlops == 'neptune' and run is not None:
         run[f'shap/bar_{category}/{group}'].upload(f)
+    plt.savefig(f"results/{exp_name}/shap/{group}_bar.png")
     plt.close(f)
 
 
-def make_bar_plot(df, values, group, run, log_path, category='explainer', mlops='neptune'):
-    shap.bar_plot(values, max_display=40, feature_names=df.columns, show=False)
+def make_bar_plot(df, values, group, run, exp_name, category='explainer', mlops='neptune'):
+    shap.plots.bar(values, show=False)
+    # shap.bar_plot(values)
     f = plt.gcf()
-    if mlops == 'neptune':
+    if mlops == 'neptune' and run is not None:
         # run[f'shap/barold_{category}/{group}'].upload(f)
         run[f'shap/barold_{category}/{group}'].upload(f)
+    plt.tight_layout()
+    plt.savefig(f"results/{exp_name}/shap/{group}_barold.png")
     plt.close(f)
 
-def make_dependence_plot(df, values, var, group, run, log_path, category='explainer', mlops='neptune'):
+def make_dependence_plot(df, values, var, group, run, exp_name, category='explainer', mlops='neptune'):
     shap.dependence_plot(var, values[1], df, show=False)
     f = plt.gcf()
-    if mlops == 'neptune':
+    if mlops == 'neptune' and run is not None:
         run[f'shap/dependence_{category}/{group}'].upload(f)
+    plt.savefig(f"results/{exp_name}/shap/{group}_dependence.png")
     plt.close(f)
 
 def log_explainer(run, group, args_dict):
@@ -156,7 +166,8 @@ def log_explainer(run, group, args_dict):
     x_df = args_dict['inputs'][group]
     labels = args_dict['labels'][group]
     # columns = args_dict['columns']
-    log_path = args_dict['log_path']
+    exp_name = args_dict['exp_name']
+    log_path = f"logs/{exp_name}"
 
     unique_classes = np.unique(labels)
     # The explainer doesn't like tensors, hence the f function
@@ -179,6 +190,7 @@ def log_explainer(run, group, args_dict):
         indices = stratified_split.split(x_df, labels).__next__()[1]
         x_df = x_df.iloc[indices]
         explainer = shap.KernelExplainer(f, x_df)
+        X = x_df.to_numpy(dtype=np.float32)
 
     # y_shap = y[test_index]    # Get the shap values from my test data
     shap_values = explainer(X)
@@ -226,7 +238,7 @@ def log_explainer(run, group, args_dict):
             plt.savefig(f"{log_path}/{group}_linear_shap_{label}_kde_abs.png")
             plt.close()
             run[f'shap/linear_{group}_{label}_kde'].upload(f"{log_path}/{group}_linear_shap_{label}_kde_abs.png")
-            
+
             values, base = np.histogram(shap_values_df.abs(), bins=40)
             #evaluate the cumulative
             cumulative = np.cumsum(values)
@@ -278,6 +290,8 @@ def log_explainer(run, group, args_dict):
                 run[f'shap/linear_{group}_{label}'].upload(f"{log_path}/{group}_linear_shap_{label}_abs.csv")
 
                 shap_values_df.transpose().hist(bins=100, figsize=(10, 10))
+                plt.ylabel('Frequency')
+                plt.xlabel('SHAP value')
                 plt.savefig(f"{log_path}/{group}_linear_shap_{label}_hist_abs.png")
                 plt.close()
                 plt.title(f'base_value: {np.round(bv, 2)}')
@@ -285,6 +299,8 @@ def log_explainer(run, group, args_dict):
                 run[f'shap/linear_{group}_{label}_hist'].upload(f"{log_path}/{group}_linear_shap_{label}_hist_abs.png")
                 # start x axis at 0
                 shap_values_df.abs().sort_values(ascending=False).plot(kind='kde', figsize=(10, 10))
+                plt.ylabel('Density')
+                plt.xlabel('SHAP value')
                 # shap_values_df.transpose().cumsum().hist(bins=100, figsize=(10, 10))
                 plt.xlim(0, shap_values_df.abs().max())
                 plt.savefig(f"{log_path}/{group}_linear_shap_{label}_kde_abs.png")
@@ -292,7 +308,7 @@ def log_explainer(run, group, args_dict):
                 plt.title(f'base_value: {np.round(bv, 2)}')
                 # if i == 0:
                 run[f'shap/linear_{group}_{label}_kde'].upload(f"{log_path}/{group}_linear_shap_{label}_kde_abs.png")
-                
+
                 values, base = np.histogram(shap_values_df.abs(), bins=40)
                 #evaluate the cumulative
                 cumulative = np.cumsum(values)
@@ -301,6 +317,8 @@ def log_explainer(run, group, args_dict):
                 #plot the survival function
                 plt.plot(base[:-1], len(shap_values_df.abs())-cumulative, c='green')
 
+                plt.ylabel('Cumulative Density')
+                plt.xlabel('SHAP value')
                 plt.savefig(f"{log_path}/{group}_linear_shap_{label}_cumulative_abs.png")
                 plt.close()
                 plt.title(f'base_value: {np.round(bv, 2)}')
@@ -311,24 +329,25 @@ def log_explainer(run, group, args_dict):
                 pass
 
     # if x_df.shape[1] <= 1000:
-    #     make_barplot(x_df, labels, shap_values[:, :, 0], 
+    #     make_barplot(x_df, labels, shap_values[:, :, 0],
     #                 group, run, 'LinearExplainer', mlops='neptune')
     #     # Summary plot
-    #     make_summary_plot(x_df, shap_values[:, :, 0], group, run, 
-    #                     'LinearExplainer', mlops='neptune')
-    #     make_beeswarm_plot(shap_values[:, :, 0], group, run,
-    #                         'LinearExplainer', mlops='neptune')
-    #     make_heatmap(shap_values[:, :, 0], group, run,
-    #                 'LinearExplainer', mlops='neptune')
-    #     # mask = np.array([np.argwhere(x[0] == 1)[0][0] for x in cats])
-    #     # make_group_difference_plot(x_df.sum(1).to_numpy(), mask, group, run, 'LinearExplainer', mlops='neptune')
-    #     make_bar_plot(x_df, shap_values[0], group, run,
-    #                 'LinearExplainer', mlops='neptune')
-    #     make_force_plot(x_df, shap_values[0], x_df.columns, 
-    #                     group, run, 'LinearExplainer', mlops='neptune')
+    os.makedirs(f"results/{exp_name}/shap", exist_ok=True)
+    # df, values, features, group, run, exp_name, category='explainer', mlops='neptune'
+    make_force_plot(x_df, shap_values[0], x_df.columns, group, run, 
+                    exp_name, 'LinearExplainer', mlops='neptune')
+    make_bar_plot(x_df, shap_values, group, run, exp_name,
+                'LinearExplainer', mlops='neptune')
+    make_summary_plot(x_df, shap_values, group, run, exp_name,
+                    'LinearExplainer', mlops='neptune')
+    make_beeswarm_plot(shap_values, group, run, exp_name, 'LinearExplainer', mlops='neptune')
+    make_heatmap(shap_values, group, run, exp_name,
+                'LinearExplainer', mlops='neptune')
+    # mask = np.array([np.argwhere(x[0] == 1)[0][0] for x in cats])
+    # make_group_difference_plot(x_df.sum(1).to_numpy(), mask, group, run, 'LinearExplainer', mlops='neptune')
     return run
 
-def log_kernel_explainer(model, x_df, misclassified, 
+def log_kernel_explainer(model, x_df, misclassified,
                          labels, group, run, cats, log_path):
     unique_classes = np.unique(labels)
 
@@ -362,7 +381,8 @@ def log_kernel_explainer(model, x_df, misclassified,
 def log_shap(run, args_dict):
     # explain all the predictions in the test set
     # explainer = shap.KernelExplainer(svc_linear.predict_proba, X_train[:100])
-    os.makedirs(args_dict['log_path'], exist_ok=True)
+    log_path = args_dict['exp_name']
+    os.makedirs(log_path, exist_ok=True)
     for group in ['valid', 'test']:
         if group not in args_dict['inputs']:
             continue
