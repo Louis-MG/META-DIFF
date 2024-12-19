@@ -118,6 +118,11 @@ Finally, ssssstart the pipeline :snake::
 snakemake --cores X --use-conda
 ```
 
+# Coming next 
+
+- addition of a quarto report with all the numbers and figures
+- addition of a script to automatically set up the databases
+
 # Issues
 
 If you have any issues, let me know in the Issues space, with an informative title and description.
