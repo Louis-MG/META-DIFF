@@ -19,17 +19,17 @@ rule kmindex_build:
     input:
         fof= config["fof"]
     output:
-        output_dir = config["project_path"] + "pipeline_output/biomarker/",
-        output_index = config["project_path"] + "pipeline_output/biomarker/index/biomarkers"
+        index = config["project_path"] + "pipeline_output/biomarker/index"
     threads: config["threads"]
     params:
+        output_dir = config["project_path"] + "pipeline_output/biomarker/",
         bloom_filter= config["bloom_filter"],
         bitw= config["bitw"]
     conda:
         "../../env/kmindex.yaml"
     shell:
         """
-        kmindex build --fof {input.fof} --run-dir {output.output_dir}/index_workdir --index {output.output_index} --register-as biomarkers --hard-min 1 --kmer-size 25 --bloom-size {params.bloom_filter}} --bitw {params.bitw}
+        kmindex build --fof {input.fof} --run-dir {params.output_dir}/index_workdir --index {output.index} --register-as biomarkers --hard-min 1 --kmer-size 25 --bloom-size {params.bloom_filter}} --bitw {params.bitw}
         """
 
 
