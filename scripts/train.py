@@ -279,11 +279,11 @@ class Train:
             self.best_model = copy.deepcopy(classifier)
             self.best_score = score
             self.best_scores = copy.deepcopy(scores)
-            os.makedirs(f'results/{self.exp_name}', exist_ok=True)
-            np.save(f'results/{self.exp_name}/model/best_test_scores_{self.name}', scores['test']['mcc'])
+            os.makedirs(f'{self.args.output}/{self.exp_name}', exist_ok=True)
+            np.save(f'{self.args.output}/{self.exp_name}/model/best_test_scores_{self.name}', scores['test']['mcc'])
             self.best_hparams = copy.deepcopy(h_params)
             # Save the best model classifier
-            with open(f'results/{self.exp_name}/model/best_model_{self.name}.pkl', 'wb') as f:
+            with open(f'{self.args.output}/{self.exp_name}/model/best_model_{self.name}.pkl', 'wb') as f:
                 pickle.dump(self.best_model, f)
         self.pbar.set_description("Best score: %s" % np.round(self.best_score, 3))
         print('Best score:', self.best_score)
@@ -355,26 +355,26 @@ class Train:
                     scores[group][f'cluster_{cluster_metric}'] = scores[group]['cluster_metrics'][cluster_metric]
                 scores[group].pop('cluster_metrics')
 
-        # Create a directory to save the results if not exist
-        os.makedirs(f'results/{self.exp_name}/scores', exist_ok=True)
-        os.makedirs(f'results/{self.exp_name}/model', exist_ok=True)
+        # Create a directory to save the {args.output}} if not exist
+        os.makedirs(f'{args.output}/{self.exp_name}/scores', exist_ok=True)
+        os.makedirs(f'{args.output}/{self.exp_name}/model', exist_ok=True)
 
         # Save what is in scores as a json
-        pd.DataFrame(scores).to_json(f'results/{self.exp_name}/scores/scores_{self.name}.json')
+        pd.DataFrame(scores).to_json(f'{args.output}/{self.exp_name}/scores/scores_{self.name}.json')
         # Save what is in score, except for cluster_metrics, as a table in csv format
-        pd.DataFrame({k: v for k, v in scores.items()}).to_csv(f'results/{self.exp_name}/scores/scores_{self.name}.csv')
+        pd.DataFrame({k: v for k, v in scores.items()}).to_csv(f'{args.output}/{self.exp_name}/scores/scores_{self.name}.csv')
         # Save scores after getting averages
         scores = {group: {k: np.mean(v) for k, v in scores[group].items()} for group in scores.keys()}
-        pd.DataFrame(scores).to_json(f'results/{self.exp_name}/scores/scores_avg_{self.name}.json')
-        pd.DataFrame(scores).to_csv(f'results/{self.exp_name}/scores/scores_avg_{self.name}.csv')
+        pd.DataFrame(scores).to_json(f'{args.output}/{self.exp_name}/scores/scores_avg_{self.name}.json')
+        pd.DataFrame(scores).to_csv(f'{args.output}/{self.exp_name}/scores/scores_avg_{self.name}.csv')
 
         # Save the best hparams to file
-        pd.DataFrame(h_params_dict, index=[0]).to_csv(f'results/{self.exp_name}/model/best_hparams_{self.name}.csv')
+        pd.DataFrame(h_params_dict, index=[0]).to_csv(f'{args.output}/{self.exp_name}/model/best_hparams_{self.name}.csv')
         # Save confusion matrices
-        os.makedirs(f'results/{self.exp_name}/confusion_matrix', exist_ok=True)
+        os.makedirs(f'{args.output}/{self.exp_name}/confusion_matrix', exist_ok=True)
         for group in ['train', 'valid', 'test']:
             cm = confusion_matrix(ys_dict[group], preds_dict[group])
-            pd.DataFrame(cm).to_csv(f'results/{self.exp_name}/confusion_matrix/{group}_{self.name}.csv')
+            pd.DataFrame(cm).to_csv(f'{args.output}/{self.exp_name}/confusion_matrix/{group}_{self.name}.csv')
             labels = np.unique(ys_dict[group])
 
             # Plot de la matrice de confusion
@@ -385,7 +385,7 @@ class Train:
             plt.title(f"{group} mcc: {np.round(scores[group]['mcc'], 3)}, acc: {np.round(scores[group]['acc'], 3)}")
 
             # Sauvegarder le graphique dans un fichier
-            plt.savefig(f"results/{self.exp_name}/confusion_matrix/{group}_{self.name}.png")
+            plt.savefig(f"{args.output}/{self.exp_name}/confusion_matrix/{group}_{self.name}.png")
             plt.close()
 
             # Save scatter plot of the predictions, small dots.
@@ -404,48 +404,48 @@ class Train:
             # lt.xlabel('True labels')
             # lt.ylabel('Probability labels')
             # lt.title(f'{group} predictions')
-            # lt.savefig(f"results/{self.exp_name}/scatter_{group}_{self.name}.png")
+            # lt.savefig(f"{args.output}}/{self.exp_name}/scatter_{group}_{self.name}.png")
             # lt.close()
 
         if self.log_neptune:
             run[f"scores/{self.name}"].upload(
-                f"results/{self.exp_name}/scores_{self.name}.csv"
+                f"{self.args.output}/{self.exp_name}/scores_{self.name}.csv"
                 )
             run[f"scores_avg/{self.name}"].upload(
-                f"results/{self.exp_name}/scores_avg_{self.name}.csv"
+                f"{self.args.output}/{self.exp_name}/scores_avg_{self.name}.csv"
                 )
             run[f"best_hparams/{self.name}"].upload(
-                f"results/{self.exp_name}/best_hparams_{self.name}.csv"
+                f"{self.args.output}/{self.exp_name}/best_hparams_{self.name}.csv"
                 )
 
             run[f"confusion_matrix_train/{self.name}"].upload(
-                f"results/{self.exp_name}/confusion_matrix/train_{self.name}.csv"
+                f"{self.args.output}/{self.exp_name}/confusion_matrix/train_{self.name}.csv"
                 )
             run[f"confusion_matrix_valid/{self.name}"].upload(
-                f"results/{self.exp_name}/confusion_matrix/valid_{self.name}.csv"
+                f"{self.args.output}/{self.exp_name}/confusion_matrix/valid_{self.name}.csv"
                 )
             run[f"confusion_matrix_test/{self.name}"].upload(
-                f"results/{self.exp_name}/confusion_matrix/test_{self.name}.csv"
+                f"{self.args.output}/{self.exp_name}/confusion_matrix/test_{self.name}.csv"
                 )
 
             run[f"confusion_matrix_train/{self.name}"].upload(
-                f"results/{self.exp_name}/confusion_matrix/train_{self.name}.png"
+                f"{self.args.output}/{self.exp_name}/confusion_matrix/train_{self.name}.png"
                 )
             run[f"confusion_matrix_valid/{self.name}"].upload(
-                f"results/{self.exp_name}/confusion_matrix/valid_{self.name}.png"
+                f"{self.args.output}/{self.exp_name}/confusion_matrix/valid_{self.name}.png"
                 )
             run[f"confusion_matrix_test/{self.name}"].upload(
-                f"results/{self.exp_name}/confusion_matrix/test_{self.name}.png"
+                f"{self.args.output}/{self.exp_name}/confusion_matrix/test_{self.name}.png"
                 )
 
             # run[f"scatter_train/{self.name}"].upload(
-            #     f"results/{self.exp_name}/scatter_train_{self.name}.png"
+            #     f"{args.output}}/{self.exp_name}/scatter_train_{self.name}.png"
             #     )
             # run[f"scatter_valid/{self.name}"].upload(
-            #     f"results/{self.exp_name}/scatter_valid_{self.name}.png"
+            #     f"{args.output}}/{self.exp_name}/scatter_valid_{self.name}.png"
             #     )
             # run[f"scatter_test/{self.name}"].upload(
-            #     f"results/{self.exp_name}/scatter_test_{self.name}.png"
+            #     f"{args.output}}/{self.exp_name}/scatter_test_{self.name}.png"
             #     )
 
 

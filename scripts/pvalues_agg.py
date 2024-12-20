@@ -30,9 +30,7 @@ def verif_input(path: Union[str, bytes, os.PathLike]):
 	:return: nothing
 	"""
 	path = str(path)
-	if os.path.isfile(path):
-		pass
-	else:
+	if not os.path.isfile(path):
 		print(f"ERROR: file {path} does not exist or is not a file.")
 		sys.exit()
 
@@ -45,9 +43,7 @@ def verif_output(path: Union[str, bytes, os.PathLike], prefix: str):
 	:return: nothing
 	"""
 	path = str(path)
-	if os.path.isdir(path) :
-		pass
-	else:
+	if not os.path.isdir(path) :
 		print(f"ERROR: folder {path} not found.")
 		sys.exit()
 	if os.path.isfile(path+"/"+prefix+".aggregated.fa") :
@@ -94,23 +90,19 @@ def load_pvalue_dict(path: Union[str, bytes, os.PathLike]) -> dict[str, float]:
 	return kmer_2_pvalue
 
 
-def reverse_complement(kmer: str):
+def reverse_complement(kmer: str) -> str :
 	"""
 	Reverse complement a kmer.
 	:param kmer: string
 	:return: reversed complement string of the kmer.
 	"""
-	rev_compl_kmer = ""
-	rev_kmer = kmer[::-1]
 	dict_reverse_nucleotides = {"A":"T", "T":"A", "C":"G", "G":"C"}
-	for i in range(0, len(kmer)) :
-			rev_compl_kmer += dict_reverse_nucleotides[rev_kmer[i]]
-	return rev_compl_kmer
+	return ''.join(dict_reverse_nucleotides[ch] for ch in reversed(kmer))
 
 
 class Unitig(object):
 	"""
-	Object representing a unitig, with its sequence and aggregated pvalue.
+	Object representing an unitig, with its sequence and aggregated pvalue.
 	"""
 	sequence : ""
 	pvalue : 0
