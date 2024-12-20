@@ -24,12 +24,13 @@ rule kmindex_build:
     params:
         output_dir = config["project_path"] + "pipeline_output/biomarker/",
         bloom_filter= config["bloom_filter"],
-        bitw= config["bitw"]
+        bitw= config["bitw"],
+        partitions = config["partitions"]
     conda:
         "../../env/kmindex.yaml"
     shell:
         """
-        kmindex build --fof {input.fof} --run-dir {params.output_dir}/index_workdir --index {output.index} --register-as biomarkers --hard-min 1 --kmer-size 25 --bloom-size {params.bloom_filter} --bitw {params.bitw} --threads {threads}
+        kmindex build --fof {input.fof} --run-dir {params.output_dir}/index_workdir --index {output.index} --register-as biomarkers --hard-min 1 --kmer-size 25 --bloom-size {params.bloom_filter} --bitw {params.bitw} --threads {threads} --nb-partitions {params.partitions}
         """
 
 
