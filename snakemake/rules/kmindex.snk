@@ -19,7 +19,8 @@ rule kmindex_build:
     input:
         fof= config["fof"]
     output:
-        output = config["project_path"] + "pipeline_output/biomarker/"
+        output_dir = config["project_path"] + "pipeline_output/biomarker/",
+        output_index = config["project_path"] + "pipeline_output/biomarker/index/biomarkers"
     threads: config["threads"]
     params:
         bloom_filter= config["bloom_filter"],
@@ -28,7 +29,7 @@ rule kmindex_build:
         "../../env/kmindex.yaml"
     shell:
         """
-        kmindex build --fof {input.fof} --run-dir {output}/index_workdir --index {output}/index --register-as biomarkers --hard-min 1 --kmer-size 25 --bloom-size {params.bloom_filter}} --bitw {params.bitw}
+        kmindex build --fof {input.fof} --run-dir {output.output_dir}/index_workdir --index {output.output_index} --register-as biomarkers --hard-min 1 --kmer-size 25 --bloom-size {params.bloom_filter}} --bitw {params.bitw}
         """
 
 
