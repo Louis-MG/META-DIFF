@@ -50,7 +50,7 @@ rule get_query:
 
 rule kmindex_query:
     input:
-        unitigs = config["project_path"] + "pipeline_output/biomarker/top_unitigs.fa"
+        unitigs = config["project_path"] + "pipeline_output/biomarker/top_unitigs.fa",
         index = config["project_path"] + "pipeline_output/biomarker/index"
     output:
         folder = config["project_path"] + "pipeline_output/biomarker/output_query_unitigs",
@@ -60,7 +60,7 @@ rule kmindex_query:
         "../../env/kmindex.yaml"
     shell:
         """
-        kmindex query -i {input.index} -z 6 -o {output.folder} --fastx {input.unitigs} --format matrix -a -t {threads}
+        kmindex query -i {input.indexgi} -z 6 -o {output.folder} --fastx {input.unitigs} --format matrix -a -t {threads}
         """
 
 rule classification :
