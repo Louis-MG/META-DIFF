@@ -16,7 +16,7 @@ from train import process_model
 if __name__ == '__main__':
     print("Running GP-CV")
     parser = argparse.ArgumentParser(description='Run GP-CV')
-    parser.add_argument('--n_features', type=int, default=-1, help='Number of features, for debbunging purpose. -1 for all features.')
+    parser.add_argument('--n_features', type=int, default=-1, help='Number of features, for debugging purpose. -1 for all features.')
     parser.add_argument('--experiment_name', type=str, default='', help='Experiment name')
     parser.add_argument('--nk_input_features', type=int, default=10, help='Number of thousands of features used.')
     parser.add_argument('--use_mi', type=int, default=0, help='Use mutual information')
@@ -71,10 +71,10 @@ if __name__ == '__main__':
     sorted_mi = [x[0] for x in sorted_mi]
     X_sorted = X.iloc[:, sorted_mi]
 
-    save_figures(X_sorted, experiment_name)
+    save_figures(X_sorted, args.output, experiment_name)
     # get the clusters
     clusters = get_clusters(X_sorted)
-    get_ordinations(X_sorted, Y, experiment_name)
+    get_ordinations(X_sorted, Y, experiment_name, args.output)
     # get the models
     models, hparam_names, spaces = import_models(models_done)
 

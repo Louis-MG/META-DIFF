@@ -1,7 +1,7 @@
 """
 Pipeline for META-DIFF
 """
-#from sympy.strategies import condition, expand
+from sympy.strategies import condition, expand
 
 configfile: "./config.yaml"
 ruleorder: kmdiff_count > kmdiff_diff > bcalm > kraken_assign > annot_extract_candidates > kmindex_build > pval_agg > get_query > kmindex_query > prodigal > microbeannotator > summary_table > machine_learning
@@ -26,7 +26,9 @@ rule all:
         expand(config["project_path"] + "pipeline_output/taxonomy/kraken_{condition}.report", condition = config["condition"]),
         expand(config["project_path"] + "pipeline_output/taxonomy/{condition}_clades.tsv", condition = config["condition"]),
         config["project_path"] + "pipeline_output/biomarker/top_unitigs.fa",
-        config["project_path"] + "pipeline_output/biomarker/output_query_unitigs/index.tsv"
+        config["project_path"] + "pipeline_output/biomarker/output_query_unitigs/index.tsv",
+        config["project_path"] + "pipeline_output/ML/" + config["experiment_name"] + "/histograms/allclasses.png",
+        config["project_path"] + "pipeline_output/ML/" + config["experiment_name"] + "/ord/lda.png"
 
 ##########################################################
 ###########            OTHER RULES            ############

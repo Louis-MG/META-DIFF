@@ -8,6 +8,7 @@ src_path: "/path/to/META-DIFF/"
 project_path: "/mnt/ssd/LM/"
 fof: "/mnt/projects_tn03/KMER_analysis/DATA/AcneData/fof.txt"
 
+experiment_name: "microbiome_analysis"
 threads: 120
 unitig_length: 500
 bcalm_memory: 20000
@@ -16,5 +17,6 @@ bitw: 64
 bloom_filter: 1000000000
 top_unitigs: 5000
 neptune_key: ""
+log_neptune: 0
 n_splits: 5
 n_calls: 20

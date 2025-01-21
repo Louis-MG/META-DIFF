@@ -340,7 +340,7 @@ class Train:
                     'model_name': self.name,
                     'exp_name': self.exp_name,
                 }
-                self.log_stuff(run, h_params_dict, ys_dict, preds_dict, probas_dict_true, self.best_scores)
+                self.log_stuff(run, h_params_dict, ys_dict, preds_dict, probas_dict_true, self.best_scoresm)
                 run = log_shap(run, args_dict)
                 if run is not None:
                     run.stop()
@@ -356,25 +356,25 @@ class Train:
                 scores[group].pop('cluster_metrics')
 
         # Create a directory to save the {args.output}} if not exist
-        os.makedirs(f'{args.output}/{self.exp_name}/scores', exist_ok=True)
-        os.makedirs(f'{args.output}/{self.exp_name}/model', exist_ok=True)
+        os.makedirs(f'{self.args.output}/{self.exp_name}/scores', exist_ok=True)
+        os.makedirs(f'{self.args.output}/{self.exp_name}/model', exist_ok=True)
 
         # Save what is in scores as a json
-        pd.DataFrame(scores).to_json(f'{args.output}/{self.exp_name}/scores/scores_{self.name}.json')
+        pd.DataFrame(scores).to_json(f'{self.args.output}/{self.exp_name}/scores/scores_{self.name}.json')
         # Save what is in score, except for cluster_metrics, as a table in csv format
-        pd.DataFrame({k: v for k, v in scores.items()}).to_csv(f'{args.output}/{self.exp_name}/scores/scores_{self.name}.csv')
+        pd.DataFrame({k: v for k, v in scores.items()}).to_csv(f'{self.args.output}/{self.exp_name}/scores/scores_{self.name}.csv')
         # Save scores after getting averages
         scores = {group: {k: np.mean(v) for k, v in scores[group].items()} for group in scores.keys()}
-        pd.DataFrame(scores).to_json(f'{args.output}/{self.exp_name}/scores/scores_avg_{self.name}.json')
-        pd.DataFrame(scores).to_csv(f'{args.output}/{self.exp_name}/scores/scores_avg_{self.name}.csv')
+        pd.DataFrame(scores).to_json(f'{self.args.output}/{self.exp_name}/scores/scores_avg_{self.name}.json')
+        pd.DataFrame(scores).to_csv(f'{self.args.output}/{self.exp_name}/scores/scores_avg_{self.name}.csv')
 
         # Save the best hparams to file
-        pd.DataFrame(h_params_dict, index=[0]).to_csv(f'{args.output}/{self.exp_name}/model/best_hparams_{self.name}.csv')
+        pd.DataFrame(h_params_dict, index=[0]).to_csv(f'{self.args.output}/{self.exp_name}/model/best_hparams_{self.name}.csv')
         # Save confusion matrices
-        os.makedirs(f'{args.output}/{self.exp_name}/confusion_matrix', exist_ok=True)
+        os.makedirs(f'{self.args.output}/{self.exp_name}/confusion_matrix', exist_ok=True)
         for group in ['train', 'valid', 'test']:
             cm = confusion_matrix(ys_dict[group], preds_dict[group])
-            pd.DataFrame(cm).to_csv(f'{args.output}/{self.exp_name}/confusion_matrix/{group}_{self.name}.csv')
+            pd.DataFrame(cm).to_csv(f'{self.args.output}/{self.exp_name}/confusion_matrix/{group}_{self.name}.csv')
             labels = np.unique(ys_dict[group])
 
             # Plot de la matrice de confusion
@@ -385,7 +385,7 @@ class Train:
             plt.title(f"{group} mcc: {np.round(scores[group]['mcc'], 3)}, acc: {np.round(scores[group]['acc'], 3)}")
 
             # Sauvegarder le graphique dans un fichier
-            plt.savefig(f"{args.output}/{self.exp_name}/confusion_matrix/{group}_{self.name}.png")
+            plt.savefig(f"{self.args.output}/{self.exp_name}/confusion_matrix/{group}_{self.name}.png")
             plt.close()
 
             # Save scatter plot of the predictions, small dots.

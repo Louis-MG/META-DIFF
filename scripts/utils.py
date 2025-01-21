@@ -51,12 +51,12 @@ def get_scaler(scaler):
     else:
         exit('Wrong scaler name')
 
-def save_figures(df, experiment_name):
+def save_figures(df, output, experiment_name):
     # Flatten the matrix to a 1D array for distribution plots
     data = df.values.flatten()
 
     # Create the directory to save the histograms
-    os.makedirs(f"results/{experiment_name}/histograms", exist_ok=True)
+    os.makedirs(f"{output}/{experiment_name}/histograms", exist_ok=True)
 
     # 1. Histogram
     plt.figure(figsize=(6, 4))
@@ -64,7 +64,7 @@ def save_figures(df, experiment_name):
     plt.title("Histogram of Matrix Values")
     plt.xlabel("Value")
     plt.ylabel("Frequency")
-    plt.savefig(f"results/{experiment_name}/histograms/allclasses.png")
+    plt.savefig(f"{output}/{experiment_name}/histograms/allclasses.png")
     plt.close()
 
     # Make an histogram of the number of zeros per sample
@@ -72,14 +72,14 @@ def save_figures(df, experiment_name):
     plt.xlabel('Number of zeros')
     plt.ylabel('Number of samples')
     plt.title('Histogram of the number of zeros per sample')
-    plt.savefig(f"results/{experiment_name}/histograms/zeros_per_sample_allclasses.png")
+    plt.savefig(f"{output}/{experiment_name}/histograms/zeros_per_sample_allclasses.png")
     plt.close()
 
     plt.hist(np.sum(df == 0, axis=0), bins=20)
     plt.xlabel('Number of zeros')
     plt.ylabel('Number of features')
     plt.title('Histogram of the number of zeros per feature')
-    plt.savefig(f"results/{experiment_name}/histograms/histogram_zeros_per_feature_allclasses.png")
+    plt.savefig(f"{output}/{experiment_name}/histograms/histogram_zeros_per_feature_allclasses.png")
     plt.close()
 
 
@@ -102,16 +102,16 @@ def get_clusters(X):
 
     return clusters
 
-def get_ordinations(X, Y, exp_name) -> None:
+def get_ordinations(X, Y, exp_name, output) -> None:
     """
-    Funtion to create and save ordination plots for visualizing the data
+    Funtcion to create and save ordination plots for visualizing the data
 
     Args:
         X (_type_): _description_
         Y (_type_): _description_
         exp_name (_type_): _description_
     """
-    os.makedirs(f"results/{exp_name}/ord", exist_ok=True)
+    os.makedirs(f"{output}/{exp_name}/ord", exist_ok=True)
     # Ordinations
     # PCA
     from sklearn.decomposition import PCA
@@ -121,7 +121,7 @@ def get_ordinations(X, Y, exp_name) -> None:
     plt.xlabel('PCA1')
     plt.ylabel('PCA2')
     plt.title('PCA')
-    plt.savefig(f"results/{exp_name}/ord/pca.png")
+    plt.savefig(f"{output}/{exp_name}/ord/pca.png")
     plt.close()
 
     # UMAP
@@ -132,7 +132,7 @@ def get_ordinations(X, Y, exp_name) -> None:
     plt.xlabel('UMAP1')
     plt.ylabel('UMAP2')
     plt.title('UMAP')
-    plt.savefig(f"results/{exp_name}/ord/umap.png")
+    plt.savefig(f"{output}/{exp_name}/ord/umap.png")
     plt.close()
 
     # NMDS
@@ -143,7 +143,7 @@ def get_ordinations(X, Y, exp_name) -> None:
     plt.xlabel('MDS1')
     plt.ylabel('MDS2')
     plt.title('MDS')
-    plt.savefig(f"results/{exp_name}/ord/mds.png")
+    plt.savefig(f"{output}/{exp_name}/ord/mds.png")
     plt.close()
 
     # USE LDA after splitting the data
@@ -154,7 +154,7 @@ def get_ordinations(X, Y, exp_name) -> None:
     plt.scatter(X_lda, np.zeros(X_lda.shape), c=y_train)
     plt.xlabel('LDA')
     plt.title('LDA')
-    plt.savefig(f"results/{exp_name}/ord/lda.png")
+    plt.savefig(f"{output}/{exp_name}/ord/lda.png")
     plt.close()
 
     # Test scores with LDA
@@ -168,7 +168,7 @@ def get_ordinations(X, Y, exp_name) -> None:
     plt.scatter(valid_LDA, np.zeros(valid_LDA.shape), c=y_test)
     plt.xlabel('LDA')
     plt.title('LDA')
-    plt.savefig(f"results/{exp_name}/ord/lda_test.png")
+    plt.savefig(f"{output}/{exp_name}/ord/lda_test.png")
     plt.close()
 
     # Test scores with QDA
