@@ -9,9 +9,12 @@ rule bcalm:
         memory = config["bcalm_memory"],
         outfile = config["project_path"] + "pipeline_output/kmdiff_output/{condition}_kmers"
     threads: config["threads"]
+    log:
+        stdout = config["project_path"] + "logs/bcalm.stdout",
+        stderr = config["project_path"] + "logs/bcalm.stderr"
     conda :
         "../../env/bcalm.yaml"
     shell:
         """
-        bcalm -in {input} -out {params.outfile} -nb-cores {threads} -abundance-min 1 -max-memory {params.memory}
+        bcalm -in {input} -out {params.outfile} -nb-cores {threads} -abundance-min 1 -max-memory {params.memory} > {log.stdout} 2> {log.stderr}
         """

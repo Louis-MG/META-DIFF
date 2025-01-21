@@ -8,11 +8,14 @@ rule pval_agg:
         output = config["project_path"] + "pipeline_output/biomarker/",
         script_path = "scripts/pvalues_agg.py",
         condition_name = lambda wildcards: wildcards.condition
+    log:
+        stdout = config["project_path"] + "logs/pval_agg.stdout",
+        stderr = config["project_path"] + "logs/pval_agg.stderr"
     conda:
         "../../env/python.3.10.yaml"
     shell:
         """
-        python3 {params.script_path} -k {input.kmers} -u {input.unitigs} -o {params.output} -p {params.condition_name}
+        python3 {params.script_path} -k {input.kmers} -u {input.unitigs} -o {params.output} -p {params.condition_name} > {log.stdout} 2> {log.stderr}
         """
 
 rule kmindex_build:
@@ -26,11 +29,14 @@ rule kmindex_build:
         bloom_filter= config["bloom_filter"],
         bitw= config["bitw"],
         partitions = config["partitions"]
+    log:
+        stdout = config["project_path"] + "logs/kmindex_build.stdout",
+        stderr = config["project_path"] + "logs/kmindex_build.stderr"
     conda:
         "../../env/kmindex.yaml"
     shell:
         """
-        kmindex build --fof {input.fof} --run-dir {params.output_dir}/index_workdir --index {output.index} --register-as biomarkers --hard-min 1 --kmer-size 25 --bloom-size {params.bloom_filter} --bitw {params.bitw} --threads {threads} --nb-partitions {params.partitions}
+        kmindex build --fof {input.fof} --run-dir {params.output_dir}/index_workdir --index {output.index} --register-as biomarkers --hard-min 1 --kmer-size 25 --bloom-size {params.bloom_filter} --bitw {params.bitw} --threads {threads} --nb-partitions {params.partitions} > {log.stdout} 2> {log.stderr}
         """
 
 
@@ -56,11 +62,14 @@ rule kmindex_query:
         folder = config["project_path"] + "pipeline_output/biomarker/output_query_unitigs",
         file = config["project_path"] + "pipeline_output/biomarker/output_query_unitigs/index.tsv"
     threads: config["threads"]
+    log:
+        stdout = config["project_path"] + "logs/microbeannotator.stdout",
+        stderr = config["project_path"] + "logs/microbeannotator.stderr"
     conda:
         "../../env/kmindex.yaml"
     shell:
         """
-        kmindex query -i {input.indexgi} -z 6 -o {output.folder} --fastx {input.unitigs} --format matrix -a -t {threads}
+        kmindex query -i {input.index} -z 6 -o {output.folder} --fastx {input.unitigs} --format matrix -a -t {threads} > {log.stdout} 2> {log.stderr}
         """
 
 rule classification :
@@ -69,6 +78,9 @@ rule classification :
     output:
         output = config["project_path"] + "pipeline_output/biomarker/"
     threads: config["threads"]
+    log:
+        stdout = config["project_path"] + "logs/microbeannotator.stdout",
+        stderr = config["project_path"] + "logs/microbeannotator.stderr"
     params:
         script_path= "scripts/ml.py"
     conda:

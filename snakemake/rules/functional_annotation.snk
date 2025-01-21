@@ -7,11 +7,14 @@ rule annot_extract_candidates:
         config["project_path"] + "pipeline_output/functional_annotation/{condition}_unitigs.filtered.fa"
     params:
         length = config["unitig_length"]
+    log:
+        stdout = config["project_path"] + "logs/annot_extract_candidates.stdout",
+        stderr = config["project_path"] + "logs/annot_extract_candidates.stderr"
     conda:
         "../../env/seqkit.yaml"
     shell:
         """
-        seqkit seq --min-len {params.length} -i {input} > {output} 
+        seqkit seq --min-len {params.length} -i {input} > {output} > {log.stdout} 2> {log.stderr}
         """
 
 
@@ -23,12 +26,15 @@ rule prodigal:
     threads : config["threads"]
     params:
         coords = config["project_path"] + "pipeline_output/functional_annotation/{condition}_coords.gbk",
-        translation = config["project_path"] + "pipeline_output/functional_annotation/{condition}_protein_translation.faa",
+        translation = config["project_path"] + "pipeline_output/functional_annotation/{condition}_protein_translation.faa"
+    log:
+        stdout = config["project_path"] + "logs/prodigal.stdout",
+        stderr = config["project_path"] + "logs/prodigal.stderr"
     conda:
         "../../env/prodigal.yaml"
     shell:
         """
-        prodigal -p meta -i {input} -o {params.coords} -a {params.translation}
+        prodigal -p meta -i {input} -o {params.coords} -a {params.translation} > {log.stdout} 2> {log.stderr}
         """
 
 rule microbeannotator:
@@ -37,6 +43,9 @@ rule microbeannotator:
     output:
         config["project_path"] + "pipeline_output/functional_annotation/metabolic_summary__heatmap.pdf", config["project_path"] + "pipeline_output/functional_annotation/metabolic_summary__barplot.pdf", config["project_path"] + "pipeline_output/functional_annotation/metabolic_summary__module_completeness.tab"
     threads: config["threads"]
+    log:
+        stdout = config["project_path"] + "logs/microbeannotator.stdout",
+        stderr = config["project_path"] + "logs/microbeannotator.stderr"
     params:
         process = 1,
         database = config["microbeannotator_db_path"],
@@ -45,7 +54,7 @@ rule microbeannotator:
         "../../env/microbeannotator.yaml"
     shell:
         """
-        microbeannotator  -p {params.process} -t {threads} -m diamond --database {params.database} --cluster rows -o {params.output_folder} -i {input}
+        microbeannotator  -p {params.process} -t {threads} -m diamond --database {params.database} --cluster rows -o {params.output_folder} -i {input} > {log.stdout} 2> {log.stderr}
         """
 
 rule summary_table:
@@ -61,10 +70,13 @@ rule summary_table:
         script_path = "scripts/sumup_table.py",
         annot = config["project_path"] + "pipeline_output/functional_annotation/{condition}_protein_translation.faa.annot",
         condition_name = lambda wildcards: wildcards.condition
+    log:
+        stdout = config["project_path"] + "logs/summary_table.stdout",
+        stderr = config["project_path"] + "logs/summary_table.stderr"
     conda: 
         "../../env/python.3.10.yaml"
     shell:
         """
-	    python3 {params.script_path} -a {params.annot} -g {input.translation} -o {params.output} -u {input.unitigs} -c {params.condition_name} -k {input.kraken_output}
+	    python3 {params.script_path} -a {params.annot} -g {input.translation} -o {params.output} -u {input.unitigs} -c {params.condition_name} -k {input.kraken_output} > {log.stdout} 2> {log.stderr}
         mv {params.output}/{params.condition_name}_clades.tsv  {params.output}/../taxonomy/
         """

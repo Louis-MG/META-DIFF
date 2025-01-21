@@ -10,13 +10,16 @@ rule kmdiff_count:
     params:
         output_folder = config["project_path"] + "pipeline_output/kmdiff_output/",
         partitions = config["partitions"]
+    log:
+        stdout = config["project_path"] + "logs/kmdiff.stdout",
+        stderr = config["project_path"] + "logs/kmdiff.stderr"
     conda:
         "../../env/kmdiff.yaml"
     shell:
         """
         ulimit -n 10000
         rm -d {params.output_folder}
-        kmdiff count -f {input} -d {params.output_folder} -t {threads} --nb-partitions {params.partitions}
+        kmdiff count -f {input} -d {params.output_folder} -t {threads} --nb-partitions {params.partitions} > {log.stdout} 2> {log.stderr}
         """
 
 ########### diff
@@ -30,6 +33,9 @@ rule kmdiff_diff:
     params:
         output_folder = config["project_path"] + "pipeline_output/kmdiff_output/"
     threads: config["threads"]
+    log:
+        stdout = config["project_path"] + "logs/kmdiff.stdout",
+        stderr = config["project_path"] + "logs/kmdiff.stderr"
     conda:
         "../../env/kmdiff.yaml"
     shell:
@@ -37,7 +43,7 @@ rule kmdiff_diff:
         ulimit -n 10000
         nb_control=$(grep -c -F 'case' {input.fof})
         nb_case=$(grep -c -F 'control' {input.fof})
-        kmdiff diff --km-run {params.output_folder} -t {threads} --output-dir {params.output_folder} --nb-controls "$nb_control" --nb-cases "$nb_case" --save-sk --correction "benjamini"
+        kmdiff diff --km-run {params.output_folder} -t {threads} --output-dir {params.output_folder} --nb-controls "$nb_control" --nb-cases "$nb_case" --save-sk --correction "benjamini" > {log.stdout} 2> {log.stderr}
         """
 
 
