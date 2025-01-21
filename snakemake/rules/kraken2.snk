@@ -11,9 +11,12 @@ rule kraken_assign:
     params:
         output_dir = config["project_path"] + "pipeline_output/taxonomy/",
         database = config["kraken_database_path"]
+    log:
+        stdout = config["project_path"] + "logs/kraken_assign_{condition}.stdout",
+        stderr = config["project_path"] + "logs/kraken_assign_{condition}.stderr"
     conda :
         "../../env/kraken2.yaml"
     shell:
         """
-        kraken2 --output {output.output} --report {output.report} --threads {threads} --db {params.database} --use-names --unclassified-out {output.output_unknown} {input}
+        kraken2 --output {output.output} --report {output.report} --threads {threads} --db {params.database} --use-names --unclassified-out {output.output_unknown} {input} > {log.stdout} 2> {log.stderr}
         """
