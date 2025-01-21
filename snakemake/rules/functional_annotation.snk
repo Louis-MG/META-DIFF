@@ -44,8 +44,8 @@ rule microbeannotator:
         config["project_path"] + "pipeline_output/functional_annotation/metabolic_summary__heatmap.pdf", config["project_path"] + "pipeline_output/functional_annotation/metabolic_summary__barplot.pdf", config["project_path"] + "pipeline_output/functional_annotation/metabolic_summary__module_completeness.tab"
     threads: config["threads"]
     log:
-        stdout = config["project_path"] + "logs/microbeannotator_{condition}.stdout",
-        stderr = config["project_path"] + "logs/microbeannotator_{condition}.stderr"
+        stdout = config["project_path"] + "logs/microbeannotator.stdout",
+        stderr = config["project_path"] + "logs/microbeannotator.stderr"
     params:
         process = 1,
         database = config["microbeannotator_db_path"],

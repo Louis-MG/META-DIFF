@@ -2,7 +2,8 @@ rule machine_learning:
     input:
         matrix = config["project_path"] + "pipeline_output/biomarker/output_query/index.tsv"
     output:
-        config["project_path"] + "pipeline_output/ML"
+        config["project_path"] + "pipeline_output/ML" + microbiome_analysis/histograms/allclasses.png,
+        config["project_path"] + "pipeline_output/ML" microbiome_analysis/ord/lda.png
     params:
         neptune_key = config["neptune_key"],
         script_path = "scripts/ml.py",
