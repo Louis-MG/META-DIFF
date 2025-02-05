@@ -9,8 +9,8 @@ rule pval_agg:
         script_path = "scripts/pvalues_agg.py",
         condition_name = lambda wildcards: wildcards.condition
     log:
-        stdout = config["project_path"] + "logs/pval_agg_{condition}.stdout",
-        stderr = config["project_path"] + "logs/pval_agg_{condition}.stderr"
+        stdout = config["project_path"] + "/pipeline_output/logs/pval_agg_{condition}.stdout",
+        stderr = config["project_path"] + "pipeline_output/logs/pval_agg_{condition}.stderr"
     conda:
         "../../env/python.3.10.yaml"
     shell:
@@ -22,7 +22,7 @@ rule kmindex_build:
     input:
         fof= config["fof"]
     output:
-        index = config["project_path"] + "pipeline_output/biomarker/index"
+        config["project_path"] + "pipeline_output/biomarker/G/index.json"
     threads: config["threads"]
     params:
         output_dir = config["project_path"] + "pipeline_output/biomarker/",
@@ -30,13 +30,13 @@ rule kmindex_build:
         bitw= config["bitw"],
         partitions = config["partitions"]
     log:
-        stdout = config["project_path"] + "logs/kmindex_build.stdout",
-        stderr = config["project_path"] + "logs/kmindex_build.stderr"
+        stdout = config["project_path"] + "/pipeline_output/logs/kmindex_build.stdout",
+        stderr = config["project_path"] + "/pipeline_output/logs/kmindex_build.stderr"
     conda:
         "../../env/kmindex.yaml"
     shell:
         """
-        kmindex build --fof {input.fof} --run-dir {params.output_dir}/index_workdir --index {output.index} --register-as biomarkers --hard-min 1 --kmer-size 25 --bloom-size {params.bloom_filter} --bitw {params.bitw} --threads {threads} --nb-partitions {params.partitions} > {log.stdout} 2> {log.stderr}
+        kmindex build --fof {input.fof} --run-dir {params.output_dir}/index_workdir --index {params.output_dir}/G --register-as biomarkers --hard-min 1 --kmer-size 25 --bloom-size {params.bloom_filter} --bitw {params.bitw} --threads {threads} --nb-partitions {params.partitions} > {log.stdout} 2> {log.stderr}
         """
 
 
@@ -57,14 +57,14 @@ rule get_query:
 rule kmindex_query:
     input:
         unitigs = config["project_path"] + "pipeline_output/biomarker/top_unitigs.fa",
-        index = config["project_path"] + "pipeline_output/biomarker/index"
+        index = config["project_path"] + "pipeline_output/biomarker/G/biomarkers"
     output:
         folder = config["project_path"] + "pipeline_output/biomarker/output_query_unitigs",
         file = config["project_path"] + "pipeline_output/biomarker/output_query_unitigs/index.tsv"
     threads: config["threads"]
     log:
-        stdout = config["project_path"] + "logs/kmindex_query.stdout",
-        stderr = config["project_path"] + "logs/kmindex_query.stderr"
+        stdout = config["project_path"] + "/pipeline_output/logs/kmindex_query.stdout",
+        stderr = config["project_path"] + "/pipeline_output/logs/kmindex_query.stderr"
     conda:
         "../../env/kmindex.yaml"
     shell:
@@ -79,8 +79,8 @@ rule classification :
         output = config["project_path"] + "pipeline_output/biomarker/"
     threads: config["threads"]
     log:
-        stdout = config["project_path"] + "logs/classification.stdout",
-        stderr = config["project_path"] + "logs/classification.stderr"
+        stdout = config["project_path"] + "/pipeline_output/logs/classification.stdout",
+        stderr = config["project_path"] + "/pipeline_output/logs/classification.stderr"
     params:
         script_path= "scripts/ml.py"
     conda:

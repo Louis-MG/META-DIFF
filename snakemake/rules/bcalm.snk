@@ -10,8 +10,8 @@ rule bcalm:
         outfile = config["project_path"] + "pipeline_output/kmdiff_output/{condition}_kmers"
     threads: config["threads"]
     log:
-        stdout = config["project_path"] + "logs/bcalm_{condition}.stdout",
-        stderr = config["project_path"] + "logs/bcalm_{condition}.stderr"
+        stdout = config["project_path"] + "/pipeline_output/logs/bcalm_{condition}.stdout",
+        stderr = config["project_path"] + "/pipeline_output/logs/bcalm_{condition}.stderr"
     conda :
         "../../env/bcalm.yaml"
     shell:

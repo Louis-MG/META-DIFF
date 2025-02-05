@@ -8,8 +8,8 @@ rule annot_extract_candidates:
     params:
         length = config["unitig_length"]
     log:
-        stdout = config["project_path"] + "logs/annot_extract_candidates_{condition}.stdout",
-        stderr = config["project_path"] + "logs/annot_extract_candidates_{condition}.stderr"
+        stdout = config["project_path"] + "/pipeline_output/logs/annot_extract_candidates_{condition}.stdout",
+        stderr = config["project_path"] + "/pipeline_output/logs/annot_extract_candidates_{condition}.stderr"
     conda:
         "../../env/seqkit.yaml"
     shell:
@@ -28,8 +28,8 @@ rule prodigal:
         coords = config["project_path"] + "pipeline_output/functional_annotation/{condition}_coords.gbk",
         translation = config["project_path"] + "pipeline_output/functional_annotation/{condition}_protein_translation.faa"
     log:
-        stdout = config["project_path"] + "logs/prodigal_{condition}.stdout",
-        stderr = config["project_path"] + "logs/prodigal_{condition}.stderr"
+        stdout = config["project_path"] + "/pipeline_output/logs/prodigal_{condition}.stdout",
+        stderr = config["project_path"] + "/pipeline_output/logs/prodigal_{condition}.stderr"
     conda:
         "../../env/prodigal.yaml"
     shell:
