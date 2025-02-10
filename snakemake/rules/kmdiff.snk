@@ -11,8 +11,8 @@ rule kmdiff_count:
         output_folder = config["project_path"] + "pipeline_output/kmdiff_output/",
         partitions = config["partitions"]
     log:
-        stdout = config["project_path"] + "logs/kmdiff.stdout",
-        stderr = config["project_path"] + "logs/kmdiff.stderr"
+        stdout = config["project_path"] + "logs/kmdiff_count.stdout",
+        stderr = config["project_path"] + "logs/kmdiff_counts.stderr"
     conda:
         "../../env/kmdiff.yaml"
     shell:
@@ -34,8 +34,8 @@ rule kmdiff_diff:
         output_folder = config["project_path"] + "pipeline_output/kmdiff_output/"
     threads: config["threads"]
     log:
-        stdout = config["project_path"] + "logs/kmdiff.stdout",
-        stderr = config["project_path"] + "logs/kmdiff.stderr"
+        stdout = config["project_path"] + "logs/kmdiff_diff.stdout",
+        stderr = config["project_path"] + "logs/kmdiff_diff.stderr"
     conda:
         "../../env/kmdiff.yaml"
     shell:
