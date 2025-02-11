@@ -6,7 +6,7 @@ rule pval_agg:
         config["project_path"] + "pipeline_output/biomarker/{condition}.aggregated.fa"
     params:
         output = config["project_path"] + "pipeline_output/biomarker/",
-        script_path = "scripts/pvalues_agg.py",
+        script_path = config['src_path'] + "/scripts/pvalues_agg.py",
         condition_name = lambda wildcards: wildcards.condition
     log:
         stdout = config["project_path"] + "/pipeline_output/logs/pval_agg_{condition}.stdout",
@@ -18,6 +18,7 @@ rule pval_agg:
         python3 {params.script_path} -k {input.kmers} -u {input.unitigs} -o {params.output} -p {params.condition_name} > {log.stdout} 2> {log.stderr}
         """
 
+# OMG changer ca pour juste register et couper du temps de run et des soucis ??? Sinon faire la run kmtricks qui marche puis register pour pas me casser la nouille
 rule kmindex_build:
     input:
         fof= config["fof"]
@@ -36,7 +37,9 @@ rule kmindex_build:
         "../../env/kmindex.yaml"
     shell:
         """
-        kmindex build --fof {input.fof} --run-dir {params.output_dir}/index_workdir --index {params.output_dir}/G --register-as biomarkers --hard-min 1 --kmer-size 25 --bloom-size {params.bloom_filter} --bitw {params.bitw} --threads {threads} --nb-partitions {params.partitions} > {log.stdout} 2> {log.stderr}
+        #kmindex build --fof {input.fof} --run-dir {params.output_dir}/index_workdir --index {params.output_dir}/G --register-as biomarkers --hard-min 1 --kmer-size 25 --bloom-size {params.bloom_filter} --bitw {params.bitw} --threads {threads} --nb-partitions {params.partitions} > {log.stdout} 2> {log.stderr}
+        kmtricks pipeline --file {input.fof} --run-dir {params.output_dir}/index_workdir --kmer-size 25 --hard-min 1 --bloom-size {params.bloom_filter} --minimizer-size 10 --nb-partitions {params.partitions} --threads {params.threads} --mode hash:bf:bin
+        kmindex register -p {params.output_dir}/index_workdir -i {params.output_dir}/G --name biomarkers
         """
 
 
@@ -57,11 +60,13 @@ rule get_query:
 rule kmindex_query:
     input:
         unitigs = config["project_path"] + "pipeline_output/biomarker/top_unitigs.fa",
-        index = config["project_path"] + "pipeline_output/biomarker/G/biomarkers"
+        check = config["project_path"] + "pipeline_output/biomarker/G/index.json"
     output:
         folder = config["project_path"] + "pipeline_output/biomarker/output_query_unitigs",
         file = config["project_path"] + "pipeline_output/biomarker/output_query_unitigs/index.tsv"
     threads: config["threads"]
+    params:
+        index = "config["project_path"] + "pipeline_output/biomarker/G/biomarkers"
     log:
         stdout = config["project_path"] + "/pipeline_output/logs/kmindex_query.stdout",
         stderr = config["project_path"] + "/pipeline_output/logs/kmindex_query.stderr"
@@ -69,7 +74,7 @@ rule kmindex_query:
         "../../env/kmindex.yaml"
     shell:
         """
-        kmindex query -i {input.index} -z 6 -o {output.folder} --fastx {input.unitigs} --format matrix -a -t {threads} > {log.stdout} 2> {log.stderr}
+        kmindex query -i {params.index} -z 6 -o {output.folder} --fastx {input.unitigs} --format matrix -a -t {threads} > {log.stdout} 2> {log.stderr}
         """
 
 rule classification :
@@ -82,7 +87,7 @@ rule classification :
         stdout = config["project_path"] + "/pipeline_output/logs/classification.stdout",
         stderr = config["project_path"] + "/pipeline_output/logs/classification.stderr"
     params:
-        script_path= "scripts/ml.py"
+        script_path= config['src_path'] + "/scripts/ml.py"
     conda:
         "../../env/python.3.10.yaml"
     shell:
