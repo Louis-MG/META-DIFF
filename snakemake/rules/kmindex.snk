@@ -18,7 +18,6 @@ rule pval_agg:
         python3 {params.script_path} -k {input.kmers} -u {input.unitigs} -o {params.output} -p {params.condition_name} > {log.stdout} 2> {log.stderr}
         """
 
-# OMG changer ca pour juste register et couper du temps de run et des soucis ??? Sinon faire la run kmtricks qui marche puis register pour pas me casser la nouille
 rule kmindex_build:
     input:
         fof= config["fof"]
@@ -37,8 +36,7 @@ rule kmindex_build:
         "../../env/kmindex.yaml"
     shell:
         """
-        #kmindex build --fof {input.fof} --run-dir {params.output_dir}/index_workdir --index {params.output_dir}/G --register-as biomarkers --hard-min 1 --kmer-size 25 --bloom-size {params.bloom_filter} --bitw {params.bitw} --threads {threads} --nb-partitions {params.partitions} > {log.stdout} 2> {log.stderr}
-        kmtricks pipeline --file {input.fof} --run-dir {params.output_dir}/index_workdir --kmer-size 25 --hard-min 1 --bloom-size {params.bloom_filter} --minimizer-size 10 --nb-partitions {params.partitions} --threads {params.threads} --mode hash:bf:bin > {log.stdout} 2> {log.stderr}
+        kmtricks pipeline --file {input.fof} --run-dir {params.output_dir}/index_workdir --kmer-size 25 --hard-min 1 --bloom-size {params.bloom_filter} --minimizer-size 10 --nb-partitions {params.partitions} --threads {threads} --mode hash:bf:bin > {log.stdout} 2> {log.stderr}
         kmindex register -p {params.output_dir}/index_workdir -i {params.output_dir}/G --name biomarkers >> {log.stdout} 2>> {log.stderr}
         """
 

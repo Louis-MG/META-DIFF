@@ -149,9 +149,13 @@ def load_unitigs(path: Union[str, bytes, os.PathLike], kmer_dict: dict[str, floa
 				header = line.rstrip('\n')
 			else :
 				sequence = line
-				unitig = make_unitig(sequence=sequence, kmer_dict=kmer_dict, header=header)
-				unitig_CCT = CCT(unitig)
-				list_unitigs.append(unitig_CCT)
+				#if the sequence corresponds to the fake sequence, just ignores it.
+				if header == ">ref|NC_003210.1|:209461-211401 Listeria monocytogenes actin-assembly inducing protein precursor" :
+						pass
+				else :
+					unitig = make_unitig(sequence=sequence, kmer_dict=kmer_dict, header=header)
+					unitig_CCT = CCT(unitig)
+					list_unitigs.append(unitig_CCT)
 	return list_unitigs
 
 
