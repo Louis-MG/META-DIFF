@@ -14,7 +14,7 @@ rule annot_extract_candidates:
         "../../env/seqkit.yaml"
     shell:
         """
-        seqkit seq --min-len {params.length} -i {input} > {output} > {log.stdout} 2> {log.stderr}
+        seqkit seq --min-len {params.length} -i {input} -o {output} 1> {log.stdout} 2> {log.stderr}
         """
 
 
