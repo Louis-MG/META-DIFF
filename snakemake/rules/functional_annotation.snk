@@ -68,7 +68,7 @@ rule summary_table:
     params:
         output = config["project_path"] + "pipeline_output/functional_annotation/",
         script_path = config["src_path"] + "scripts/sumup_table.py",
-        annot = config["project_path"] + "pipeline_output/functional_annotation/{condition}_protein_translation.faa.annot",
+        annot = config["project_path"] + "pipeline_output/functional_annotation/annotation_results/{condition}_protein_translation.faa.annot",
         condition_name = lambda wildcards: wildcards.condition
     log:
         stdout = config["project_path"] + "logs/summary_table_{condition}.stdout",
