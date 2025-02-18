@@ -67,7 +67,7 @@ rule summary_table:
         config["project_path"] + "pipeline_output/taxonomy/{condition}_clades.tsv"
     params:
         output = config["project_path"] + "pipeline_output/functional_annotation/",
-        script_path = "scripts/sumup_table.py",
+        script_path = config["src_path"] + "scripts/sumup_table.py",
         annot = config["project_path"] + "pipeline_output/functional_annotation/{condition}_protein_translation.faa.annot",
         condition_name = lambda wildcards: wildcards.condition
     log:
