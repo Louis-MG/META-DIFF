@@ -36,8 +36,8 @@ rule kmindex_build:
         "../../env/kmindex.yaml"
     shell:
         """
-        kmtricks pipeline --file {input.fof} --run-dir {params.output_dir}/index_workdir --kmer-size 25 --hard-min 1 --bloom-size {params.bloom_filter} --minimizer-size 10 --nb-partitions {params.partitions} --threads {threads} --mode hash:bf:bin > {log.stdout} 2> {log.stderr}
-        kmindex register -p {params.output_dir}/index_workdir -i {params.output_dir}/G --name biomarkers >> {log.stdout} 2>> {log.stderr}
+        rm -d {params.output_dir}/G
+        kmindex build --file {input.fof} --index {params.out_dir}/G --run-dir {params.output_dir}/index_workdir --kmer-size 25 --hard-min 1 --bloom-size {params.bloom_filter} --nb-partitions {params.partitions} --threads {threads} --register-as biomarkers > {log.stdout} 2> {log.stderr}
         """
 
 
@@ -64,7 +64,7 @@ rule kmindex_query:
         file = config["project_path"] + "pipeline_output/biomarker/output_query_unitigs/index.tsv"
     threads: config["threads"]
     params:
-        index = config["project_path"] + "pipeline_output/biomarker/G/biomarkers"
+        index = config["project_path"] + "pipeline_output/biomarker/G"
     log:
         stdout = config["project_path"] + "/pipeline_output/logs/kmindex_query.stdout",
         stderr = config["project_path"] + "/pipeline_output/logs/kmindex_query.stderr"
@@ -72,24 +72,6 @@ rule kmindex_query:
         "../../env/kmindex.yaml"
     shell:
         """
+        rm -d {output.folder}
         kmindex query -i {params.index} -z 6 -o {output.folder} --fastx {input.unitigs} --format matrix -a -t {threads} > {log.stdout} 2> {log.stderr}
-        """
-
-rule classification :
-    input:
-        matrix= config["project_path"] + "pipeline_output/biomarker/output_query_unitigs/unitig_abundances.tsv"
-    output:
-        output = config["project_path"] + "pipeline_output/biomarker/"
-    threads: config["threads"]
-    log:
-        stdout = config["project_path"] + "/pipeline_output/logs/classification.stdout",
-        stderr = config["project_path"] + "/pipeline_output/logs/classification.stderr"
-    params:
-        script_path= config["src_path"] + "/scripts/ml.py"
-    conda:
-        "../../env/python.3.10.yaml"
-    shell:
-        """
-        sed -i 's/control[0-9]*/control/g;s/case[0-9]*/case/g' {input.matrix}
-        python3 {params.script_path}
         """
