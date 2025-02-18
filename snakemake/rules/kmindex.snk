@@ -37,7 +37,7 @@ rule kmindex_build:
     shell:
         """
         rm -d {params.output_dir}/G
-        kmindex build --file {input.fof} --index {params.out_dir}/G --run-dir {params.output_dir}/index_workdir --kmer-size 25 --hard-min 1 --bloom-size {params.bloom_filter} --nb-partitions {params.partitions} --threads {threads} --register-as biomarkers > {log.stdout} 2> {log.stderr}
+        kmindex build --fof {input.fof} --index {params.output_dir}/G --run-dir {params.output_dir}/index_workdir --kmer-size 25 --hard-min 1 --bloom-size {params.bloom_filter} --nb-partitions {params.partitions} --threads {threads} --register-as biomarkers > {log.stdout} 2> {log.stderr}
         """
 
 
@@ -60,10 +60,10 @@ rule kmindex_query:
         unitigs = config["project_path"] + "pipeline_output/biomarker/top_unitigs.fa",
         check = config["project_path"] + "pipeline_output/biomarker/G/index.json"
     output:
-        folder = config["project_path"] + "pipeline_output/biomarker/output_query_unitigs",
-        file = config["project_path"] + "pipeline_output/biomarker/output_query_unitigs/index.tsv"
+        file = config["project_path"] + "pipeline_output/biomarker/output_query_unitigs/biomarkers.tsv"
     threads: config["threads"]
     params:
+        folder = config["project_path"] + "pipeline_output/biomarker/output_query_unitigs",
         index = config["project_path"] + "pipeline_output/biomarker/G"
     log:
         stdout = config["project_path"] + "/pipeline_output/logs/kmindex_query.stdout",
@@ -72,6 +72,6 @@ rule kmindex_query:
         "../../env/kmindex.yaml"
     shell:
         """
-        rm -d {output.folder}
-        kmindex query -i {params.index} -z 6 -o {output.folder} --fastx {input.unitigs} --format matrix -a -t {threads} > {log.stdout} 2> {log.stderr}
+        rm -d {params.folder}
+        kmindex query -i {params.index} -z 6 -o {params.folder} --fastx {input.unitigs} --format matrix -a -t {threads} > {log.stdout} 2> {log.stderr}
         """
