@@ -1,6 +1,6 @@
 rule machine_learning:
     input:
-        matrix = config["project_path"] + "pipeline_output/biomarker/output_query_unitigs/index.tsv"
+        matrix = config["project_path"] + "pipeline_output/biomarker/output_query_unitigs/biomarkers.tsv"
     output:
         config["project_path"] + "pipeline_output/ML/" + config["experiment_name"] + "/histograms/allclasses.png",
         config["project_path"] + "pipeline_output/ML/" + config["experiment_name"] + "/ord/lda.png"
