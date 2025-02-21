@@ -33,7 +33,7 @@ if __name__ == '__main__':
     models_done = args.models_done.split(',')
     df = pd.read_csv(f"{args.input}", sep="\t").transpose()
 
-    experiment_name = f'{args.experiment_name}_{args.nk_input_features}k_features_mi{args.use_mi}'
+    experiment_name = f'{args.experiment_name}'
     os.makedirs(f"{args.output}/{experiment_name}/histograms", exist_ok=True)
 
     df.columns = df.iloc[0]
