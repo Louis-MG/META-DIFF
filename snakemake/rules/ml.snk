@@ -10,7 +10,8 @@ rule machine_learning:
         n_splits = config["n_splits"],
         n_calls = config["n_calls"],
         experiment_name = config["experiment_name"],
-        log_neptune = config["log_neptune"]
+        log_neptune = config["log_neptune"],
+        output = config["project_path"] + "pipeline_output/ML/"
     conda:
         "../../env/python.3.10.yaml"
     log:
@@ -19,5 +20,5 @@ rule machine_learning:
     shell:
         """
         sed -i 's/control[0-9]*/control/g;s/case[0-9]*/case/g' {input.matrix}
-        python3 {params.script_path} --input {input.matrix} --output {output} --log_neptune {params.log_neptune} --log_shap 1 --n_splits {params.n_splits} --n_calls {params.n_calls} --experiment_name {params.experiment_name} > {log.stdout} 2> {log.stderr}
+        python3 {params.script_path} --input {input.matrix} --output {params.output} --log_neptune {params.log_neptune} --log_shap 1 --n_splits {params.n_splits} --n_calls {params.n_calls} --experiment_name {params.experiment_name} > {log.stdout} 2> {log.stderr}
         """
