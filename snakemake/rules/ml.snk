@@ -20,5 +20,6 @@ rule machine_learning:
     shell:
         """
         sed -i 's/control[0-9]*/control/g;s/case[0-9]*/case/g' {input.matrix}
+        export NEPTUNE_API_TOKEN={params.neptune_key}
         python3 {params.script_path} --input {input.matrix} --output {params.output} --log_neptune {params.log_neptune} --log_shap 1 --n_splits {params.n_splits} --n_calls {params.n_calls} --experiment_name {params.experiment_name} > {log.stdout} 2> {log.stderr}
         """

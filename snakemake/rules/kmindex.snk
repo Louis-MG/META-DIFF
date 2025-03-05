@@ -10,7 +10,7 @@ rule pval_agg:
         condition_name = lambda wildcards: wildcards.condition
     log:
         stdout = config["project_path"] + "/pipeline_output/logs/pval_agg_{condition}.stdout",
-        stderr = config["project_path"] + "pipeline_output/logs/pval_agg_{condition}.stderr"
+        stderr = config["project_path"] + "/pipeline_output/logs/pval_agg_{condition}.stderr"
     conda:
         "../../env/python.3.10.yaml"
     shell:

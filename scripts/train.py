@@ -339,6 +339,7 @@ class Train:
                     'model': self.best_model,
                     'model_name': self.name,
                     'exp_name': self.exp_name,
+                    'output': self.args.output
                 }
                 self.log_stuff(run, h_params_dict, ys_dict, preds_dict, probas_dict_true, self.best_scores)
                 run = log_shap(run, args_dict)
