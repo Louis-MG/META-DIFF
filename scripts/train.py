@@ -77,7 +77,7 @@ class Train:
             hparam: h_params[i] for i, hparam in enumerate(self.hparams_names)
         }
 
-        if self.log_neptune:
+        if self.log_neptune and NEPTUNE_API_TOKEN != '' and NEPTUNE_PROJECT_NAME is not None:
             # Create a Neptune run object
             run = self.init_neptune(h_params_dict)
         else:
