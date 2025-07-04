@@ -91,8 +91,6 @@ class Train:
             run = self.init_neptune(h_params_dict)
         else:
             run = None
-            # Makes sure that the log_neptune is set to False when the pro
-            self.log_neptune = False
         zeros_cutoff = 0
         self.iter += 1
         bag = 1
