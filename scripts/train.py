@@ -51,24 +51,29 @@ class Train:
         self.args = args
 
     def init_neptune(self, h_params_dict):
-        run = neptune.init_run(
-            project=f"{NEPTUNE_PROJECT_NAME}{self.exp_name.split('_')[0].upper()}",
-            api_token=NEPTUNE_API_TOKEN,
-            source_files=['gp_cv.py',
-                            'models_config.py',
-                            'utils.py',
-                            'train.py',
-                            'requirements.txt',
-                            'log_shap.py',
-                            ],
-        )
-        run["parameters"] = h_params_dict
-        run['name'] = self.name
-        run['use_mi'] = self.use_mi
-        run['nk_input_features'] = self.nk_input_features
-        run['n_splits'] = self.n_splits
-        run['n_features'] = self.args.n_features
-        return run
+        try:
+            run = neptune.init_run(
+                project=f"{NEPTUNE_PROJECT_NAME}{self.exp_name.split('_')[0].upper()}",
+                api_token=NEPTUNE_API_TOKEN,
+                source_files=['gp_cv.py',
+                                'models_config.py',
+                                'utils.py',
+                                'train.py',
+                                'requirements.txt',
+                                'log_shap.py',
+                                ],
+            )
+            run["parameters"] = h_params_dict
+            run['name'] = self.name
+            run['use_mi'] = self.use_mi
+            run['nk_input_features'] = self.nk_input_features
+            run['n_splits'] = self.n_splits
+            run['n_features'] = self.args.n_features
+            return run
+        except Exception as e:
+            print(f"[WARNING] Neptune run could not be initialized: {e}. Disabling Neptune logging for this run.")
+            self.log_neptune = False
+            return None
 
 
     def train(self, h_params):
@@ -77,6 +82,10 @@ class Train:
             hparam: h_params[i] for i, hparam in enumerate(self.hparams_names)
         }
 
+        # Makes sure that the log_neptune is set to False when NEPTUNE_API_TOKEN is not set
+        if NEPTUNE_API_TOKEN == '' or NEPTUNE_API_TOKEN is None:
+            self.log_neptune = False
+            print("Neptune logging is disabled because NEPTUNE_API_TOKEN is not set")
         if self.log_neptune:
             # Create a Neptune run object
             run = self.init_neptune(h_params_dict)
