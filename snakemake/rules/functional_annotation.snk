@@ -37,9 +37,11 @@ rule prodigal:
         prodigal -p meta -i {input} -o {params.coords} -a {params.translation} > {log.stdout} 2> {log.stderr}
         """
 
+#TODO: faire la règle par input, si l'un ou l'autre est nul.
 rule microbeannotator:
     input:
-        expand(config["project_path"] + "pipeline_output/functional_annotation/{condition}_protein_translation.faa", condition = config["condition"])
+        case = config["project_path"] + "pipeline_output/functional_annotation/case_protein_translation.faa",
+        control = config["project_path"] + "pipeline_output/functional_annotation/control_protein_translation.faa"
     output:
         config["project_path"] + "pipeline_output/functional_annotation/metabolic_summary__heatmap.pdf", config["project_path"] + "pipeline_output/functional_annotation/metabolic_summary__barplot.pdf", config["project_path"] + "pipeline_output/functional_annotation/metabolic_summary__module_completeness.tab"
     threads: config["threads"]
@@ -54,7 +56,19 @@ rule microbeannotator:
         "../../env/microbeannotator.yaml"
     shell:
         """
-        microbeannotator  -p {params.process} -t {threads} -m diamond --database {params.database} --cluster rows -o {params.output_folder} -i {input} > {log.stdout} 2> {log.stderr}
+        if [ ! -s {input.case} ] && [ ! -s {input.control} ]
+        then
+            echo "No gene sequence detected." > {log.stdout}
+            exit 0
+        else if [ ! -s {input.case} ] && [ -s {input.control} ]
+            echo "No unitigs to annotate in cases" > {log.stdout}
+            microbeannotator  -p {params.process} -t {threads} -m diamond --database {params.database} --cluster rows -o {params.output_folder} -i {input.control} > {log.stdout} 2> {log.stderr}
+        else if [ s {input.case} ] && [ ! -s {input.control} ]
+            echo "No unitigs to annotate in controls" > {log.stdout}
+            microbeannotator  -p {params.process} -t {threads} -m diamond --database {params.database} --cluster rows -o {params.output_folder} -i {input.case} > {log.stdout} 2> {log.stderr}
+        else :
+            microbeannotator  -p {params.process} -t {threads} -m diamond --database {params.database} --cluster rows -o {params.output_folder} -i {input.control} {input.case} > {log.stdout} 2> {log.stderr}
+        fi
         """
 
 rule summary_table:
@@ -63,8 +77,8 @@ rule summary_table:
         unitigs = config["project_path"] + "pipeline_output/functional_annotation/{condition}_unitigs.filtered.fa",
         kraken_output = config["project_path"] + "pipeline_output/taxonomy/kraken_{condition}.output"
     output:
-        config["project_path"] + "pipeline_output/functional_annotation/{condition}_unitigs_to_clade_and_gene_functions.tsv",
-        config["project_path"] + "pipeline_output/taxonomy/{condition}_clades.tsv"
+        table = config["project_path"] + "pipeline_output/functional_annotation/{condition}_unitigs_to_clade_and_gene_functions.tsv",
+        clades = config["project_path"] + "pipeline_output/taxonomy/{condition}_clades.tsv"
     params:
         output = config["project_path"] + "pipeline_output/functional_annotation/",
         script_path = config["src_path"] + "/scripts/sumup_table.py",
@@ -77,6 +91,14 @@ rule summary_table:
         "../../env/python.3.10.yaml"
     shell:
         """
-	    python3 {params.script_path} -a {params.annot} -g {input.translation} -o {params.output} -u {input.unitigs} -c {params.condition_name} -k {input.kraken_output} > {log.stdout} 2> {log.stderr}
-        mv {params.output}/{params.condition_name}_clades.tsv  {params.output}/../taxonomy/
+        if [ ! -s {input.translation} ]
+        then
+            echo "No table to built, no gene was detected" > {log.stdout}
+            touch {output.clades} {output.table}
+            exit 0
+        else
+    	    python3 {params.script_path} -a {params.annot} -g {input.translation} -o {params.output} -u {input.unitigs} -c {params.condition_name} -k {input.kraken_output} > {log.stdout} 2> {log.stderr}
+            mv {params.output}/{params.condition_name}_clades.tsv  {params.output}/../taxonomy/
+        fi
         """
+    
