@@ -34,7 +34,14 @@ rule prodigal:
         "../../env/prodigal.yaml"
     shell:
         """
-        prodigal -p meta -i {input} -o {params.coords} -a {params.translation} > {log.stdout} 2> {log.stderr}
+        if [ ! -s {input} ]:
+        then
+            echo "No unitigs for gene sequence detection and translation." > {log.stdout}
+            touch {output}
+            exit 0
+        else
+            prodigal -p meta -i {input} -o {params.coords} -a {params.translation} > {log.stdout} 2> {log.stderr}
+        fi
         """
 
 #TODO: faire la règle par input, si l'un ou l'autre est nul.
