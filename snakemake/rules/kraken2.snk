@@ -18,5 +18,12 @@ rule kraken_assign:
         "../../env/kraken2.yaml"
     shell:
         """
-        kraken2 --output {output.output} --report {output.report} --threads {threads} --db {params.database} --use-names --unclassified-out {output.output_unknown} {input} > {log.stdout} 2> {log.stderr}
+        if [ ! -s {input} ];
+        then
+            echo "No unitigs to assign to a taxonomy for {wildcards.condition}." > {log.stdout}
+            touch {output.report} {output.output} {output.output_unknown}
+            exit 0
+        else
+            kraken2 --output {output.output} --report {output.report} --threads {threads} --db {params.database} --use-names --unclassified-out {output.output_unknown} {input} > {log.stdout} 2> {log.stderr}
+        fi
         """

@@ -18,7 +18,7 @@ rule bcalm:
         """
         if [ ! -s {input} ]
         then
-            echo "No differentially abundant kmers for {condition}" > {log.stdout}
+            echo "No differentially abundant kmers for {wildcards.condition}" > {log.stdout}
             touch {output}
             exit 0
         else
