@@ -34,7 +34,7 @@ rule prodigal:
         "../../env/prodigal.yaml"
     shell:
         """
-        if [ ! -s {input} ]:
+        if [ ! -s {input} ]
         then
             echo "No unitigs for gene sequence detection and translation." > {log.stdout}
             touch {output}
