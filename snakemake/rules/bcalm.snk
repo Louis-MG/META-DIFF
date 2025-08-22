@@ -22,6 +22,6 @@ rule bcalm:
             touch {output}
             exit 0
         else
-            bcalm -in {input} -out {params.outfile} -nb-cores {threads} -abundance-min 1 -max-memory {params.memory} > {log.stdout} 2> {log.stderr}
+            bcalm -in {input} -out {params.outfile} -nb-cores {threads} -abundance-min 1 -max-memory {params.memory} >> {log.stdout} 2> {log.stderr}
         fi
         """

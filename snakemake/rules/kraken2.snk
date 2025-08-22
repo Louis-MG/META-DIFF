@@ -24,6 +24,6 @@ rule kraken_assign:
             touch {output.report} {output.output} {output.output_unknown}
             exit 0
         else
-            kraken2 --output {output.output} --report {output.report} --threads {threads} --db {params.database} --use-names --unclassified-out {output.output_unknown} {input} > {log.stdout} 2> {log.stderr}
+            kraken2 --output {output.output} --report {output.report} --threads {threads} --db {params.database} --use-names --unclassified-out {output.output_unknown} {input} >> {log.stdout} 2> {log.stderr}
         fi
         """

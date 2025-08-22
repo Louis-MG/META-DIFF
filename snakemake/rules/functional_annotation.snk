@@ -70,11 +70,11 @@ rule microbeannotator:
         elif [ ! -s {input.case} ] && [ -s {input.control} ]
         then
             echo "No unitigs to annotate in cases" > {log.stdout}
-            microbeannotator  -p {params.process} -t {threads} -m diamond --database {params.database} --cluster rows -o {params.output_folder} -i {input.control} > {log.stdout} 2> {log.stderr}
-        elif [ s {input.case} ] && [ ! -s {input.control} ]
+            microbeannotator  -p {params.process} -t {threads} -m diamond --database {params.database} --cluster rows -o {params.output_folder} -i {input.control} >> {log.stdout} 2> {log.stderr}
+        elif [ -s {input.case} ] && [ ! -s {input.control} ]
         then
             echo "No unitigs to annotate in controls" > {log.stdout}
-            microbeannotator  -p {params.process} -t {threads} -m diamond --database {params.database} --cluster rows -o {params.output_folder} -i {input.case} > {log.stdout} 2> {log.stderr}
+            microbeannotator  -p {params.process} -t {threads} -m diamond --database {params.database} --cluster rows -o {params.output_folder} -i {input.case} >> {log.stdout} 2> {log.stderr}
         else
             microbeannotator  -p {params.process} -t {threads} -m diamond --database {params.database} --cluster rows -o {params.output_folder} -i {input.control} {input.case} > {log.stdout} 2> {log.stderr}
         fi
@@ -106,7 +106,7 @@ rule summary_table:
             touch {output.clades} {output.table}
             exit 0
         else
-    	    python3 {params.script_path} -a {params.annot} -g {input.translation} -o {params.output} -u {input.unitigs} -c {params.condition_name} -k {input.kraken_output} > {log.stdout} 2> {log.stderr}
+    	    python3 {params.script_path} -a {params.annot} -g {input.translation} -o {params.output} -u {input.unitigs} -c {params.condition_name} -k {input.kraken_output} >> {log.stdout} 2> {log.stderr}
             mv {params.output}/{params.condition_name}_clades.tsv  {params.output}/../taxonomy/
         fi
         """
