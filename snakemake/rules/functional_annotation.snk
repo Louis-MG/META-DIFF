@@ -67,10 +67,12 @@ rule microbeannotator:
         then
             echo "No gene sequence detected." > {log.stdout}
             exit 0
-        else if [ ! -s {input.case} ] && [ -s {input.control} ]
+        elif [ ! -s {input.case} ] && [ -s {input.control} ]
+        then
             echo "No unitigs to annotate in cases" > {log.stdout}
             microbeannotator  -p {params.process} -t {threads} -m diamond --database {params.database} --cluster rows -o {params.output_folder} -i {input.control} > {log.stdout} 2> {log.stderr}
-        else if [ s {input.case} ] && [ ! -s {input.control} ]
+        elif [ s {input.case} ] && [ ! -s {input.control} ]
+        then
             echo "No unitigs to annotate in controls" > {log.stdout}
             microbeannotator  -p {params.process} -t {threads} -m diamond --database {params.database} --cluster rows -o {params.output_folder} -i {input.case} > {log.stdout} 2> {log.stderr}
         else
