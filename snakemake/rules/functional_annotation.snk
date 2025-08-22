@@ -73,7 +73,7 @@ rule microbeannotator:
         else if [ s {input.case} ] && [ ! -s {input.control} ]
             echo "No unitigs to annotate in controls" > {log.stdout}
             microbeannotator  -p {params.process} -t {threads} -m diamond --database {params.database} --cluster rows -o {params.output_folder} -i {input.case} > {log.stdout} 2> {log.stderr}
-        else :
+        else
             microbeannotator  -p {params.process} -t {threads} -m diamond --database {params.database} --cluster rows -o {params.output_folder} -i {input.control} {input.case} > {log.stdout} 2> {log.stderr}
         fi
         """
