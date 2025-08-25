@@ -40,10 +40,8 @@ def get_gene_header_to_gene_function_dict(annot_path: Union[str, bytes, os.PathL
     """
     gene_to_function_dict = {}
     with open(annot_path, "r") as f:
-        print("dict gene_header_to_gene_function_dict")
         for line in f:
             gene_to_function_dict[line.strip().split("\t")[0]] = [line.strip().split("\t")[3], line.strip().split("\t")[4]]
-    del gene_to_function_dict["ref-NC-003210.1-209461-211401-ListeriaMonocytogenes-actin-assembly-inducing-protein-precursor_1"]
     return gene_to_function_dict
 
 
@@ -55,10 +53,8 @@ def get_gene_header_to_gene_seq_dict(gene_seq_path: Union[str, bytes, os.PathLik
     """
     gene_header_to_gene_seq_dict = {}
     with open(gene_seq_path, "r") as f:
-        print("dict gene_header_to_gene_seq_dict")
         for record in SeqIO.parse(gene_seq_path, "fasta"):
             gene_header_to_gene_seq_dict[record.id.rstrip('#')] = record.seq
-    del gene_header_to_gene_seq_dict["ref-NC-003210.1-209461-211401-ListeriaMonocytogenes-actin-assembly-inducing-protein-precursor_1"]
     return gene_header_to_gene_seq_dict
 
 
@@ -96,7 +92,6 @@ def get_unitigs_dict(unitigs_path: Union[str, bytes, os.PathLike]) -> Dict[str, 
     for record in SeqIO.parse(unitigs_path, "fasta"):
         unitigs_dict[record.id.split(" ")[0]] = record.seq
         # removes the unitigs that was added for the functional annotation
-    del unitigs_dict[">ref-NC-003210.1-209461-211401-ListeriaMonocytogenes-actin-assembly-inducing-protein-precursor"]
     return unitigs_dict
 
 def write_output_gene_table(path_output: Union[str, bytes, os.PathLike], gene_header_to_gene_function_dict: Dict[str, List[str]], unitigs_dict: Dict[str, str], gene_header_to_gene_seq_dict, unitigs_to_clade_dict: Dict[str, str]):
