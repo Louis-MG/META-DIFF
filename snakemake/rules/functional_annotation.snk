@@ -22,7 +22,8 @@ rule prodigal:
     input:
         config["project_path"] + "pipeline_output/functional_annotation/{condition}_unitigs.filtered.fa"
     output:
-        config["project_path"] + "pipeline_output/functional_annotation/{condition}_protein_translation.faa", config["project_path"] + "pipeline_output/functional_annotation/{condition}_coords.gbk"
+        config["project_path"] + "pipeline_output/functional_annotation/{condition}_protein_translation.faa",
+        config["project_path"] + "pipeline_output/functional_annotation/{condition}_coords.gbk"
     threads : config["threads"]
     params:
         coords = config["project_path"] + "pipeline_output/functional_annotation/{condition}_coords.gbk",
@@ -44,13 +45,15 @@ rule prodigal:
         fi
         """
 
-#TODO: faire la règle par input, si l'un ou l'autre est nul.
 rule microbeannotator:
     input:
         case = config["project_path"] + "pipeline_output/functional_annotation/case_protein_translation.faa",
         control = config["project_path"] + "pipeline_output/functional_annotation/control_protein_translation.faa"
     output:
-        config["project_path"] + "pipeline_output/functional_annotation/metabolic_summary__heatmap.pdf", config["project_path"] + "pipeline_output/functional_annotation/metabolic_summary__barplot.pdf", config["project_path"] + "pipeline_output/functional_annotation/metabolic_summary__module_completeness.tab"
+        case_annot = config["project_path"] + "pipeline_output/functional_annotation/annotation_results/case_protein_translation.faa.annot",
+        case_ko = config["project_path"] + "pipeline_output/functional_annotation/annotation_results/case_protein_translation.faa.ko",
+        control_annot = config["project_path"] + "pipeline_output/functional_annotation/annotation_results/control_protein_translation.faa.annot",
+        control_ko = config["project_path"] + "pipeline_output/functional_annotation/annotation_results/control_protein_translation.faa.ko"
     threads: config["threads"]
     log:
         stdout = config["project_path"] + "logs/microbeannotator.stdout",
@@ -66,20 +69,22 @@ rule microbeannotator:
         if [ ! -s {input.case} ] && [ ! -s {input.control} ]
         then
             echo "No gene sequence detected." > {log.stdout}
+            touch {output}
             exit 0
         elif [ ! -s {input.case} ] && [ -s {input.control} ]
         then
             echo "No unitigs to annotate in cases" > {log.stdout}
+            touch {output.case_annot} {output.case_ko}
             microbeannotator  -p {params.process} -t {threads} -m diamond --database {params.database} --cluster rows -o {params.output_folder} -i {input.control} >> {log.stdout} 2> {log.stderr}
         elif [ -s {input.case} ] && [ ! -s {input.control} ]
         then
             echo "No unitigs to annotate in controls" > {log.stdout}
+            touch {output.control_annot} {output.control_ko}
             microbeannotator  -p {params.process} -t {threads} -m diamond --database {params.database} --cluster rows -o {params.output_folder} -i {input.case} >> {log.stdout} 2> {log.stderr}
         else
             microbeannotator  -p {params.process} -t {threads} -m diamond --database {params.database} --cluster rows -o {params.output_folder} -i {input.control} {input.case} > {log.stdout} 2> {log.stderr}
         fi
         """
-
 rule summary_table:
     input:
         translation = config["project_path"] + "pipeline_output/functional_annotation/{condition}_protein_translation.faa",
@@ -106,7 +111,8 @@ rule summary_table:
             touch {output.clades} {output.table}
             exit 0
         else
-    	    python3 {params.script_path} -a {params.annot} -g {input.translation} -o {params.output} -u {input.unitigs} -c {params.condition_name} -k {input.kraken_output} >> {log.stdout} 2> {log.stderr}
+    	    python3 {params.script_path} -a {params.annot} -g {input.translation} -o {params.output} -u {input.unitigs} \
+    	    -c {params.condition_name} -k {input.kraken_output} >> {log.stdout} 2> {log.stderr}
             mv {params.output}/{params.condition_name}_clades.tsv  {params.output}/../taxonomy/
         fi
         """
