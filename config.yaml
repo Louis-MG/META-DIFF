@@ -13,7 +13,7 @@ threads: 120
 unitig_length: 500
 bcalm_memory: 20000
 partitions: 8
-bitw: 64
+bitw: 8
 bloom_filter: 1000000000
 top_unitigs: 5000
 neptune_key: ""
