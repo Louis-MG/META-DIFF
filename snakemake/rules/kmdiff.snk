@@ -43,7 +43,8 @@ rule kmdiff_diff:
         ulimit -n 10000
         nb_control=$(grep -c -F 'case' {input.fof})
         nb_case=$(grep -c -F 'control' {input.fof})
-        kmdiff diff --km-run {params.output_folder} -t {threads} --output-dir {params.output_folder} --nb-controls "$nb_control" --nb-cases "$nb_case" --save-sk --correction "benjamini" > {log.stdout} 2> {log.stderr}
+        kmdiff diff --km-run {params.output_folder} -t {threads} --output-dir {params.output_folder} --nb-controls "$nb_control" \
+        --nb-cases "$nb_case" --save-sk --correction "benjamini" > {log.stdout} 2> {log.stderr}
         """
 
 

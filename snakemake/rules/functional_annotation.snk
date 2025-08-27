@@ -75,16 +75,21 @@ rule microbeannotator:
         then
             echo "No unitigs to annotate in cases" > {log.stdout}
             touch {output.case_annot} {output.case_ko}
-            microbeannotator  -p {params.process} -t {threads} -m diamond --database {params.database} --cluster rows -o {params.output_folder} -i {input.control} >> {log.stdout} 2> {log.stderr}
+            microbeannotator  -p {params.process} -t {threads} -m diamond --database {params.database} --cluster rows \
+                     -o {params.output_folder} -i {input.control} >> {log.stdout} 2> {log.stderr}
         elif [ -s {input.case} ] && [ ! -s {input.control} ]
         then
             echo "No unitigs to annotate in controls" > {log.stdout}
             touch {output.control_annot} {output.control_ko}
-            microbeannotator  -p {params.process} -t {threads} -m diamond --database {params.database} --cluster rows -o {params.output_folder} -i {input.case} >> {log.stdout} 2> {log.stderr}
+            microbeannotator  -p {params.process} -t {threads} -m diamond --database {params.database} --cluster rows \
+                     -o {params.output_folder} -i {input.case} >> {log.stdout} 2> {log.stderr}
         else
-            microbeannotator  -p {params.process} -t {threads} -m diamond --database {params.database} --cluster rows -o {params.output_folder} -i {input.control} {input.case} > {log.stdout} 2> {log.stderr}
+            microbeannotator  -p {params.process} -t {threads} -m diamond --database {params.database} --cluster rows \
+                     -o {params.output_folder} -i {input.control} {input.case} > {log.stdout} 2> {log.stderr}
         fi
         """
+
+
 rule summary_table:
     input:
         translation = config["project_path"] + "pipeline_output/functional_annotation/{condition}_protein_translation.faa",
