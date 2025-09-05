@@ -1,16 +1,16 @@
 rule pval_agg:
     input:
-        unitigs = config["project_path"] + "pipeline_output/kmdiff_output/{condition}_kmers.unitigs.fa",
-        kmers = config["project_path"] + "pipeline_output/kmdiff_output/{condition}_kmers.fasta"
+        unitigs = config["project_path"] + config['experiment_name'] + "/kmdiff_output/{condition}_kmers.unitigs.fa",
+        kmers = config["project_path"] + config['experiment_name'] + "/kmdiff_output/{condition}_kmers.fasta"
     output:
-        config["project_path"] + "pipeline_output/biomarker/{condition}.aggregated.fa"
+        config["project_path"] + config['experiment_name'] + "/biomarker/{condition}.aggregated.fa"
     params:
-        output = config["project_path"] + "pipeline_output/biomarker/",
+        output = config["project_path"] + config['experiment_name'] + "/biomarker/",
         script_path = config["src_path"] + "/scripts/pvalues_agg.py",
         condition_name = lambda wildcards: wildcards.condition
     log:
-        stdout = config["project_path"] + "/pipeline_output/logs/pval_agg_{condition}.stdout",
-        stderr = config["project_path"] + "/pipeline_output/logs/pval_agg_{condition}.stderr"
+        stdout = config["project_path"] + config['experiment_name'] + "/logs/pval_agg_{condition}.stdout",
+        stderr = config["project_path"] + config['experiment_name'] + "/logs/pval_agg_{condition}.stderr"
     conda:
         "../../env/python.3.10.yaml"
     shell:
@@ -22,16 +22,16 @@ rule kmindex_build:
     input:
         fof= config["fof"]
     output:
-        config["project_path"] + "pipeline_output/biomarker/G/index.json"
+        config["project_path"] + config['experiment_name'] + "/biomarker/G/index.json"
     threads: config["threads"]
     params:
-        output_dir = config["project_path"] + "pipeline_output/biomarker/",
+        output_dir = config["project_path"] + config['experiment_name'] + "/biomarker/",
         bloom_filter= config["bloom_filter"],
         bitw= config["bitw"],
         partitions = config["partitions"]
     log:
-        stdout = config["project_path"] + "/pipeline_output/logs/kmindex_build.stdout",
-        stderr = config["project_path"] + "/pipeline_output/logs/kmindex_build.stderr"
+        stdout = config["project_path"] + config['experiment_name'] + "/logs/kmindex_build.stdout",
+        stderr = config["project_path"] + config['experiment_name'] + "/logs/kmindex_build.stderr"
     conda:
         "../../env/kmindex.yaml"
     shell:
@@ -45,10 +45,10 @@ rule kmindex_build:
 
 rule get_query:
     input:
-        case = config["project_path"] + "pipeline_output/biomarker/case.aggregated.fa",
-        control = config["project_path"] + "pipeline_output/biomarker/control.aggregated.fa"
+        case = config["project_path"] + config['experiment_name'] + "/biomarker/case.aggregated.fa",
+        control = config["project_path"] + config['experiment_name'] + "/biomarker/control.aggregated.fa"
     output:
-        query = config["project_path"] + "pipeline_output/biomarker/top_unitigs.fa"
+        query = config["project_path"] + config['experiment_name'] + "/biomarker/top_unitigs.fa"
     params:
         top_unitigs = config["top_unitigs"]
     shell:
@@ -59,17 +59,17 @@ rule get_query:
 
 rule kmindex_query:
     input:
-        unitigs = config["project_path"] + "pipeline_output/biomarker/top_unitigs.fa",
-        check = config["project_path"] + "pipeline_output/biomarker/G/index.json"
+        unitigs = config["project_path"] + config['experiment_name'] + "/biomarker/top_unitigs.fa",
+        check = config["project_path"] + config['experiment_name'] + "/biomarker/G/index.json"
     output:
-        file = config["project_path"] + "pipeline_output/biomarker/output_query_unitigs/biomarkers.tsv"
+        file = config["project_path"] + config['experiment_name'] + "/biomarker/output_query_unitigs/biomarkers.tsv"
     threads: config["threads"]
     params:
-        folder = config["project_path"] + "pipeline_output/biomarker/output_query_unitigs",
-        index = config["project_path"] + "pipeline_output/biomarker/G"
+        folder = config["project_path"] + config['experiment_name'] + "/biomarker/output_query_unitigs",
+        index = config["project_path"] + config['experiment_name'] + "/biomarker/G"
     log:
-        stdout = config["project_path"] + "/pipeline_output/logs/kmindex_query.stdout",
-        stderr = config["project_path"] + "/pipeline_output/logs/kmindex_query.stderr"
+        stdout = config["project_path"] + config['experiment_name'] + "/logs/kmindex_query.stdout",
+        stderr = config["project_path"] + config['experiment_name'] + "/logs/kmindex_query.stderr"
     conda:
         "../../env/kmindex.yaml"
     shell:

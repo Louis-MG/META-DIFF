@@ -2,14 +2,14 @@
 
 rule annot_extract_candidates:
     input:
-        config["project_path"] + "pipeline_output/kmdiff_output/{condition}_kmers.unitigs.fa"
+        config["project_path"] + config['experiment_name'] + "/kmdiff_output/{condition}_kmers.unitigs.fa"
     output:
-        config["project_path"] + "pipeline_output/functional_annotation/{condition}_unitigs.filtered.fa"
+        config["project_path"] + config['experiment_name'] + "/functional_annotation/{condition}_unitigs.filtered.fa"
     params:
         length = config["unitig_length"]
     log:
-        stdout = config["project_path"] + "/pipeline_output/logs/annot_extract_candidates_{condition}.stdout",
-        stderr = config["project_path"] + "/pipeline_output/logs/annot_extract_candidates_{condition}.stderr"
+        stdout = config["project_path"] + config['experiment_name'] + "/logs/annot_extract_candidates_{condition}.stdout",
+        stderr = config["project_path"] + config['experiment_name'] + "/logs/annot_extract_candidates_{condition}.stderr"
     conda:
         "../../env/seqkit.yaml"
     shell:
@@ -20,17 +20,17 @@ rule annot_extract_candidates:
 
 rule prodigal:
     input:
-        config["project_path"] + "pipeline_output/functional_annotation/{condition}_unitigs.filtered.fa"
+        config["project_path"] + config['experiment_name'] + "/functional_annotation/{condition}_unitigs.filtered.fa"
     output:
-        config["project_path"] + "pipeline_output/functional_annotation/{condition}_protein_translation.faa",
-        config["project_path"] + "pipeline_output/functional_annotation/{condition}_coords.gbk"
+        config["project_path"] + config['experiment_name'] + "/functional_annotation/{condition}_protein_translation.faa",
+        config["project_path"] + config['experiment_name'] + "/functional_annotation/{condition}_coords.gbk"
     threads : config["threads"]
     params:
-        coords = config["project_path"] + "pipeline_output/functional_annotation/{condition}_coords.gbk",
-        translation = config["project_path"] + "pipeline_output/functional_annotation/{condition}_protein_translation.faa"
+        coords = config["project_path"] + config['experiment_name'] + "/functional_annotation/{condition}_coords.gbk",
+        translation = config["project_path"] + config['experiment_name'] + "/functional_annotation/{condition}_protein_translation.faa"
     log:
-        stdout = config["project_path"] + "/pipeline_output/logs/prodigal_{condition}.stdout",
-        stderr = config["project_path"] + "/pipeline_output/logs/prodigal_{condition}.stderr"
+        stdout = config["project_path"] + config['experiment_name'] + "/logs/prodigal_{condition}.stdout",
+        stderr = config["project_path"] + config['experiment_name'] + "/logs/prodigal_{condition}.stderr"
     conda:
         "../../env/prodigal.yaml"
     shell:
@@ -47,13 +47,13 @@ rule prodigal:
 
 rule microbeannotator:
     input:
-        case = config["project_path"] + "pipeline_output/functional_annotation/case_protein_translation.faa",
-        control = config["project_path"] + "pipeline_output/functional_annotation/control_protein_translation.faa"
+        case = config["project_path"] + config['experiment_name'] + "/functional_annotation/case_protein_translation.faa",
+        control = config["project_path"] + config['experiment_name'] + "/functional_annotation/control_protein_translation.faa"
     output:
-        case_annot = config["project_path"] + "pipeline_output/functional_annotation/annotation_results/case_protein_translation.faa.annot",
-        case_ko = config["project_path"] + "pipeline_output/functional_annotation/annotation_results/case_protein_translation.faa.ko",
-        control_annot = config["project_path"] + "pipeline_output/functional_annotation/annotation_results/control_protein_translation.faa.annot",
-        control_ko = config["project_path"] + "pipeline_output/functional_annotation/annotation_results/control_protein_translation.faa.ko"
+        case_annot = config["project_path"] + config['experiment_name'] + "/functional_annotation/annotation_results/case_protein_translation.faa.annot",
+        case_ko = config["project_path"] + config['experiment_name'] + "/functional_annotation/annotation_results/case_protein_translation.faa.ko",
+        control_annot = config["project_path"] + config['experiment_name'] + "/functional_annotation/annotation_results/control_protein_translation.faa.annot",
+        control_ko = config["project_path"] + config['experiment_name'] + "/functional_annotation/annotation_results/control_protein_translation.faa.ko"
     threads: config["threads"]
     log:
         stdout = config["project_path"] + "logs/microbeannotator.stdout",
@@ -61,7 +61,7 @@ rule microbeannotator:
     params:
         process = 1,
         database = config["microbeannotator_db_path"],
-        output_folder = config["project_path"] + "pipeline_output/functional_annotation/"
+        output_folder = config["project_path"] + config['experiment_name'] + "/functional_annotation/"
     conda:
         "../../env/microbeannotator.yaml"
     shell:
@@ -92,16 +92,16 @@ rule microbeannotator:
 
 rule summary_table:
     input:
-        translation = config["project_path"] + "pipeline_output/functional_annotation/{condition}_protein_translation.faa",
-        unitigs = config["project_path"] + "pipeline_output/functional_annotation/{condition}_unitigs.filtered.fa",
-        kraken_output = config["project_path"] + "pipeline_output/taxonomy/kraken_{condition}.output"
+        translation = config["project_path"] + config['experiment_name'] + "/functional_annotation/{condition}_protein_translation.faa",
+        unitigs = config["project_path"] + config['experiment_name'] + "/functional_annotation/{condition}_unitigs.filtered.fa",
+        kraken_output = config["project_path"] + config['experiment_name'] + "/taxonomy/kraken_{condition}.output"
     output:
-        table = config["project_path"] + "pipeline_output/functional_annotation/{condition}_unitigs_to_clade_and_gene_functions.tsv",
-        clades = config["project_path"] + "pipeline_output/taxonomy/{condition}_clades.tsv"
+        table = config["project_path"] + config['experiment_name'] + "/functional_annotation/{condition}_unitigs_to_clade_and_gene_functions.tsv",
+        clades = config["project_path"] + config['experiment_name'] + "/taxonomy/{condition}_clades.tsv"
     params:
-        output = config["project_path"] + "pipeline_output/functional_annotation/",
+        output = config["project_path"] + config['experiment_name'] + "/functional_annotation/",
         script_path = config["src_path"] + "/scripts/sumup_table.py",
-        annot = config["project_path"] + "pipeline_output/functional_annotation/annotation_results/{condition}_protein_translation.faa.annot",
+        annot = config["project_path"] + config['experiment_name'] + "/functional_annotation/annotation_results/{condition}_protein_translation.faa.annot",
         condition_name = lambda wildcards: wildcards.condition
     log:
         stdout = config["project_path"] + "logs/summary_table_{condition}.stdout",
@@ -116,8 +116,8 @@ rule summary_table:
             touch {output.clades} {output.table}
             exit 0
         else
-    	    python3 {params.script_path} -a {params.annot} -g {input.translation} -o {params.output} -u {input.unitigs} \
-    	    -c {params.condition_name} -k {input.kraken_output} >> {log.stdout} 2> {log.stderr}
+            python3 {params.script_path} -a {params.annot} -g {input.translation} -o {params.output} -u {input.unitigs} \
+            -c {params.condition_name} -k {input.kraken_output} >> {log.stdout} 2> {log.stderr}
             mv {params.output}/{params.condition_name}_clades.tsv  {params.output}/../taxonomy/
         fi
         """

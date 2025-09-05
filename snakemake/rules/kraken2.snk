@@ -2,18 +2,18 @@
 
 rule kraken_assign:
     input:
-        config["project_path"] + "pipeline_output/kmdiff_output/{condition}_kmers.unitigs.fa"
+        config["project_path"] + config['experiment_name'] + "/kmdiff_output/{condition}_kmers.unitigs.fa"
     output:
-        report = config["project_path"] + "pipeline_output/taxonomy/kraken_{condition}.report",
-        output = config["project_path"] + "pipeline_output/taxonomy/kraken_{condition}.output",
-        output_unknown = config["project_path"] + "pipeline_output/taxonomy/{condition}_unassigned.unitigs.fa"
+        report = config["project_path"] + config['experiment_name'] + "/taxonomy/kraken_{condition}.report",
+        output = config["project_path"] + config['experiment_name'] + "/taxonomy/kraken_{condition}.output",
+        output_unknown = config["project_path"] + config['experiment_name'] + "/taxonomy/{condition}_unassigned.unitigs.fa"
     threads: config["threads"]
     params:
-        output_dir = config["project_path"] + "pipeline_output/taxonomy/",
+        output_dir = config["project_path"] + config['experiment_name'] + "/taxonomy/",
         database = config["kraken_database_path"]
     log:
-        stdout = config["project_path"] + "/pipeline_output/logs/kraken_assign_{condition}.stdout",
-        stderr = config["project_path"] + "/pipeline_output/logs/kraken_assign_{condition}.stderr"
+        stdout = config["project_path"] + config['experiment_name'] + "/logs/kraken_assign_{condition}.stdout",
+        stderr = config["project_path"] + config['experiment_name'] + "/logs/kraken_assign_{condition}.stderr"
     conda :
         "../../env/kraken2.yaml"
     shell:

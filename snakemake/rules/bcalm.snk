@@ -2,16 +2,16 @@
 
 rule bcalm:
     input:
-        config["project_path"] + "pipeline_output/kmdiff_output/{condition}_kmers.fasta"
+        config["project_path"] + config['experiment_name'] + "/kmdiff_output/{condition}_kmers.fasta"
     output:
-        config["project_path"] + "pipeline_output/kmdiff_output/{condition}_kmers.unitigs.fa"
+        config["project_path"] + config['experiment_name'] + "/kmdiff_output/{condition}_kmers.unitigs.fa"
     params:
         memory = config["bcalm_memory"],
-        outfile = config["project_path"] + "pipeline_output/kmdiff_output/{condition}_kmers"
+        outfile = config["project_path"] + config['experiment_name'] + "/kmdiff_output/{condition}_kmers"
     threads: config["threads"]
     log:
-        stdout = config["project_path"] + "/pipeline_output/logs/bcalm_{condition}.stdout",
-        stderr = config["project_path"] + "/pipeline_output/logs/bcalm_{condition}.stderr"
+        stdout = config["project_path"] + config['experiment_name'] + "/logs/bcalm_{condition}.stdout",
+        stderr = config["project_path"] + config['experiment_name'] + "/logs/bcalm_{condition}.stderr"
     conda :
         "../../env/bcalm.yaml"
     shell:
