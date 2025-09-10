@@ -24,7 +24,26 @@ rule kraken_assign:
             touch {output.report} {output.output} {output.output_unknown}
             exit 0
         else
-            kraken2 --output {output.output} --report {output.report} --threads {threads} --db {params.database} \
+            k2 classify --use-daemon --output {output.output} --report {output.report} --threads {threads} --db {params.database} \
             --use-names --unclassified-out {output.output_unknown} {input} >> {log.stdout} 2> {log.stderr}
         fi
+        """
+
+rule kraken_clean:
+    input:
+        expand(config["project_path"] + config['experiment_name'] + "/taxonomy/kraken_{condition}.report", condition = config['condition']),
+        expand(config["project_path"] + config['experiment_name'] + "/taxonomy/kraken_{condition}.output", condition = config['condition'])
+    output:
+        config["project_path"] + config['experiment_name'] + "/taxonomy/killed_daemon.txt"
+    params:
+        database = config["kraken_database_path"]
+    log:
+        stdout = config["project_path"] + config['experiment_name'] + "/logs/kraken_clean.stdout",
+        stderr = config["project_path"] + config['experiment_name'] + "/logs/kraken_clean.stderr"
+    conda:
+        "../../env/kraken2.yaml"
+    shell:
+        """
+        k2 clean --stop-daemon
+        echo 1 > {output}
         """

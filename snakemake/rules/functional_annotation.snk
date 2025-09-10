@@ -96,7 +96,8 @@ rule summary_table:
         unitigs = config["project_path"] + config['experiment_name'] + "/functional_annotation/{condition}_unitigs.filtered.fa",
         kraken_output = config["project_path"] + config['experiment_name'] + "/taxonomy/kraken_{condition}.output",
         ko = config["project_path"] + config['experiment_name'] + "/functional_annotation/annotation_results/{condition}_protein_translation.faa.ko",
-        annot = config["project_path"] + config['experiment_name'] + "/functional_annotation/annotation_results/{condition}_protein_translation.faa.annot"
+        annot = config["project_path"] + config['experiment_name'] + "/functional_annotation/annotation_results/{condition}_protein_translation.faa.annot",
+        daemon_hunter = config["project_path"] + config['experiment_name'] + "/taxonomy/killed_daemon.txt"
     output:
         table = config["project_path"] + config['experiment_name'] + "/functional_annotation/{condition}_unitigs_to_clade_and_gene_functions.tsv",
         clades = config["project_path"] + config['experiment_name'] + "/taxonomy/{condition}_clades.tsv"
