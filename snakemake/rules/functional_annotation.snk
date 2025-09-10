@@ -94,14 +94,15 @@ rule summary_table:
     input:
         translation = config["project_path"] + config['experiment_name'] + "/functional_annotation/{condition}_protein_translation.faa",
         unitigs = config["project_path"] + config['experiment_name'] + "/functional_annotation/{condition}_unitigs.filtered.fa",
-        kraken_output = config["project_path"] + config['experiment_name'] + "/taxonomy/kraken_{condition}.output"
+        kraken_output = config["project_path"] + config['experiment_name'] + "/taxonomy/kraken_{condition}.output",
+        ko = config["project_path"] + config['experiment_name'] + "/functional_annotation/annotation_results/{condition}_protein_translation.faa.ko",
+        annot = config["project_path"] + config['experiment_name'] + "/functional_annotation/annotation_results/{condition}_protein_translation.faa.annot"
     output:
         table = config["project_path"] + config['experiment_name'] + "/functional_annotation/{condition}_unitigs_to_clade_and_gene_functions.tsv",
         clades = config["project_path"] + config['experiment_name'] + "/taxonomy/{condition}_clades.tsv"
     params:
         output = config["project_path"] + config['experiment_name'] + "/functional_annotation/",
         script_path = config["src_path"] + "/scripts/sumup_table.py",
-        annot = config["project_path"] + config['experiment_name'] + "/functional_annotation/annotation_results/{condition}_protein_translation.faa.annot",
         condition_name = lambda wildcards: wildcards.condition
     log:
         stdout = config["project_path"] + "logs/summary_table_{condition}.stdout",
@@ -116,7 +117,7 @@ rule summary_table:
             touch {output.clades} {output.table}
             exit 0
         else
-            python3 {params.script_path} -a {params.annot} -g {input.translation} -o {params.output} -u {input.unitigs} \
+            python3 {params.script_path} -a {input.annot} -g {input.translation} -o {params.output} -u {input.unitigs} \
             -c {params.condition_name} -k {input.kraken_output} >> {log.stdout} 2> {log.stderr}
             mv {params.output}/{params.condition_name}_clades.tsv  {params.output}/../taxonomy/
         fi
