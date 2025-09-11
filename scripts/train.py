@@ -20,8 +20,11 @@ if "NEPTUNE_API_TOKEN" in os.environ:
     NEPTUNE_API_TOKEN = os.environ["NEPTUNE_API_TOKEN"]
 else:
     NEPTUNE_API_TOKEN = None
-NEPTUNE_PROJECT_NAME = "METAG/"
-NEPTUNE_MODEL_NAME = "AC-"
+if "NEPTUNE_PROJECT_NAME" in os.environ:
+    NEPTUNE_PROJECT_NAME = os.environ["NEPTUNE_PROJECT_NAME"]
+else:
+    NEPTUNE_PROJECT_NAME = None
+    # TODO: ajouter un truc pour que s project name est None alors run = None
 
 
 class Train:
@@ -54,7 +57,7 @@ class Train:
     def init_neptune(self, h_params_dict):
         try:
             run = neptune.init_run(
-                project=f"{NEPTUNE_PROJECT_NAME}{self.exp_name.split('_')[0].upper()}",
+                project=f"{NEPTUNE_PROJECT_NAME}",
                 api_token=NEPTUNE_API_TOKEN,
                 source_files=[
                     "gp_cv.py",
@@ -336,7 +339,7 @@ class Train:
                         pass
                     scores[group]["cluster_metrics"][f"{cluster_id}_acc"] += [acc]
 
-            if self.log_neptune:
+            if self.log_neptune and run != None:
                 for group in scores.keys():
                     for metric in scores[group].keys():
                         if metric != "cluster_metrics":
@@ -383,7 +386,7 @@ class Train:
             f'test: {np.mean(scores["test"]["mcc"])}'
         )
 
-        if self.log_neptune:
+        if self.log_neptune and run != None:
             run["log_shap"] = 0
             run["iter"] = self.iter
             # End the run

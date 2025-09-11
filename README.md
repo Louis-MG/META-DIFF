@@ -118,6 +118,8 @@ Finally, ssssstart the pipeline :snake::
 snakemake --cores X --use-conda
 ```
 
+You can test the pipeline using the minimal example provided in the `test` folder.
+
 # Coming next 
 
 - addition of a quarto report with all the numbers and figures
