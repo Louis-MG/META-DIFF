@@ -15,7 +15,6 @@ from utils import get_scaler, augment_data
 from skopt.plots import plot_convergence, plot_evaluations, plot_objective, plot_regret
 from skopt import gp_minimize
 
-# TODO NEED TO CHANGE THE ACTUAL KEY BY A GLOBAL VARIABLE
 if "NEPTUNE_API_TOKEN" in os.environ:
     NEPTUNE_API_TOKEN = os.environ["NEPTUNE_API_TOKEN"]
 else:
