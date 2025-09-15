@@ -231,7 +231,7 @@ def log_explainer(run, group, args_dict):
             plt.savefig(f"{output}/{group}_linear_shap_{label}_kde_abs.png")
             plt.close()
             if run is not None:
-                run[f'shap/linear_{group}_{label}_kde'].upload(f"{output}/{group}_linear_shap_{label}_kde_abs.png')
+                run[f"shap/linear_{group}_{label}_kde"].upload(f"{output}/{group}_linear_shap_{label}_kde_abs.png")
 
             # Cumulée et survie
             values, base = np.histogram(shap_agg.abs(), bins=40)
