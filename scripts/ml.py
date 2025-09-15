@@ -30,7 +30,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--nk_input_features",
         type=int,
-        default=10,
+        default=5,
         help="Number of thousands of features used.",
     )
     parser.add_argument("--use_mi", type=int, default=0, help="Use mutual information")

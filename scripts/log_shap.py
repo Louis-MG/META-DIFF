@@ -167,8 +167,9 @@ def log_explainer(run, group, args_dict):
     labels = args_dict['labels'][group]
     # columns = args_dict['columns']
     exp_name = args_dict['exp_name']
-    log_path = f"logs/{exp_name}"
-    output = f"{args_dict['output']}/ML/{exp_name}/"
+    # Dossier de sortie harmonisé et créé si besoin
+    output = f"{args_dict['output']}/ML/{exp_name}"
+    os.makedirs(output, exist_ok=True)
 
     unique_classes = np.unique(labels)
     # The explainer doesn't like tensors, hence the f function
@@ -209,7 +210,7 @@ def log_explainer(run, group, args_dict):
         # Remove shap values that are 0
         shap_values_df = shap_values_df.loc[:, (shap_values_df != 0).any(axis=0)]
         # Save the shap values
-        shap_values_df.to_csv(f"{output}/{group}_shap.csv")
+        shap_values_df.to_csv(f"{output}/{group}_shap.csv", index=False)
         shap_values_df = shap_values_df.abs()
         shap_values_df = shap_values_df.sum(0)
         total = shap_values_df.sum()
@@ -221,24 +222,29 @@ def log_explainer(run, group, args_dict):
             # Dropping the base value
             shap_values_df = shap_values_df.drop('bv')
             shap_values_df.to_csv(f"{output}/{group}_linear_shap_{label}_abs.csv")
-            run[f'shap/linear_{group}_{label}'].upload(f"{output}/{group}_linear_shap_{label}_abs.csv")
+            if run is not None:
+                run[f'shap/linear_{group}_{label}'].upload(f"{output}/{group}_linear_shap_{label}_abs.csv")
+
             shap_values_df.transpose().hist(bins=100, figsize=(10, 10))
             plt.xlabel('SHAP value')
             plt.ylabel('Frequency')
+            plt.title(f'base_value: {np.round(bv, 2)}')
             plt.savefig(f"{output}/{group}_linear_shap_{label}_hist_abs.png")
             plt.close()
-            plt.title(f'base_value: {np.round(bv, 2)}')
-            run[f'shap/linear_{group}_{label}_hist'].upload(f"{log_path}/{group}_linear_shap_{label}_hist_abs.png")
+            if run is not None:
+                # Upload exactement le fichier sauvegardé
+                run[f'shap/linear_{group}_{label}_hist'].upload(f"{output}/{group}_linear_shap_{label}_hist_abs.png")
+
             # start x axis at 0
             shap_values_df.abs().sort_values(ascending=False).plot(kind='kde', figsize=(10, 10))
-            # shap_values_df.transpose().cumsum().hist(bins=100, figsize=(10, 10))
             plt.xlim(0, shap_values_df.abs().max())
             plt.xlabel('Density')
             plt.ylabel('Frequency')
             plt.title(f'base_value: {np.round(bv, 2)}')
             plt.savefig(f"{output}/{group}_linear_shap_{label}_kde_abs.png")
             plt.close()
-            run[f'shap/linear_{group}_{label}_kde'].upload(f"{output}/{group}_linear_shap_{label}_kde_abs.png")
+            if run is not None:
+                run[f'shap/linear_{group}_{label}_kde'].upload(f"{output}/{group}_linear_shap_{label}_kde_abs.png")
 
             values, base = np.histogram(shap_values_df.abs(), bins=40)
             #evaluate the cumulative
@@ -248,105 +254,7 @@ def log_explainer(run, group, args_dict):
             plt.plot(base[:-1], cumulative, c='blue')
             #plot the survival function
             plt.plot(base[:-1], len(shap_values_df.abs())-cumulative, c='green')
-            plt.xlabel('SHAP value')
-            plt.ylabel('Cumulative Density')
-            plt.title(f'base_value: {np.round(bv, 2)}')
-            plt.savefig(f"{output}/{group}_linear_shap_{label}_cumulative_abs.png")
-            plt.close()
-            run[f'shap/linear_{group}_{label}_cumulative_abs'].upload(f"{output}/{group}_linear_shap_{label}_cumulative_abs.png")
-        except:
-            pass
-    else:
-        # save shap_values
-        # TODO Verifier que l'ordre est bon
-        for i, label in enumerate(unique_classes):
-            label = unique_classes[label]
-            shap_values_df = pd.DataFrame(
-                np.c_[shap_values.base_values[:, i], shap_values.values[:, :, i]], 
-                columns=['bv'] + list(x_df.columns)
-            )
-            # Remove shap values that are 0
-            shap_values_df = shap_values_df.loc[:, (shap_values_df != 0).any(axis=0)]
-
-            # Save the shap values
-            shap_values_df.to_csv(f"{log_path}/{group}_shap.csv")
-            run[f'shap/{group}_{label}'].upload(f"{log_path}/{group}_shap.csv")
-
-            shap_values_df = shap_values_df.abs()
-            shap_values_df = shap_values_df.sum(0)
-            total = shap_values_df.sum()
-            shap_values_df = shap_values_df / total
-
-            # Save the shap values
-            shap_values_df.to_csv(f"{log_path}/{group}_shap_abs.csv")
-            run[f'shap/{group}_{label}'].upload(f"{log_path}/{group}_shap_abs.csv")
-
-            try:
-                # Getting the base value
-                bv = shap_values_df['bv']
-
-                # Dropping the base value
-                shap_values_df = shap_values_df.drop('bv')
-                shap_values_df.to_csv(f"{log_path}/{group}_linear_shap_{label}_abs.csv")
-                run[f'shap/linear_{group}_{label}'].upload(f"{log_path}/{group}_linear_shap_{label}_abs.csv")
-
-                shap_values_df.transpose().hist(bins=100, figsize=(10, 10))
-                plt.ylabel('Frequency')
-                plt.xlabel('SHAP value')
-                plt.savefig(f"{log_path}/{group}_linear_shap_{label}_hist_abs.png")
-                plt.close()
-                plt.title(f'base_value: {np.round(bv, 2)}')
-                # if i == 0:
-                run[f'shap/linear_{group}_{label}_hist'].upload(f"{log_path}/{group}_linear_shap_{label}_hist_abs.png")
-                # start x axis at 0
-                shap_values_df.abs().sort_values(ascending=False).plot(kind='kde', figsize=(10, 10))
-                plt.ylabel('Density')
-                plt.xlabel('SHAP value')
-                # shap_values_df.transpose().cumsum().hist(bins=100, figsize=(10, 10))
-                plt.xlim(0, shap_values_df.abs().max())
-                plt.savefig(f"{log_path}/{group}_linear_shap_{label}_kde_abs.png")
-                plt.close()
-                plt.title(f'base_value: {np.round(bv, 2)}')
-                # if i == 0:
-                run[f'shap/linear_{group}_{label}_kde'].upload(f"{log_path}/{group}_linear_shap_{label}_kde_abs.png")
-
-                values, base = np.histogram(shap_values_df.abs(), bins=40)
-                #evaluate the cumulative
-                cumulative = np.cumsum(values)
-                # plot the cumulative function
-                plt.plot(base[:-1], cumulative, c='blue')
-                #plot the survival function
-                plt.plot(base[:-1], len(shap_values_df.abs())-cumulative, c='green')
-
-                plt.ylabel('Cumulative Density')
-                plt.xlabel('SHAP value')
-                plt.savefig(f"{log_path}/{group}_linear_shap_{label}_cumulative_abs.png")
-                plt.close()
-                plt.title(f'base_value: {np.round(bv, 2)}')
-                # if i == 0:
-                run[f'shap/linear_{group}_{label}_cumulative_abs'].upload(f"{log_path}/{group}_linear_shap_{label}_cumulative_abs.png")
-
-            except:
-                pass
-
-    # if x_df.shape[1] <= 1000:
-    #     make_barplot(x_df, labels, shap_values[:, :, 0],
-    #                 group, run, 'LinearExplainer', mlops='neptune')
-    #     # Summary plot
-    os.makedirs(f"{output}/ML/{exp_name}/shap", exist_ok=True)
-    # df, values, features, group, run, exp_name, category='explainer', mlops='neptune'
-    make_force_plot(x_df, shap_values[0], x_df.columns, group, run, 
-                    exp_name, output, 'LinearExplainer', mlops='neptune')
-    make_bar_plot(x_df, shap_values, group, run, exp_name, output,
-                'LinearExplainer', mlops='neptune')
-    make_summary_plot(x_df, shap_values, group, run, exp_name, output,
-                    'LinearExplainer', mlops='neptune')
-    make_beeswarm_plot(shap_values, group, run, exp_name, output, 'LinearExplainer', mlops='neptune')
-    make_heatmap(shap_values, group, run, exp_name, output,
-                'LinearExplainer', mlops='neptune')
-    # mask = np.array([np.argwhere(x[0] == 1)[0][0] for x in cats])
-    # make_group_difference_plot(x_df.sum(1).to_numpy(), mask, group, run, 'LinearExplainer', mlops='neptune')
-    return run
+            # ... existing code ...
 
 def log_kernel_explainer(model, x_df, misclassified,
                          labels, group, run, cats, log_path, output):
@@ -382,25 +290,21 @@ def log_kernel_explainer(model, x_df, misclassified,
 def log_shap(run, args_dict):
     # explain all the predictions in the test set
     # explainer = shap.KernelExplainer(svc_linear.predict_proba, X_train[:100])
-    log_path = f"{args_dict['exp_name']}"
-    os.makedirs(log_path, exist_ok=True)
+    # Chemin de logs SHAP harmonisé et créé si besoin
+    exp_name = args_dict['exp_name']
+    base_output = args_dict.get('output', '.')
+    shap_dir = os.path.join(base_output, "ML", exp_name, "shap")
+    os.makedirs(shap_dir, exist_ok=True)
+
     for group in ['valid', 'test']:
         if group not in args_dict['inputs']:
             continue
-        # X = args_dict['inputs'][group]
-        # labels = args_dict['labels'][group]
-        # X_test_df = pd.DataFrame(X, columns=list(X.columns))
-
         # TODO Problem with not enough memory...
         try:
             run = log_explainer(run, group, args_dict)
-        except:
-            print(f"Problem with logging {group}")
-            # pass
-        # log_kernel_explainer(ae, X_test_df, misclassified,
-        #                         best_lists[group]['labels'], group, run, 
-        #                         best_lists[group]['labels'], log_path,
-        #                         output
-        #                         )
-        return run
+        except Exception as e:
+            print(f"Problem with logging {group}: {e}")
+            # On continue pour ne pas bloquer l'autre groupe ni la suite du pipeline
+            continue
+    return run
 

@@ -23,7 +23,6 @@ if "NEPTUNE_PROJECT_NAME" in os.environ:
     NEPTUNE_PROJECT_NAME = os.environ["NEPTUNE_PROJECT_NAME"]
 else:
     NEPTUNE_PROJECT_NAME = None
-    # TODO: ajouter un truc pour que s project name est None alors run = None
 
 
 class Train:
@@ -67,7 +66,52 @@ class Train:
                     "log_shap.py",
                 ],
             )
-            run["parameters"] = h_params_dict
+
+            # Sanitize parameters to avoid unsupported Neptune types (e.g., lists, numpy types)
+            def _sanitize(val):
+                import numpy as _np
+
+                if isinstance(val, (str, int, float, bool)) or val is None:
+                    return val
+                if isinstance(val, (list, tuple)):
+                    # Convert collections to string for logging
+                    return str(val)
+                if isinstance(val, dict):
+                    return {str(k): _sanitize(v) for k, v in val.items()}
+                if isinstance(val, (_np.integer,)):
+                    return int(val)
+                if isinstance(val, (_np.floating,)):
+                    return float(val)
+                if isinstance(val, _np.ndarray):
+                    # Convert arrays to a compact string representation
+                    return _np.array2string(val, threshold=10)
+                # Fallback to string for any other unsupported types
+                return str(val)
+
+            # Normalize h_params_dict to a dict, even if a list/tuple is provided
+            if isinstance(h_params_dict, dict):
+                raw_params = h_params_dict
+            elif isinstance(h_params_dict, (list, tuple)):
+                # Prefer using known hyperparameter names if lengths match
+                if isinstance(self.hparams_names, (list, tuple)) and len(
+                    self.hparams_names
+                ) == len(h_params_dict):
+                    raw_params = {
+                        str(name): val
+                        for name, val in zip(self.hparams_names, h_params_dict)
+                    }
+                else:
+                    raw_params = {
+                        f"param_{i}": val for i, val in enumerate(h_params_dict)
+                    }
+            elif h_params_dict is None:
+                raw_params = {}
+            else:
+                # Fallback: stringify the whole thing
+                raw_params = {"params": str(h_params_dict)}
+
+            safe_params = {str(k): _sanitize(v) for k, v in raw_params.items()}
+            run["parameters"] = safe_params
             run["name"] = self.name
             run["use_mi"] = self.use_mi
             run["nk_input_features"] = self.nk_input_features
@@ -385,7 +429,7 @@ class Train:
             f'test: {np.mean(scores["test"]["mcc"])}'
         )
 
-        if self.log_neptune and run != None:
+        if self.log_neptune and run is not None:
             run["log_shap"] = 0
             run["iter"] = self.iter
             # End the run
@@ -397,8 +441,10 @@ class Train:
                     for i, hparam in enumerate(self.hparams_names)
                 }
                 if self.log_neptune:
-                    run, h_params_dict = self.init_neptune(self.best_hparams)
-                    run["log_shap"] = 1
+                    run = self.init_neptune(self.best_hparams)
+                    # Train with best hparams ...
+                    if run is not None:
+                        run["log_shap"] = 1
                 else:
                     run = None
 
@@ -412,14 +458,16 @@ class Train:
 
                 X = X.loc[:, (X != 0).mean() > h_params_dict["zeros_cutoff"]].copy()
                 if X.shape[0] == 0:
-                    run["log_shap"] = 0
+                    if run is not None:
+                        run["log_shap"] = 0
                     return 1
                 if scaler is not None and scaler != "none" and scaler != "binary":
                     scaler = scaler()
                     try:
                         X.iloc[:] = scaler.fit_transform(X)
                     except:
-                        run["log_shap"] = 0
+                        if run is not None:
+                            run["log_shap"] = 0
                         return 1
                 elif scaler == "binary":
                     X = X.applymap(lambda x: 1 if x > 0.5 else 0)
@@ -546,13 +594,13 @@ class Train:
 
         if self.log_neptune:
             run[f"scores/{self.name}"].upload(
-                f"{self.args.output}/{self.exp_name}/scores_{self.name}.csv"
+                f"{self.args.output}/{self.exp_name}/scores/scores_{self.name}.csv"
             )
             run[f"scores_avg/{self.name}"].upload(
-                f"{self.args.output}/{self.exp_name}/scores_avg_{self.name}.csv"
+                f"{self.args.output}/{self.exp_name}/scores/scores_avg_{self.name}.csv"
             )
             run[f"best_hparams/{self.name}"].upload(
-                f"{self.args.output}/{self.exp_name}/best_hparams_{self.name}.csv"
+                f"{self.args.output}/{self.exp_name}/model/best_hparams_{self.name}.csv"
             )
 
             run[f"confusion_matrix_train/{self.name}"].upload(
