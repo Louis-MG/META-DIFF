@@ -448,14 +448,13 @@ class Train:
                 else:
                     run = None
 
-                features_cutoff = int(X.shape[1] * h_params_dict["features_cutoff"])
+                # Re-construire X complet selon les meilleurs hyperparamètres et réentraîner le meilleur modèle
                 X = self.data["X"].copy()
+                features_cutoff = int(X.shape[1] * h_params_dict["features_cutoff"])
                 if self.use_mi:
                     X = X.iloc[:, self.mi[:features_cutoff]].copy()
 
-                # This function returns the scaler from a string
                 scaler = get_scaler(h_params_dict["scaler"])
-
                 X = X.loc[:, (X != 0).mean() > h_params_dict["zeros_cutoff"]].copy()
                 if X.shape[0] == 0:
                     if run is not None:
@@ -472,15 +471,55 @@ class Train:
                 elif scaler == "binary":
                     X = X.applymap(lambda x: 1 if x > 0.5 else 0)
 
+                # Réentraînement du meilleur modèle avec les meilleurs hyperparamètres sur toutes les données
+                try:
+                    best_param_grid = {}
+                    best_ensemble_grid = {}
+                    bag = 1 if "bagging" in self.name else 0
+                    for name, val in h_params_dict.items():
+                        if bag and name != "n_aug" and "bagging" in self.name:
+                            best_ensemble_grid[name] = val
+                        elif name not in [
+                            "n_aug",
+                            "p",
+                            "g",
+                            "scaler",
+                            "features_cutoff",
+                            "zeros_cutoff",
+                        ]:
+                            best_param_grid[name] = val
+
+                    clf_for_shap = copy.deepcopy(self.model)
+                    if "bagging" in self.name and hasattr(
+                        clf_for_shap, "base_estimator"
+                    ):
+                        clf_for_shap.base_estimator.set_params(**best_ensemble_grid)
+                    clf_for_shap.set_params(**best_param_grid)
+                    # y complet (sans split) pour l'entraînement global
+                    y_full = self.data["y"].copy()
+                    clf_for_shap.fit(X.values, y_full.values)
+                    self.best_model = clf_for_shap
+                except Exception as e:
+                    print(f"[WARNING] Failed to refit best model for SHAP: {e}")
+
+                # Utiliser les indices de la dernière itération pour constituer les groupes valid/test
                 Xs = {
                     group: X.iloc[inds].copy()
                     for group, inds in zip(
                         ["train", "valid", "test"], [train_inds, valid_inds, test_inds]
                     )
                 }
+                Xs["all"] = X.copy()
+                ys_all = {
+                    "train": ys["train"],
+                    "valid": ys["valid"],
+                    "test": ys["test"],
+                }
+                ys_all["all"] = y_full.copy()
+
                 args_dict = {
                     "inputs": Xs,
-                    "labels": ys,
+                    "labels": ys_all,
                     "model": self.best_model,
                     "model_name": self.name,
                     "exp_name": self.exp_name,

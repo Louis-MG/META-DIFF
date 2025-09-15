@@ -608,7 +608,6 @@ def log_shap(run, args_dict):
     for group in ["valid", "test"]:
         if group not in args_dict["inputs"]:
             continue
-        # TODO Problem with not enough memory...
         try:
             run = log_explainer(run, group, args_dict)
         except Exception as e:
