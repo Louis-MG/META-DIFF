@@ -120,4 +120,133 @@ if __name__ == "__main__":
             spaces[name],
             args,
         )
-        fig = plt.figure()
+
+def log_shap(run, args_dict):
+    # explain all the predictions in the test set
+    # explainer = shap.KernelExplainer(svc_linear.predict_proba, X_train[:100])
+    # Chemin de sortie SHAP harmonisé et créé si besoin
+    exp_name = args_dict['exp_name']
+    base_output = args_dict.get('output', '.')
+    shap_dir = os.path.join(base_output, "ML", exp_name, "shap")
+    os.makedirs(shap_dir, exist_ok=True)
+
+    for group in ['valid', 'test']:
+        if group not in args_dict['inputs']:
+            continue
+        # TODO Problem with not enough memory...
+        try:
+            run = log_explainer(run, group, args_dict)
+        except Exception as e:
+            print(f"Problem with logging {group}: {e}")
+            continue
+    return run
+
+def log_explainer(run, group, args_dict):
+    model = args_dict['model']
+    model_name = args_dict['model_name']
+    x_df = args_dict['inputs'][group]
+    labels = args_dict['labels'][group]
+    exp_name = args_dict['exp_name']
+    # Dossier de sortie harmonisé et créé si besoin
+    output = f"{args_dict['output']}/ML/{exp_name}"
+    os.makedirs(output, exist_ok=True)
+
+    unique_classes = np.unique(labels)
+    # The explainer doesn't like tensors, hence the f function
+    f = lambda x: model.predict(x)
+    X = x_df.to_numpy(dtype=np.float32)
+
+    if model_name == 'xgb':
+        model = model.get_booster()
+    if model_name in ['xgboost', 'xgb', 'lightgbm', 'rfr', 'rfc']:
+        explainer = shap.TreeExplainer(model)
+    elif model_name in ['linreg', 'logreg', 'qda', 'lda']:
+        explainer = shap.LinearExplainer(model, X)
+    else:
+        stratified_split = StratifiedShuffleSplit(n_splits=1, test_size=10, random_state=42)
+        indices = stratified_split.split(x_df, labels).__next__()[1]
+        x_df = x_df.iloc[indices]
+        explainer = shap.KernelExplainer(f, x_df)
+        X = x_df.to_numpy(dtype=np.float32)
+
+    shap_values = explainer(X)
+    if len(unique_classes) == 2:
+        if hasattr(shap_values, "base_values") and hasattr(shap_values, "values"):
+            if np.ndim(shap_values.base_values) > 1 and shap_values.base_values.shape[-1] == 2:
+                shap_values_df = pd.DataFrame(
+                    np.c_[shap_values.base_values[:, 0], shap_values.values[:, :, 0]],
+                    columns=['bv'] + list(x_df.columns)
+                )
+            else:
+                shap_values_df = pd.DataFrame(
+                    np.c_[shap_values.base_values, shap_values.values],
+                    columns=['bv'] + list(x_df.columns)
+                )
+        else:
+            # Sécurise le cas où l’API SHAP renverrait un array simple
+            base_val = np.mean(shap_values) if np.ndim(shap_values) == 2 else 0.0
+            shap_values_df = pd.DataFrame(
+                np.c_[np.full((X.shape[0], 1), base_val), shap_values],
+                columns=['bv'] + list(x_df.columns)
+            )
+
+        # Remove shap values that are 0
+        shap_values_df = shap_values_df.loc[:, (shap_values_df != 0).any(axis=0)]
+        # Save the shap values
+        shap_values_df.to_csv(f"{output}/{group}_shap.csv", index=False)
+
+        # Agrégation absolue normalisée
+        shap_agg = shap_values_df.abs().sum(0)
+        total = shap_agg.sum()
+        if total == 0:
+            return run
+        shap_agg = shap_agg / total
+
+        try:
+            # Getting the base value
+            bv = shap_agg['bv']
+            label = unique_classes[0]
+            # Dropping the base value
+            shap_agg = shap_agg.drop('bv')
+
+            shap_agg.to_csv(f"{output}/{group}_linear_shap_{label}_abs.csv")
+            if run is not None:
+                run[f'shap/linear_{group}_{label}'].upload(f"{output}/{group}_linear_shap_{label}_abs.csv")
+
+            shap_agg.transpose().hist(bins=100, figsize=(10, 10))
+            plt.xlabel('SHAP value')
+            plt.ylabel('Frequency')
+            plt.title(f'base_value: {np.round(bv, 2)}')
+            plt.savefig(f"{output}/{group}_linear_shap_{label}_hist_abs.png")
+            plt.close()
+            if run is not None:
+                run[f'shap/linear_{group}_{label}_hist'].upload(f"{output}/{group}_linear_shap_{label}_hist_abs.png")
+
+            # KDE
+            shap_agg.abs().sort_values(ascending=False).plot(kind='kde', figsize=(10, 10))
+            plt.xlim(0, shap_agg.abs().max())
+            plt.xlabel('Density')
+            plt.ylabel('Frequency')
+            plt.title(f'base_value: {np.round(bv, 2)}')
+            plt.savefig(f"{output}/{group}_linear_shap_{label}_kde_abs.png")
+            plt.close()
+            if run is not None:
+                run[f'shap/linear_{group}_{label}_kde'].upload(f"{output}/{group}_linear_shap_{label}_kde_abs.png')
+
+            # Cumulée et survie
+            values, base = np.histogram(shap_agg.abs(), bins=40)
+            cumulative = np.cumsum(values)
+            plt.figure(figsize=(12, 8))
+            plt.plot(base[:-1], cumulative, c='blue', label='Cumulative')
+            plt.plot(base[:-1], len(shap_agg.abs()) - cumulative, c='green', label='Survival')
+            plt.xlabel('SHAP value')
+            plt.ylabel('Count')
+            plt.title(f'Cumulative and survival functions - base_value: {np.round(bv, 2)}')
+            plt.legend()
+            plt.savefig(f"{output}/{group}_linear_shap_{label}_cum_surv_abs.png")
+            plt.close()
+            if run is not None:
+                run[f'shap/linear_{group}_{label}_cum_surv'].upload(f"{output}/{group}_linear_shap_{label}_cum_surv_abs.png")
+        except Exception as e:
+            print(f"Problem while summarizing SHAP values for group {group}: {e}")
+    return run
