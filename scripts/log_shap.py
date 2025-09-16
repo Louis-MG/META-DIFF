@@ -602,7 +602,7 @@ def log_shap(run, args_dict):
     # Chemin de logs SHAP harmonisé et créé si besoin
     exp_name = args_dict["exp_name"]
     base_output = args_dict.get("output", ".")
-    shap_dir = os.path.join(base_output, "ML", exp_name, "shap")
+    shap_dir = os.path.join(base_output, "shap")
     os.makedirs(shap_dir, exist_ok=True)
 
     for group in ["valid", "test"]:

@@ -122,26 +122,26 @@ if __name__ == "__main__":
         )
 
 
-def log_shap(run, args_dict):
-    # explain all the predictions in the test set
-    # explainer = shap.KernelExplainer(svc_linear.predict_proba, X_train[:100])
-    # Chemin de logs SHAP harmonisé et créé si besoin
-    exp_name = args_dict["exp_name"]
-    base_output = args_dict.get("output", ".")
-    shap_dir = os.path.join(base_output, "ML", exp_name, "shap")
-    os.makedirs(shap_dir, exist_ok=True)
-
-    # Inclure aussi le groupe 'all'
-    for group in ["valid", "test", "all"]:
-        if group not in args_dict["inputs"]:
-            continue
-        try:
-            run = log_explainer(run, group, args_dict)
-        except Exception as e:
-            print(f"Problem with logging {group}: {e}")
-            # On continue pour ne pas bloquer l'autre groupe ni la suite du pipeline
-            continue
-    return run
+# def log_shap(run, args_dict):
+#     # explain all the predictions in the test set
+#     # explainer = shap.KernelExplainer(svc_linear.predict_proba, X_train[:100])
+#     # Chemin de logs SHAP harmonisé et créé si besoin
+#     exp_name = args_dict["exp_name"]
+#     base_output = args_dict.get("output", ".")
+#     shap_dir = os.path.join(base_output, "shap")
+#     os.makedirs(shap_dir, exist_ok=True)
+#
+#     # Inclure aussi le groupe 'all'
+#     for group in ["valid", "test", "all"]:
+#         if group not in args_dict["inputs"]:
+#             continue
+#         try:
+#             run = log_explainer(run, group, args_dict)
+#         except Exception as e:
+#             print(f"Problem with logging {group}: {e}")
+#             # On continue pour ne pas bloquer l'autre groupe ni la suite du pipeline
+#             continue
+#     return run
 
 
 def log_explainer(run, group, args_dict):

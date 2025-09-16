@@ -502,6 +502,7 @@ class Train:
                 except Exception as e:
                     print(f"[WARNING] Failed to refit best model for SHAP: {e}")
 
+                # TODO: regarder pourquoi le meilleur model ne se lance pas
                 # Utiliser les indices de la dernière itération pour constituer les groupes valid/test
                 Xs = {
                     group: X.iloc[inds].copy()
@@ -509,7 +510,7 @@ class Train:
                         ["train", "valid", "test"], [train_inds, valid_inds, test_inds]
                     )
                 }
-                Xs["all"] = X.copy()
+                # Xs["all"] = X.copy()
                 ys_all = {
                     "train": ys["train"],
                     "valid": ys["valid"],
