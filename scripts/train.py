@@ -503,6 +503,8 @@ class Train:
                     print(f"[WARNING] Failed to refit best model for SHAP: {e}")
 
                 # TODO: regarder pourquoi le meilleur model ne se lance pas
+                # TODO: se lance quand shap se fait, donc a la derniere run.
+                # TODO: les indices sont references avant leur creation eventuellement
                 # Utiliser les indices de la dernière itération pour constituer les groupes valid/test
                 Xs = {
                     group: X.iloc[inds].copy()
@@ -510,7 +512,7 @@ class Train:
                         ["train", "valid", "test"], [train_inds, valid_inds, test_inds]
                     )
                 }
-                # Xs["all"] = X.copy()
+                Xs["all"] = X.copy()
                 ys_all = {
                     "train": ys["train"],
                     "valid": ys["valid"],

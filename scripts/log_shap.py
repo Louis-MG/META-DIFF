@@ -39,7 +39,7 @@ def make_summary_plot(
     f = plt.gcf()
     if mlops == "neptune" and run is not None:
         run[f"shap/summary_{category}/{group}_values"].upload(f)
-    plt.savefig(f"{output}/ML/{exp_name}/shap/{group}_summary.png")
+    plt.savefig(f"{output}/shap/{group}_summary.png")
     plt.close(f)
 
 
@@ -58,7 +58,7 @@ def make_force_plot(
     f = plt.gcf()
     if mlops == "neptune" and run is not None:
         run[f"shap/force_{category}/{group}_values"].upload(f)
-    plt.savefig(f"{output}/ML/{exp_name}/shap/{group}_force.png")
+    plt.savefig(f"{output}/shap/{group}_force.png")
     plt.close(f)
 
 
@@ -69,7 +69,7 @@ def make_deep_beeswarm(
     f = plt.gcf()
     if mlops == "neptune" and run is not None:
         run[f"shap/beeswarm_{category}/{group}_values"].upload(f)
-    plt.savefig(f"{output}/ML/{exp_name}/shap/{group}_beeswarm.png")
+    plt.savefig(f"{output}/shap/{group}_beeswarm.png")
     plt.close(f)
 
 
@@ -93,7 +93,7 @@ def make_decision_plot(
     f = plt.gcf()
     if mlops == "neptune" and run is not None:
         run[f"shap/decision_{category}/{group}_values"].upload(f)
-    plt.savefig(f"{output}/ML/{exp_name}/shap/{group}_decision.png")
+    plt.savefig(f"{output}/shap/{group}_decision.png")
     plt.close(f)
 
 
@@ -120,7 +120,7 @@ def make_decision_deep(
     f = plt.gcf()
     if mlops == "neptune" and run is not None:
         run[f"shap/decision_{category}/{group}_values"].upload(f)
-    plt.savefig(f"{output}/ML/{exp_name}/shap/{group}_decision.png")
+    plt.savefig(f"{output}/shap/{group}_decision.png")
     plt.close(f)
 
 
@@ -131,7 +131,7 @@ def make_multioutput_decision_plot(
     f = plt.gcf()
     if mlops == "neptune" and run is not None:
         run[f"shap/multioutput_decision_{category}/{group}_values"].upload(f)
-    plt.savefig(f"{output}/ML/{exp_name}/shap/{group}_multioutput_decision.png")
+    plt.savefig(f"{output}/shap/{group}_multioutput_decision.png")
     plt.close(f)
 
 
@@ -143,7 +143,7 @@ def make_group_difference_plot(
     if mlops == "neptune" and run is not None:
         # run[f'shap/gdiff_{category}/{group}'].upload(f)
         run[f"shap/gdiff_{category}/{group}"].upload(f)
-    plt.savefig(f"{output}/ML/{exp_name}/shap/{group}_gdiff.png")
+    plt.savefig(f"{output}/shap/{group}_gdiff.png")
     plt.close(f)
 
 
@@ -155,7 +155,7 @@ def make_beeswarm_plot(
     if mlops == "neptune" and run is not None:
         # run[f'shap/beeswarm_{category}/{group}'].upload(f)
         run[f"shap/beeswarm_{category}/{group}"].upload(f)
-    plt.savefig(f"{output}/ML/{exp_name}/shap/{group}_beeswarm.png")
+    plt.savefig(f"{output}/shap/{group}_beeswarm.png")
     plt.close(f)
 
 
@@ -172,7 +172,7 @@ def make_heatmap(
     if mlops == "neptune" and run is not None:
         # run[f'shap/heatmap_{category}/{group}'].upload(f)
         run[f"shap/heatmap_{category}/{group}"].upload(f)
-    plt.savefig(f"{output}/ML/{exp_name}/shap/{group}_heatmap.png")
+    plt.savefig(f"{output}/shap/{group}_heatmap.png")
     plt.close(f)
 
 
@@ -190,7 +190,7 @@ def make_heatmap_deep(
     if mlops == "neptune" and run is not None:
         # run[f'shap/heatmap_{category}/{group}'].upload(f)
         run[f"shap/heatmap_{category}/{group}"].upload(f)
-    plt.savefig(f"{output}/ML/{exp_name}/shap/{group}_heatmap_deep.png")
+    plt.savefig(f"{output}/shap/{group}_heatmap_deep.png")
     plt.close(f)
 
 
@@ -205,7 +205,7 @@ def make_barplot(
     f = plt.gcf()
     if mlops == "neptune" and run is not None:
         run[f"shap/bar_{category}/{group}"].upload(f)
-    plt.savefig(f"{output}/ML/{exp_name}/shap/{group}_bar.png")
+    plt.savefig(f"{output}/shap/{group}_bar.png")
     plt.close(f)
 
 
@@ -219,7 +219,7 @@ def make_bar_plot(
         # run[f'shap/barold_{category}/{group}'].upload(f)
         run[f"shap/barold_{category}/{group}"].upload(f)
     plt.tight_layout()
-    plt.savefig(f"{output}/ML/{exp_name}/shap/{group}_barold.png")
+    plt.savefig(f"{output}/shap/{group}_barold.png")
     plt.close(f)
 
 
@@ -230,7 +230,7 @@ def make_dependence_plot(
     f = plt.gcf()
     if mlops == "neptune" and run is not None:
         run[f"shap/dependence_{category}/{group}"].upload(f)
-    plt.savefig(f"{output}/ML/{exp_name}/shap/{group}_dependence.png")
+    plt.savefig(f"{output}/shap/{group}_dependence.png")
     plt.close(f)
 
 
@@ -242,7 +242,7 @@ def log_explainer(run, group, args_dict):
     # columns = args_dict['columns']
     exp_name = args_dict["exp_name"]
     # Dossier de sortie harmonisé et créé si besoin
-    output = f"{args_dict['output']}/ML/{exp_name}"
+    output = f"{args_dict['output']}"
     os.makedirs(output, exist_ok=True)
 
     unique_classes = np.unique(labels)
@@ -377,7 +377,7 @@ def log_explainer(run, group, args_dict):
             shap_values_df = shap_values_df.loc[:, (shap_values_df != 0).any(axis=0)]
 
             # Save the shap values
-
+            log_path = f"{output}"
             shap_values_df.to_csv(f"{log_path}/{group}_shap.csv")
 
             run[f"shap/{group}_{label}"].upload(f"{log_path}/{group}_shap.csv")
@@ -500,7 +500,7 @@ def log_explainer(run, group, args_dict):
 
     #     # Summary plot
 
-    os.makedirs(f"{output}/ML/{exp_name}/shap", exist_ok=True)
+    os.makedirs(f"{output}/shap", exist_ok=True)
 
     # df, values, features, group, run, exp_name, category='explainer', mlops='neptune'
 
