@@ -27,8 +27,8 @@ rule all:
         expand(config["project_path"] + "pipeline_output/taxonomy/{condition}_clades.tsv", condition = config["condition"]),
         config["project_path"] + "pipeline_output/biomarker/top_unitigs.fa",
         config["project_path"] + "pipeline_output/biomarker/output_query_unitigs/biomarkers.tsv",
-        config["project_path"] + "pipeline_output/ML/" + config["experiment_name"] + "/histograms/allclasses.png",
-        config["project_path"] + "pipeline_output/ML/" + config["experiment_name"] + "/ord/lda.png"
+        config["project_path"] + "pipeline_output/ML/" + "/histograms/allclasses.png",
+        config["project_path"] + "pipeline_output/ML/" + "/ord/lda.png"
 
 ##########################################################
 ###########            OTHER RULES            ############
