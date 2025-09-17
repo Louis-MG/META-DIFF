@@ -48,7 +48,7 @@ if __name__ == "__main__":
     df = pd.read_csv(f"{args.input}", sep="\t").transpose()
 
     experiment_name = f"{args.experiment_name}"
-    os.makedirs(f"{args.output}/{experiment_name}/histograms", exist_ok=True)
+    os.makedirs(f"{args.output}/histograms", exist_ok=True)
 
     df.columns = df.iloc[0]
     df = df.drop(df.index[0])
@@ -80,7 +80,7 @@ if __name__ == "__main__":
         # Make plots of the mutual information
         # make a progress bar
         sns.histplot(mi, bins=50)
-        plt.savefig(f"{args.output}/{experiment_name}/histograms/mutual_info_gain.png")
+        plt.savefig(f"{args.output}/histograms/mutual_info_gain.png")
         plt.close()
     else:
         mi = np.ones(X.shape[1])
@@ -151,7 +151,7 @@ def log_explainer(run, group, args_dict):
     labels = args_dict["labels"][group]
     exp_name = args_dict["exp_name"]
     # Dossier de sortie harmonisé et créé si besoin
-    output = f"{args_dict['output']}/ML/{exp_name}"
+    output = f"{args_dict['output']}"
     os.makedirs(output, exist_ok=True)
 
     unique_classes = np.unique(labels)
@@ -201,7 +201,7 @@ def log_explainer(run, group, args_dict):
         # Remove shap values that are 0
         shap_values_df = shap_values_df.loc[:, (shap_values_df != 0).any(axis=0)]
         # Save the shap values
-        shap_values_df.to_csv(f"{output}/{group}_shap.csv", index=False)
+        shap_values_df.to_csv(f"{output}/shap/{group}_shap.csv", index=False)
 
         # Agrégation absolue normalisée
         shap_agg = shap_values_df.abs().sum(0)
@@ -217,21 +217,21 @@ def log_explainer(run, group, args_dict):
             # Dropping the base value
             shap_agg = shap_agg.drop("bv")
 
-            shap_agg.to_csv(f"{output}/{group}_linear_shap_{label}_abs.csv")
+            shap_agg.to_csv(f"{output}/shap/{group}_linear_shap_{label}_abs.csv")
             if run is not None:
                 run[f"shap/linear_{group}_{label}"].upload(
-                    f"{output}/{group}_linear_shap_{label}_abs.csv"
+                    f"{output}/shap/{group}_linear_shap_{label}_abs.csv"
                 )
 
             shap_agg.transpose().hist(bins=100, figsize=(10, 10))
             plt.xlabel("SHAP value")
             plt.ylabel("Frequency")
             plt.title(f"base_value: {np.round(bv, 2)}")
-            plt.savefig(f"{output}/{group}_linear_shap_{label}_hist_abs.png")
+            plt.savefig(f"{output}/shap/{group}_linear_shap_{label}_hist_abs.png")
             plt.close()
             if run is not None:
                 run[f"shap/linear_{group}_{label}_hist"].upload(
-                    f"{output}/{group}_linear_shap_{label}_hist_abs.png"
+                    f"{output}/shap/{group}_linear_shap_{label}_hist_abs.png"
                 )
 
             # KDE
@@ -242,11 +242,11 @@ def log_explainer(run, group, args_dict):
             plt.xlabel("Density")
             plt.ylabel("Frequency")
             plt.title(f"base_value: {np.round(bv, 2)}")
-            plt.savefig(f"{output}/{group}_linear_shap_{label}_kde_abs.png")
+            plt.savefig(f"{output}/shap/{group}_linear_shap_{label}_kde_abs.png")
             plt.close()
             if run is not None:
                 run[f"shap/linear_{group}_{label}_kde"].upload(
-                    f"{output}/{group}_linear_shap_{label}_kde_abs.png"
+                    f"{output}/shap/{group}_linear_shap_{label}_kde_abs.png"
                 )
 
             # Cumulée et survie
@@ -263,11 +263,11 @@ def log_explainer(run, group, args_dict):
                 f"Cumulative and survival functions - base_value: {np.round(bv, 2)}"
             )
             plt.legend()
-            plt.savefig(f"{output}/{group}_linear_shap_{label}_cum_surv_abs.png")
+            plt.savefig(f"{output}/shap/{group}_linear_shap_{label}_cum_surv_abs.png")
             plt.close()
             if run is not None:
                 run[f"shap/linear_{group}_{label}_cum_surv"].upload(
-                    f"{output}/{group}_linear_shap_{label}_cum_surv_abs.png"
+                    f"{output}/shap/{group}_linear_shap_{label}_cum_surv_abs.png"
                 )
         except Exception as e:
             print(f"Problem while summarizing SHAP values for group {group}: {e}")

@@ -14,6 +14,10 @@ from sklearn.model_selection import StratifiedShuffleSplit
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 
 
+# TODO: les figures et résultats shap divers ne sont pas dans la structure de répertoire la plus claire
+# TODO: les dossiers histogrames, ord,scores etc sont pas dans la bonne structure non plus
+
+
 def interactions_mean_matrix(shap_interactions, X, run, group):
     # Get absolute mean of matrices
     mean_shap = np.abs(shap_interactions).mean(0)
@@ -286,7 +290,7 @@ def log_explainer(run, group, args_dict):
         # Remove shap values that are 0
         shap_values_df = shap_values_df.loc[:, (shap_values_df != 0).any(axis=0)]
         # Save the shap values
-        shap_values_df.to_csv(f"{output}/{group}_shap.csv", index=False)
+        shap_values_df.to_csv(f"{output}/shap/{group}_shap.csv", index=False)
         shap_values_df = shap_values_df.abs()
         shap_values_df = shap_values_df.sum(0)
         total = shap_values_df.sum()
@@ -297,22 +301,22 @@ def log_explainer(run, group, args_dict):
             label = unique_classes[0]
             # Dropping the base value
             shap_values_df = shap_values_df.drop("bv")
-            shap_values_df.to_csv(f"{output}/{group}_linear_shap_{label}_abs.csv")
+            shap_values_df.to_csv(f"{output}/shap/{group}_linear_shap_{label}_abs.csv")
             if run is not None:
                 run[f"shap/linear_{group}_{label}"].upload(
-                    f"{output}/{group}_linear_shap_{label}_abs.csv"
+                    f"{output}/shap/{group}_linear_shap_{label}_abs.csv"
                 )
 
             shap_values_df.transpose().hist(bins=100, figsize=(10, 10))
             plt.xlabel("SHAP value")
             plt.ylabel("Frequency")
             plt.title(f"base_value: {np.round(bv, 2)}")
-            plt.savefig(f"{output}/{group}_linear_shap_{label}_hist_abs.png")
+            plt.savefig(f"{output}/shap/{group}_linear_shap_{label}_hist_abs.png")
             plt.close()
             if run is not None:
                 # Upload exactement le fichier sauvegardé
                 run[f"shap/linear_{group}_{label}_hist"].upload(
-                    f"{output}/{group}_linear_shap_{label}_hist_abs.png"
+                    f"{output}/shap/{group}_linear_shap_{label}_hist_abs.png"
                 )
 
             # start x axis at 0
@@ -323,11 +327,11 @@ def log_explainer(run, group, args_dict):
             plt.xlabel("Density")
             plt.ylabel("Frequency")
             plt.title(f"base_value: {np.round(bv, 2)}")
-            plt.savefig(f"{output}/{group}_linear_shap_{label}_kde_abs.png")
+            plt.savefig(f"{output}/shap/{group}_linear_shap_{label}_kde_abs.png")
             plt.close()
             if run is not None:
                 run[f"shap/linear_{group}_{label}_kde"].upload(
-                    f"{output}/{group}_linear_shap_{label}_kde_abs.png"
+                    f"{output}/shap/{group}_linear_shap_{label}_kde_abs.png"
                 )
 
             values, base = np.histogram(shap_values_df.abs(), bins=40)
@@ -345,12 +349,12 @@ def log_explainer(run, group, args_dict):
 
             plt.title(f"base_value: {np.round(bv, 2)}")
 
-            plt.savefig(f"{output}/{group}_linear_shap_{label}_cumulative_abs.png")
+            plt.savefig(f"{output}/shap/{group}_linear_shap_{label}_cumulative_abs.png")
 
             plt.close()
 
             run[f"shap/linear_{group}_{label}_cumulative_abs"].upload(
-                f"{output}/{group}_linear_shap_{label}_cumulative_abs.png"
+                f"{output}/shap/{group}_linear_shap_{label}_cumulative_abs.png"
             )
 
         except:
@@ -377,10 +381,9 @@ def log_explainer(run, group, args_dict):
             shap_values_df = shap_values_df.loc[:, (shap_values_df != 0).any(axis=0)]
 
             # Save the shap values
-            log_path = f"{output}"
-            shap_values_df.to_csv(f"{log_path}/{group}_shap.csv")
+            shap_values_df.to_csv(f"{output}/shap/{group}_shap.csv")
 
-            run[f"shap/{group}_{label}"].upload(f"{log_path}/{group}_shap.csv")
+            run[f"shap/{group}_{label}"].upload(f"{output}/{group}_shap.csv")
 
             shap_values_df = shap_values_df.abs()
 
@@ -392,9 +395,9 @@ def log_explainer(run, group, args_dict):
 
             # Save the shap values
 
-            shap_values_df.to_csv(f"{log_path}/{group}_shap_abs.csv")
+            shap_values_df.to_csv(f"{output}/shap/{group}_shap_abs.csv")
 
-            run[f"shap/{group}_{label}"].upload(f"{log_path}/{group}_shap_abs.csv")
+            run[f"shap/{group}_{label}"].upload(f"{output}/shap/{group}_shap_abs.csv")
 
             try:
 
@@ -406,10 +409,12 @@ def log_explainer(run, group, args_dict):
 
                 shap_values_df = shap_values_df.drop("bv")
 
-                shap_values_df.to_csv(f"{log_path}/{group}_linear_shap_{label}_abs.csv")
+                shap_values_df.to_csv(
+                    f"{output}/shap/{group}_linear_shap_{label}_abs.csv"
+                )
 
                 run[f"shap/linear_{group}_{label}"].upload(
-                    f"{log_path}/{group}_linear_shap_{label}_abs.csv"
+                    f"{output}/shap/{group}_linear_shap_{label}_abs.csv"
                 )
 
                 shap_values_df.transpose().hist(bins=100, figsize=(10, 10))
@@ -418,7 +423,7 @@ def log_explainer(run, group, args_dict):
 
                 plt.xlabel("SHAP value")
 
-                plt.savefig(f"{log_path}/{group}_linear_shap_{label}_hist_abs.png")
+                plt.savefig(f"{output}/shap/{group}_linear_shap_{label}_hist_abs.png")
 
                 plt.close()
 
@@ -427,7 +432,7 @@ def log_explainer(run, group, args_dict):
                 # if i == 0:
 
                 run[f"shap/linear_{group}_{label}_hist"].upload(
-                    f"{log_path}/{group}_linear_shap_{label}_hist_abs.png"
+                    f"{output}/shap/{group}_linear_shap_{label}_hist_abs.png"
                 )
 
                 # start x axis at 0
@@ -444,7 +449,7 @@ def log_explainer(run, group, args_dict):
 
                 plt.xlim(0, shap_values_df.abs().max())
 
-                plt.savefig(f"{log_path}/{group}_linear_shap_{label}_kde_abs.png")
+                plt.savefig(f"{output}/shap/{group}_linear_shap_{label}_kde_abs.png")
 
                 plt.close()
 
@@ -453,7 +458,7 @@ def log_explainer(run, group, args_dict):
                 # if i == 0:
 
                 run[f"shap/linear_{group}_{label}_kde"].upload(
-                    f"{log_path}/{group}_linear_shap_{label}_kde_abs.png"
+                    f"{output}/shap/{group}_linear_shap_{label}_kde_abs.png"
                 )
 
                 values, base = np.histogram(shap_values_df.abs(), bins=40)
@@ -475,7 +480,7 @@ def log_explainer(run, group, args_dict):
                 plt.xlabel("SHAP value")
 
                 plt.savefig(
-                    f"{log_path}/{group}_linear_shap_{label}_cumulative_abs.png"
+                    f"{output}/shap/{group}_linear_shap_{label}_cumulative_abs.png"
                 )
 
                 plt.close()
@@ -485,7 +490,7 @@ def log_explainer(run, group, args_dict):
                 # if i == 0:
 
                 run[f"shap/linear_{group}_{label}_cumulative_abs"].upload(
-                    f"{log_path}/{group}_linear_shap_{label}_cumulative_abs.png"
+                    f"{output}/shap/{group}_linear_shap_{label}_cumulative_abs.png"
                 )
 
             except:
@@ -572,7 +577,7 @@ def log_kernel_explainer(
     for i, label in enumerate(unique_classes):
         if i == len(shap_values):
             break
-        shap_values_df.iloc[i].to_csv(f"{log_path}/{group}_kernel_shap_{label}.csv")
+            shap_values_df.iloc[i].to_csv(f"{log_path}/{group}_kernel_shap_{label}.csv")
     # shap_values = pd.DataFrame(np.concatenate(s))
     # Summary plot
     make_summary_plot(x_df, shap_values, group, run, "Kernel", output)
@@ -602,6 +607,7 @@ def log_shap(run, args_dict):
     # Chemin de logs SHAP harmonisé et créé si besoin
     exp_name = args_dict["exp_name"]
     base_output = args_dict.get("output", ".")
+    # TODO: look slike the following two lines serve no purpose
     shap_dir = os.path.join(base_output, "shap")
     os.makedirs(shap_dir, exist_ok=True)
 

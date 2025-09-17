@@ -2,8 +2,8 @@ rule machine_learning:
     input:
         matrix = config["project_path"] + config['experiment_name'] + "/biomarker/output_query_unitigs/biomarkers.tsv"
     output:
-        config["project_path"] + config['experiment_name'] + "/ML/" + config["experiment_name"] + "/histograms/allclasses.png",
-        config["project_path"] + config['experiment_name'] + "/ML/" + config["experiment_name"] + "/ord/lda.png"
+        config["project_path"] + config['experiment_name'] + "/ML/" + "/histograms/allclasses.png",
+        config["project_path"] + config['experiment_name'] + "/ML/" + "/ord/lda.png"
     params:
         neptune_key = config["neptune_key"],
         script_path = config["src_path"] + "/scripts/ml.py",
@@ -12,7 +12,7 @@ rule machine_learning:
         experiment_name = config["experiment_name"],
         log_neptune = config["log_neptune"],
         log_shap = config["log_shap"],
-        output = config["project_path"] + config['experiment_name'] + "/ML/"
+        output = config["project_path"] + "/ML/"
     conda:
         "../../env/python.3.10.yaml"
     log:
