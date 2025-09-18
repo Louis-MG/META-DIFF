@@ -23,6 +23,7 @@ if "NEPTUNE_PROJECT_NAME" in os.environ:
     NEPTUNE_PROJECT_NAME = os.environ["NEPTUNE_PROJECT_NAME"]
 else:
     NEPTUNE_PROJECT_NAME = None
+# TODO: add exit and error message if neptune is set to 1 but no experiment name is provided
 
 
 class Train:
