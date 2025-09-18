@@ -605,7 +605,6 @@ def log_shap(run, args_dict):
     # explain all the predictions in the test set
     # explainer = shap.KernelExplainer(svc_linear.predict_proba, X_train[:100])
     # Chemin de logs SHAP harmonisé et créé si besoin
-    exp_name = args_dict["exp_name"]
     base_output = args_dict.get("output", ".")
     # TODO: look slike the following two lines serve no purpose
     shap_dir = os.path.join(base_output, "shap")

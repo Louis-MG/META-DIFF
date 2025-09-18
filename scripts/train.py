@@ -409,15 +409,15 @@ class Train:
             self.best_model = copy.deepcopy(classifier)
             self.best_score = score
             self.best_scores = copy.deepcopy(scores)
-            os.makedirs(f"{self.args.output}/{self.exp_name}", exist_ok=True)
+            os.makedirs(f"{self.args.output}/", exist_ok=True)
             np.save(
-                f"{self.args.output}/{self.exp_name}/model/best_test_scores_{self.name}",
+                f"{self.args.output}/model/best_test_scores_{self.name}",
                 scores["test"]["mcc"],
             )
             self.best_hparams = copy.deepcopy(h_params)
             # Save the best model classifier
             with open(
-                f"{self.args.output}/{self.exp_name}/model/best_model_{self.name}.pkl",
+                f"{self.args.output}/model/best_model_{self.name}.pkl",
                 "wb",
             ) as f:
                 pickle.dump(self.best_model, f)
@@ -556,16 +556,16 @@ class Train:
                 scores[group].pop("cluster_metrics")
 
         # Create a directory to save the {args.output}} if not exist
-        os.makedirs(f"{self.args.output}/{self.exp_name}/scores", exist_ok=True)
-        os.makedirs(f"{self.args.output}/{self.exp_name}/model", exist_ok=True)
+        os.makedirs(f"{self.args.output}/scores", exist_ok=True)
+        os.makedirs(f"{self.args.output}/model", exist_ok=True)
 
         # Save what is in scores as a json
         pd.DataFrame(scores).to_json(
-            f"{self.args.output}/{self.exp_name}/scores/scores_{self.name}.json"
+            f"{self.args.output}/scores/scores_{self.name}.json"
         )
         # Save what is in score, except for cluster_metrics, as a table in csv format
         pd.DataFrame({k: v for k, v in scores.items()}).to_csv(
-            f"{self.args.output}/{self.exp_name}/scores/scores_{self.name}.csv"
+            f"{self.args.output}/scores/scores_{self.name}.csv"
         )
         # Save scores after getting averages
         scores = {
@@ -573,24 +573,22 @@ class Train:
             for group in scores.keys()
         }
         pd.DataFrame(scores).to_json(
-            f"{self.args.output}/{self.exp_name}/scores/scores_avg_{self.name}.json"
+            f"{self.args.output}/scores/scores_avg_{self.name}.json"
         )
         pd.DataFrame(scores).to_csv(
-            f"{self.args.output}/{self.exp_name}/scores/scores_avg_{self.name}.csv"
+            f"{self.args.output}/scores/scores_avg_{self.name}.csv"
         )
 
         # Save the best hparams to file
         pd.DataFrame(h_params_dict, index=[0]).to_csv(
-            f"{self.args.output}/{self.exp_name}/model/best_hparams_{self.name}.csv"
+            f"{self.args.output}/model/best_hparams_{self.name}.csv"
         )
         # Save confusion matrices
-        os.makedirs(
-            f"{self.args.output}/{self.exp_name}/confusion_matrix", exist_ok=True
-        )
+        os.makedirs(f"{self.args.output}/confusion_matrix", exist_ok=True)
         for group in ["train", "valid", "test"]:
             cm = confusion_matrix(ys_dict[group], preds_dict[group])
             pd.DataFrame(cm).to_csv(
-                f"{self.args.output}/{self.exp_name}/confusion_matrix/{group}_{self.name}.csv"
+                f"{self.args.output}/confusion_matrix/{group}_{self.name}.csv"
             )
             labels = np.unique(ys_dict[group])
 
@@ -611,9 +609,7 @@ class Train:
             )
 
             # Sauvegarder le graphique dans un fichier
-            plt.savefig(
-                f"{self.args.output}/{self.exp_name}/confusion_matrix/{group}_{self.name}.png"
-            )
+            plt.savefig(f"{self.args.output}/confusion_matrix/{group}_{self.name}.png")
             plt.close()
 
             # Save scatter plot of the predictions, small dots.
@@ -637,33 +633,33 @@ class Train:
 
         if self.log_neptune:
             run[f"scores/{self.name}"].upload(
-                f"{self.args.output}/{self.exp_name}/scores/scores_{self.name}.csv"
+                f"{self.args.output}/scores/scores_{self.name}.csv"
             )
             run[f"scores_avg/{self.name}"].upload(
-                f"{self.args.output}/{self.exp_name}/scores/scores_avg_{self.name}.csv"
+                f"{self.args.output}/scores/scores_avg_{self.name}.csv"
             )
             run[f"best_hparams/{self.name}"].upload(
-                f"{self.args.output}/{self.exp_name}/model/best_hparams_{self.name}.csv"
+                f"{self.args.output}/model/best_hparams_{self.name}.csv"
             )
 
             run[f"confusion_matrix_train/{self.name}"].upload(
-                f"{self.args.output}/{self.exp_name}/confusion_matrix/train_{self.name}.csv"
+                f"{self.args.output}/confusion_matrix/train_{self.name}.csv"
             )
             run[f"confusion_matrix_valid/{self.name}"].upload(
-                f"{self.args.output}/{self.exp_name}/confusion_matrix/valid_{self.name}.csv"
+                f"{self.args.output}/confusion_matrix/valid_{self.name}.csv"
             )
             run[f"confusion_matrix_test/{self.name}"].upload(
-                f"{self.args.output}/{self.exp_name}/confusion_matrix/test_{self.name}.csv"
+                f"{self.args.output}/confusion_matrix/test_{self.name}.csv"
             )
 
             run[f"confusion_matrix_train/{self.name}"].upload(
-                f"{self.args.output}/{self.exp_name}/confusion_matrix/train_{self.name}.png"
+                f"{self.args.output}/confusion_matrix/train_{self.name}.png"
             )
             run[f"confusion_matrix_valid/{self.name}"].upload(
-                f"{self.args.output}/{self.exp_name}/confusion_matrix/valid_{self.name}.png"
+                f"{self.args.output}/confusion_matrix/valid_{self.name}.png"
             )
             run[f"confusion_matrix_test/{self.name}"].upload(
-                f"{self.args.output}/{self.exp_name}/confusion_matrix/test_{self.name}.png"
+                f"{self.args.output}/confusion_matrix/test_{self.name}.png"
             )
 
             # run[f"scatter_train/{self.name}"].upload(

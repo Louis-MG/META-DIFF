@@ -12,7 +12,7 @@ rule machine_learning:
         experiment_name = config["experiment_name"],
         log_neptune = config["log_neptune"],
         log_shap = config["log_shap"],
-        output = config["project_path"] + "/ML/"
+        output = config["project_path"] + config['experiment_name'] + "/ML/"
     conda:
         "../../env/python.3.10.yaml"
     log:
