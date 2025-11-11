@@ -5,6 +5,7 @@ This is the repository of the pipeline META-DIFF, which detects differentially a
 # Motivation
 
 Metagenomics becomes increasingly important in building our knowledge about microbes. Links between microbiome perturbations and diseases are regularly uncovered. Using kmer-based methods, this pipeline allows its users to quickly find microbial DNA sequences in differential abundances between two conditions (e.g. healthy and not healthy), and annotates them taxonomically and functionally. The pipeline also builds several machine-learning models, optimizes hyper-parameters to get the best one, and then calculates the contribution of each feature used.
+The pipeline completes the analysis of a dataset of about 100G, 60 samples (compressed), in 3h30.
 
 :exclamation: Important note: the pipeline can predict genes and annotate functions for prokaryotes only. :exclamation: 
 
@@ -41,15 +42,17 @@ Bacteria (taxid 2)      10146249
 
  - Machine-learning models and their performance (as well as feature selection):
 
-![Heatmap](/figures/model_example.png "COnfusion matrix and Shap values example")
+![Heatmap](/figures/model_example.png "Confusion matrix and Shap values example")
 
  - table of unitigs to functions by condition. Each unitig is linked to the genes it contains and their function, KO number.
 
-| Gene ID     | Translated Gene seq      | Unitig ID | Unitig seq | Gene function | KO | CLade |
-| ------------- | ------------- | ------------- | ------------- | ------------- | ------------- | ----------- |
+| Gene ID     | Translated Gene seq      | Unitig ID | Unitig seq | Gene function | KO | Clade       |
+| ------------- | ------------- | ------------- | ------------- | ------------- | ------------- |-------------|
 | Gene1 | ARDENE | Unitig1 | ACGTCGCT | Glucose transferase | K00001 | Bacteroides |
 | Gene1 | WPH | Unitig2 | ACGTCGCT | Protease | K00004 | P. plebeius |
-| Gene2 | IFPSY | Unitig1 | GTCGATCATG | Oxydase | K00761 | E. coli |
+| Gene2 | IFPSY | Unitig1 | GTCGATCATG | Oxydase | K00761 | E. coli     |
+
+ - divers plots of Shapley values (histogram, beeswarm ...)
 
 # Requirements 
 
@@ -131,5 +134,14 @@ If you have any issues, let me know in the Issues space, with an informative tit
 
 # Citations 
 
-Coming soon ! :mortar_board:
+Coming. For now the pipeline has been presented during the BiSP-MicrHub conference in Sherbrook, the 5th of November 2025:
+```latex
+@conference{louismael2025METADIFFBiSP,
+  author = {Louis-Mael Gueguen, Alban Mathieu, Simon Pelletier, Anthony Woo, Misra Namita, Magali Moreau, Olivier Perin, Arnaud Droit},
+  title = {META-DIFF: extraction of sequences in differential abundance in metagenomics dataset},
+  booktitle = {Proceedings of the BiSP - MicrHub},
+  year = {2025},
+  address = {Sherbrook, Ca}
+}
+```
 
