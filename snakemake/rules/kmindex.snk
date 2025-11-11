@@ -8,6 +8,7 @@ rule pval_agg:
         output = config["project_path"] + config['experiment_name'] + "/biomarker/",
         script_path = config["src_path"] + "/scripts/pvalues_agg.py",
         condition_name = lambda wildcards: wildcards.condition
+    threads: 1
     log:
         stdout = config["project_path"] + config['experiment_name'] + "/logs/pval_agg_{condition}.stdout",
         stderr = config["project_path"] + config['experiment_name'] + "/logs/pval_agg_{condition}.stderr"
@@ -51,6 +52,7 @@ rule get_query:
         query = config["project_path"] + config['experiment_name'] + "/biomarker/top_unitigs.fa"
     params:
         top_unitigs = config["top_unitigs"]
+    threads: 1  
     shell:
         """
         head -n {params.top_unitigs} {input.case} > {output.query}

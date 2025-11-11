@@ -29,7 +29,7 @@ rule kmdiff_diff:
         test_file = config["project_path"] + config['experiment_name'] + "/kmdiff_output/run_infos.txt",
         fof = config["fof"]
     output:
-        expand(config["project_path"] + config['experiment_name'] + "/kmdiff_output/{prefix}_kmers.fasta", prefix = ["case", "control"])
+        protected(expand(config["project_path"] + config['experiment_name'] + "/kmdiff_output/{prefix}_kmers.fasta", prefix = ["case", "control"]))
     params:
         output_folder = config["project_path"] + config['experiment_name'] + "/kmdiff_output/"
     threads: config["threads"]

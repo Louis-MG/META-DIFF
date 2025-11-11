@@ -1,4 +1,6 @@
-#############
+############# functional annot
+
+############# get unitigs to annotate
 
 rule annot_extract_candidates:
     input:
@@ -7,6 +9,7 @@ rule annot_extract_candidates:
         config["project_path"] + config['experiment_name'] + "/functional_annotation/{condition}_unitigs.filtered.fa"
     params:
         length = config["unitig_length"]
+    threads: 1
     log:
         stdout = config["project_path"] + config['experiment_name'] + "/logs/annot_extract_candidates_{condition}.stdout",
         stderr = config["project_path"] + config['experiment_name'] + "/logs/annot_extract_candidates_{condition}.stderr"
@@ -14,9 +17,10 @@ rule annot_extract_candidates:
         "../../env/seqkit.yaml"
     shell:
         """
-        seqkit seq --min-len {params.length} -i {input} -o {output} 1> {log.stdout} 2> {log.stderr}
+        seqkit seq --min-len {params.length} -i {input} -o {output} -j 1 1> {log.stdout} 2> {log.stderr}
         """
 
+############# detects gene sequences in candidates
 
 rule prodigal:
     input:
@@ -24,7 +28,7 @@ rule prodigal:
     output:
         config["project_path"] + config['experiment_name'] + "/functional_annotation/{condition}_protein_translation.faa",
         config["project_path"] + config['experiment_name'] + "/functional_annotation/{condition}_coords.gbk"
-    threads : config["threads"]
+    threads : lambda wildcards: int(wildcards.threads) - 1
     params:
         coords = config["project_path"] + config['experiment_name'] + "/functional_annotation/{condition}_coords.gbk",
         translation = config["project_path"] + config['experiment_name'] + "/functional_annotation/{condition}_protein_translation.faa"
@@ -45,6 +49,8 @@ rule prodigal:
         fi
         """
 
+############# annotates the genes detected
+
 rule microbeannotator:
     input:
         case = config["project_path"] + config['experiment_name'] + "/functional_annotation/case_protein_translation.faa",
@@ -54,7 +60,7 @@ rule microbeannotator:
         case_ko = config["project_path"] + config['experiment_name'] + "/functional_annotation/annotation_results/case_protein_translation.faa.ko",
         control_annot = config["project_path"] + config['experiment_name'] + "/functional_annotation/annotation_results/control_protein_translation.faa.annot",
         control_ko = config["project_path"] + config['experiment_name'] + "/functional_annotation/annotation_results/control_protein_translation.faa.ko"
-    threads: config["threads"]
+    threads: lambda wildcards: int(wildcards.threads) - 1
     log:
         stdout = config["project_path"] + "logs/microbeannotator.stdout",
         stderr = config["project_path"] + "logs/microbeannotator.stderr"
@@ -89,6 +95,7 @@ rule microbeannotator:
         fi
         """
 
+############# Tale of gene seq to unitigs and annotation
 
 rule summary_table:
     input:
@@ -105,6 +112,7 @@ rule summary_table:
         output = config["project_path"] + config['experiment_name'] + "/functional_annotation/",
         script_path = config["src_path"] + "/scripts/sumup_table.py",
         condition_name = lambda wildcards: wildcards.condition
+    threads: 1
     log:
         stdout = config["project_path"] + "logs/summary_table_{condition}.stdout",
         stderr = config["project_path"] + "logs/summary_table_{condition}.stderr"

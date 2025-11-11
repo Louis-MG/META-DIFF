@@ -1,5 +1,6 @@
 ############# BUILD UNITIGS
 
+#TODO: faire une rule shadow shallow pour la construction des unitigs pour eviter les trucs degueu comme les fichiers glue
 rule bcalm:
     input:
         config["project_path"] + config['experiment_name'] + "/kmdiff_output/{condition}_kmers.fasta"

@@ -7,7 +7,7 @@ rule kraken_assign:
         report = config["project_path"] + config['experiment_name'] + "/taxonomy/kraken_{condition}.report",
         output = config["project_path"] + config['experiment_name'] + "/taxonomy/kraken_{condition}.output",
         output_unknown = config["project_path"] + config['experiment_name'] + "/taxonomy/{condition}_unassigned.unitigs.fa"
-    threads: config["threads"]
+    threads: lambda wildcards: int(wildcards.threads) - 1
     params:
         output_dir = config["project_path"] + config['experiment_name'] + "/taxonomy/",
         database = config["kraken_database_path"]
@@ -37,6 +37,7 @@ rule kraken_clean:
         config["project_path"] + config['experiment_name'] + "/taxonomy/killed_daemon.txt"
     params:
         database = config["kraken_database_path"]
+    threads: 1
     log:
         stdout = config["project_path"] + config['experiment_name'] + "/logs/kraken_clean.stdout",
         stderr = config["project_path"] + config['experiment_name'] + "/logs/kraken_clean.stderr"
