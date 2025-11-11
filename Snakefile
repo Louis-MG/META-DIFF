@@ -3,8 +3,6 @@ Pipeline for META-DIFF
 """
 
 configfile: "./config.yaml"
-ruleorder: kmdiff_count > kmdiff_diff > bcalm > kraken_assign > annot_extract_candidates > kmindex_build > pval_agg > get_query > kmindex_query > prodigal > microbeannotator > summary_table > machine_learning
-
 
 ##########################################################
 ############            MAIN RULE            #############
