@@ -28,7 +28,7 @@ rule prodigal:
     output:
         config["project_path"] + config['experiment_name'] + "/functional_annotation/{condition}_protein_translation.faa",
         config["project_path"] + config['experiment_name'] + "/functional_annotation/{condition}_coords.gbk"
-    threads : lambda wildcards: int(wildcards.threads) - 1
+    threads : config["threads"]
     params:
         coords = config["project_path"] + config['experiment_name'] + "/functional_annotation/{condition}_coords.gbk",
         translation = config["project_path"] + config['experiment_name'] + "/functional_annotation/{condition}_protein_translation.faa"
@@ -60,7 +60,7 @@ rule microbeannotator:
         case_ko = config["project_path"] + config['experiment_name'] + "/functional_annotation/annotation_results/case_protein_translation.faa.ko",
         control_annot = config["project_path"] + config['experiment_name'] + "/functional_annotation/annotation_results/control_protein_translation.faa.annot",
         control_ko = config["project_path"] + config['experiment_name'] + "/functional_annotation/annotation_results/control_protein_translation.faa.ko"
-    threads: lambda wildcards: int(wildcards.threads) - 1
+    threads: config["threads"]
     log:
         stdout = config["project_path"] + "logs/microbeannotator.stdout",
         stderr = config["project_path"] + "logs/microbeannotator.stderr"
@@ -110,8 +110,8 @@ rule summary_table:
         clades = config["project_path"] + config['experiment_name'] + "/taxonomy/{condition}_clades.tsv"
     params:
         output = config["project_path"] + config['experiment_name'] + "/functional_annotation/",
-        script_path = config["src_path"] + "/scripts/sumup_table.py",
-        condition_name = lambda wildcards: wildcards.condition
+        condition_name = lambda wildcards: wildcards.condition,
+        script_path = config["src_path"] + "/scripts/sumup_table.py"
     threads: 1
     log:
         stdout = config["project_path"] + "logs/summary_table_{condition}.stdout",

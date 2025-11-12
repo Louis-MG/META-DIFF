@@ -1,6 +1,10 @@
 ############# BUILD UNITIGS
 
 #TODO: faire une rule shadow shallow pour la construction des unitigs pour eviter les trucs degueu comme les fichiers glue
+
+def half_threads(wildcards):
+    return config["threads"] // 2
+
 rule bcalm:
     input:
         config["project_path"] + config['experiment_name'] + "/kmdiff_output/{condition}_kmers.fasta"
@@ -9,7 +13,7 @@ rule bcalm:
     params:
         memory = config["bcalm_memory"],
         outfile = config["project_path"] + config['experiment_name'] + "/kmdiff_output/{condition}_kmers"
-    threads: config["threads"]
+    threads: half_threads
     log:
         stdout = config["project_path"] + config['experiment_name'] + "/logs/bcalm_{condition}.stdout",
         stderr = config["project_path"] + config['experiment_name'] + "/logs/bcalm_{condition}.stderr"

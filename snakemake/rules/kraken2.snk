@@ -1,5 +1,8 @@
 ############### UNITIG TAXONOMY ASSIGNEMENT
 
+def threads_minus_2(wildcards):
+    return config["threads"] - 2
+
 rule kraken_assign:
     input:
         config["project_path"] + config['experiment_name'] + "/kmdiff_output/{condition}_kmers.unitigs.fa"
@@ -7,7 +10,7 @@ rule kraken_assign:
         report = config["project_path"] + config['experiment_name'] + "/taxonomy/kraken_{condition}.report",
         output = config["project_path"] + config['experiment_name'] + "/taxonomy/kraken_{condition}.output",
         output_unknown = config["project_path"] + config['experiment_name'] + "/taxonomy/{condition}_unassigned.unitigs.fa"
-    threads: lambda wildcards: int(wildcards.threads) - 1
+    threads: threads_minus_2
     params:
         output_dir = config["project_path"] + config['experiment_name'] + "/taxonomy/",
         database = config["kraken_database_path"]

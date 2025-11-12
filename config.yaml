@@ -4,7 +4,7 @@ condition:
 
 microbeannotator_db_path: "/mnt/scratch/LM/KMER/MicrobeAnnotator_DB/"
 kraken_database_path: "/mnt/software/dataset/db/kraken2/2022/"
-src_path: "/path/to/META-DIFF/"
+src_path: "/home/lmgueguen/META-DIFF/"
 project_path: "/mnt/ssd/LM/"
 fof: "/mnt/projects_tn03/KMER_analysis/DATA/AcneData/fof.txt"
 
