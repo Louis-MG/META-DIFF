@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18328460.svg)](https://doi.org/10.5281/zenodo.18328460)
+
 # META-DIFF :microbe:
 
 This is the repository of the pipeline META-DIFF, which detects differentially abundant sequences between two conditions, and annotates them taxonomically and functionally.
@@ -139,9 +141,8 @@ Coming. For now the pipeline has been presented during the BiSP-MicrHub conferen
 @conference{louismael2025METADIFFBiSP,
   author = {Louis-Mael Gueguen, Alban Mathieu, Simon Pelletier, Anthony Woo, Misra Namita, Magali Moreau, Olivier Perin, Arnaud Droit},
   title = {META-DIFF: extraction of sequences in differential abundance in metagenomics dataset},
-  booktitle = {Proceedings of the BiSP - MicrHub},
+  booktitle = {BiSP - MicrHub},
   year = {2025},
   address = {Sherbrook, Ca}
 }
 ```
-
