@@ -40,7 +40,7 @@ rule kmdiff_diff:
         "../../env/kmdiff.yaml"
     shell:
         """
-        ulimit -n 10000
+        ulimit -n 100000
         nb_control=$(grep -c -F 'case' {input.fof})
         nb_case=$(grep -c -F 'control' {input.fof})
         kmdiff diff --km-run {params.output_folder} -t {threads} --output-dir {params.output_folder} --nb-controls "$nb_control" \
