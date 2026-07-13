@@ -136,13 +136,13 @@ If you have any issues, let me know in the Issues space, with an informative tit
 
 # Citations 
 
-Coming. For now the pipeline has been presented during the BiSP-MicrHub conference in Sherbrook, the 5th of November 2025:
+The pipeline has been presented during the BiSP-MicrHub conference in Sherbrooke, the 5th of November 2025 and is published in Scientific reports:
 ```latex
-@conference{louismael2025METADIFFBiSP,
-  author = {Louis-Mael Gueguen, Alban Mathieu, Simon Pelletier, Anthony Woo, Misra Namita, Magali Moreau, Olivier Perin, Arnaud Droit},
-  title = {META-DIFF: extraction of sequences in differential abundance in metagenomics dataset},
-  booktitle = {BiSP - MicrHub},
-  year = {2025},
-  address = {Sherbrook, Ca}
+@article{gueguen2026meta,
+  title={META-DIFF: ak-mer-based pipeline that detects differentially abundant sequences in metagenomics whole genome sequencing},
+  author={Gu{\'e}guen, Louis-Ma{\"e}l and Mathieu, Alban and Pelletier, Simon and Woo, Anthony and Misra, Namita and Moreau, Magali and Perin, Olivier and Droit, Arnaud},
+  journal={Scientific Reports},
+  year={2026},
+  publisher={Nature Publishing Group UK London}
 }
 ```
