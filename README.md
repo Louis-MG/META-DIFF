@@ -48,11 +48,11 @@ Bacteria (taxid 2)      10146249
 
  - table of unitigs to functions by condition. Each unitig is linked to the genes it contains and their function, KO number.
 
-| Gene ID     | Translated Gene seq      | Unitig ID | Unitig seq | Gene function | KO | Clade       |
-| ------------- | ------------- | ------------- | ------------- | ------------- | ------------- |-------------|
-| Gene1 | ARDENE | Unitig1 | ACGTCGCT | Glucose transferase | K00001 | Bacteroides |
-| Gene1 | WPH | Unitig2 | ACGTCGCT | Protease | K00004 | P. plebeius |
-| Gene2 | IFPSY | Unitig1 | GTCGATCATG | Oxydase | K00761 | E. coli     |
+| Gene ID     | Translated Gene seq      | Unitig ID | Product | Annotation source | Clade       |
+| ------------- | ------------- | ------------- | ------------- | ------------- |-------------|
+| Gene1 | ARDENE | Unitig1 | ACGTCGCT | Pyruvate:ferredoxin (Flavodoxin) oxidoreductase | SO:0001217, UniRef:UniRef50_A0A661FYL4 | Bacteroides |
+| Gene1 | WPH | Unitig2 | ACGTCGCT | Hyothetical protein | PFAM:PF00160.26 | P. plebeius |
+| Gene2 | IFPSY | Unitig1 | GTCGATCATG | RelE/StbE family addiction module toxin | EC:3.1.-.-, KEGG:K19157, SO:0001217 | E. coli     |
 
  - divers plots of Shapley values (histogram, beeswarm ...)
 
@@ -60,7 +60,7 @@ Bacteria (taxid 2)      10146249
 
 Check the wiki ! Ain't much, but it's honest work.
 Memory (RAM) needed will depend on the size of your alignment database.
-Disk space required mostly depends on the size of your dataset and databases. The number of kmers for 3To of CRC fasta files reached hundreds of millions, which is about 500G of fasta files for the first step. Other steps will use less disk. The database of `MicrobeAnnotator` is about 690G.
+Disk space required mostly depends on the size of your dataset and databases. The number of kmers for 3To of CRC fasta files reached hundreds of millions, which is about 500G of fasta files for the first step. Other steps will use less disk. The database of `Bakta` is about 68G.
 
 # Installation
 
@@ -69,10 +69,10 @@ Clone the repository:
 git clone https://github.com/Louis-MG/META-DIFF.git
 ```
 
-Get your functional database ready by following instructions at [MicrobeAnnotator](https://github.com/cruizperez/MicrobeAnnotator). Don't worry, it's just a few lines that take a while. Recommandation is the full database, and the pipeline uses the Diamond search.
-Copy the path to the MicrobeAnnotator_DB in the `snakemake/config.yaml` file:
+Get your functional database ready by following instructions at [Bakta](https://github.com/oschwengers/bakta/). Don't worry, it's just a few lines that take a while. 
+Copy the path to the Bakta database in the `snakemake/config.yaml` file (pay attention to the potential `db/`):
 ```
-microbeannotator_db_path: "/path/to/MicrobeAnnotator_DB/"
+bakta_db_path: "/path/to/bakta_DB/"
 ```
 
 Get a Kraken2 DB ready by checking the instructions at [Kraken2](https://github.com/DerrickWood/kraken2/wiki/Manual). 
@@ -110,8 +110,8 @@ Add the last paths to `./snakemake/config.yaml`:
 src_path: "/path/to/META-DIFF/"
 #kraken db path:
 kraken_database_path: "/path/to/db"
-#microbeannotator db path:
-microbeannotator_db_path: "/path/to/db"
+#bakta db path:
+bakta_db_path: "/path/to/db"
 # where your results will be
 project_path: "/path/to/your/project/"
 # path to your file of file:

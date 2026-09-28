@@ -51,6 +51,27 @@ rule prodigal:
 
 ############# annotates the genes detected
 
+rule bakta:
+     input:
+        case = config["project_path"] + config['experiment_name'] + "/functional_annotation/case_protein_translation.faa",
+        control = config["project_path"] + config['experiment_name'] + "/functional_annotation/control_protein_translation.faa"
+     output:
+        case_annot = config["project_path"] + config['experiment_name'] + "/functional_annotation/annotation_results/case.tsv",
+        control_annot = config["project_path"] + config['experiment_name'] + "/functional_annotation/annotation_results/control.tsv"
+     threads: config["threads"]
+        stdout = config["project_path"] + "logs/bakta.stdout",
+        stderr = config["project_path"] + "logs/bakta.stderr"
+     params:
+        bakta_db_path: config["bakta_db_path"],
+        output: config["project_path"] + config['experiment_name'] + "/functional_annotation/",
+        prefix: {condition}
+     conda:
+         "../../env/bakta.yaml"
+     shell:
+        """
+        bakta --db {params.bakta_DB} --prefix {params.prefix} --threads {threads} --output {params.output} --keep-contig-headers {input}
+        """
+
 rule microbeannotator:
     input:
         case = config["project_path"] + config['experiment_name'] + "/functional_annotation/case_protein_translation.faa",

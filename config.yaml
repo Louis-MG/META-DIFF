@@ -3,6 +3,7 @@ condition:
      - control
 
 microbeannotator_db_path: "/mnt/scratch/LM/KMER/MicrobeAnnotator_DB/"
+bakta_db_path: "/mnt/scratch/LM/BAKTA_DB/"
 kraken_database_path: "/mnt/software/dataset/db/kraken2/2022/"
 src_path: "/home/lmgueguen/META-DIFF/"
 project_path: "/mnt/ssd/LM/"

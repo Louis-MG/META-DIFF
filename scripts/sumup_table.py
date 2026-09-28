@@ -20,8 +20,7 @@ def check_output(path: Union[str, bytes, os.PathLike]):
 
 def check_input(
     annot_path: Union[str, bytes, os.PathLike],
-    gene_seq_path: Union[str, bytes, os.PathLike],
-    unitigs_path: Union[str, bytes, os.PathLike],
+    gene_seq_path: Union[str, bytes, os.PathLike]
 ):
     """
     Checks if input files exist.
@@ -29,7 +28,7 @@ def check_input(
     :param gene_seq_path: path to [case,control]_protein_translation.faa file.
     :param unitigs_path: path to [case,control]_unitigs.filtered.fa file.
     """
-    for i in [annot_path, gene_seq_path, unitigs_path]:
+    for i in [annot_path, gene_seq_path]:
         if not os.path.exists(i):
             print(f"ERROR: input file {i} does not exist.")
             exit(1)
@@ -39,17 +38,24 @@ def get_gene_header_to_gene_function_dict(
     annot_path: Union[str, bytes, os.PathLike],
 ) -> Dict[str, List[str]]:
     """
-    Builds the dictionary of gene headers to their KO number and function.
-    :param annot_path: path to [case,control]_protein_translation.faa.annot file.
-    :return: A dictionary of gene headers to the list of their KO number and function.
+    Builds the dictionary of gene headers to their gene name, product, annotation source.
+    :param annot_path: path to [case,control].tsv file.
+    :return: A dictionary of gene headers to the list of their gene name, product and annotation source.
     """
     gene_to_function_dict = {}
     with open(annot_path, "r") as f:
         for line in f:
-            gene_to_function_dict[line.strip().split("\t")[0]] = [
-                line.strip().split("\t")[3],
-                line.strip().split("\t")[4],
-            ]
+            if line.startswith("#"):
+                pass
+            else :
+                try:
+                    gene_to_function_dict[line.split("\t")[5]] = [
+                        line.split("\t")[0],
+                        line.split("\t")[7],
+                        line.split("\t")[8]
+                    ]
+                except:
+                    print(f'This line causes an issu: {line.split("\t")}')
     return gene_to_function_dict
 
 
@@ -58,7 +64,7 @@ def get_gene_header_to_gene_seq_dict(
 ) -> Dict[str, str]:
     """
     Builds the dictionary of gene headers to their translated sequence.
-    :param gene_seq_path: path to [case,control]_protein_translation.faa file.
+    :param gene_seq_path: path to [case,control].tsv file.
     :return: A dictionary of gene headers to their translated sequence.
     """
     gene_header_to_gene_seq_dict = {}
@@ -82,9 +88,9 @@ def get_clade_and_unitigs(
             if line.startswith("U"):
                 unitigs_to_clade[line.split("\t")[1]] = "Unclassified"
                 try:
-                    clade_align_base["Unclassified"] += int(line.strip().split("\t")[3])
+                    clade_align_base["Unclassified"] += int(line.split("\t")[3])
                 except KeyError:
-                    clade_align_base["Unclassified"] = int(line.strip().split("\t")[3])
+                    clade_align_base["Unclassified"] = int(line.split("\t")[3])
             else:
                 unitigs_to_clade[line.split("\t")[1]] = line.split("\t")[2]
                 try:
@@ -94,48 +100,32 @@ def get_clade_and_unitigs(
     return unitigs_to_clade, clade_align_base
 
 
-def get_unitigs_dict(unitigs_path: Union[str, bytes, os.PathLike]) -> Dict[str, str]:
-    """
-    Builds the dictionary of unitigs header and their sequence.
-    :param unitigs_path: path to the [case, control]_unitigs.filtered.fa file.
-    :return: A dictionary of unitigs headers and their sequence.
-    """
-    unitigs_dict = {}
-    for record in SeqIO.parse(unitigs_path, "fasta"):
-        unitigs_dict[record.id.split(" ")[0]] = record.seq
-        # removes the unitigs that was added for the functional annotation
-    return unitigs_dict
-
-
 def write_output_gene_table(
     path_output: Union[str, bytes, os.PathLike],
     gene_header_to_gene_function_dict: Dict[str, List[str]],
-    unitigs_dict: Dict[str, str],
     gene_header_to_gene_seq_dict,
     unitigs_to_clade_dict: Dict[str, str],
 ):
     """
     Writes tab-separated output file to the output directory. Format is gene header, gene translated sequence, corresponding
-    unitig header, unitig sequence, KO number, gene function.
+    unitig header, product, annotation source.
     :param path_output: path to output file.
-    :param gene_header_to_gene_function_dict: dictionary of gene headers to their KO number and function.
-    :param unitigs_dict: dictionary of unitigs headers and their sequence.
+    :param gene_header_to_gene_function_dict: dictionary of gene headers to their gene name, product and annotation source.
     :param gene_header_to_gene_seq_dict: dictionary of gene headers to their translated sequence.
     """
     with open(path_output, "w") as f:
         f.write(
-            f"{'gene_header'}\t{'gene_translated_seq'}\t{'unitig_header'}\t{'unitig_seq'}\t{'gene_KO'}\t{'gene_function'}\t{'unitig_clade'}\n"
+            f"{'gene_header'}\t{'gene_translated_seq'}\t{'unitig_header'}\t{'unitig_seq'}\t{'gene_product'}\t{'gene_annotation_source'}\t{'unitig_clade'}\n"
         )
         for gene in gene_header_to_gene_seq_dict.keys():
+            unitig_header = gene_header_to_gene_function_dict[gene][0]
             try:
-                unitig_header = gene.split("_")[0]
                 f.write(
-                    f"{gene}\t{gene_header_to_gene_seq_dict[gene]}\t{unitig_header}\t{unitigs_dict[unitig_header]}\t{gene_header_to_gene_function_dict[gene][0]}\t{gene_header_to_gene_function_dict[gene][1]}\t{unitigs_to_clade_dict[unitig_header]}\n"
+                    f"{gene}\t{gene_header_to_gene_seq_dict[gene]}\t{unitig_header}\t{gene_header_to_gene_function_dict[gene][1]}\t{gene_header_to_gene_function_dict[gene][2]}\t{unitigs_to_clade_dict[unitig_header]}\n"
                 )
             except KeyError:
-                f.write(
-                    f"{gene}\t{gene_header_to_gene_seq_dict[gene]}\t{unitig_header}\t{unitigs_dict[unitig_header]}\t{'NA'}\t{'NA'}\t{unitigs_to_clade_dict[unitig_header]}\n"
-                )
+                print(f'This is the unitig header causing an issue: {unitig_header}')
+		exit(1)
     print(f"Output written to {path_output}")
 
 
@@ -173,9 +163,6 @@ def main():
         "-o", "--output", required=True, type=str, help="Output folder."
     )
     parser.add_argument(
-        "-u", "--unitigs", required=True, type=str, help="Unitigs file."
-    )
-    parser.add_argument(
         "-c", "--case", required=True, type=str, help="Case or Control condition."
     )
     parser.add_argument(
@@ -187,24 +174,23 @@ def main():
     )
     args = parser.parse_args()
 
-    check_input(args.annot, args.gene_translation_seq, args.unitigs)
+    check_input(args.annot, args.gene_translation_seq)
     check_output(args.output)
 
     gene_header_to_gene_function = get_gene_header_to_gene_function_dict(args.annot)
     gene_header_to_gene_seq = get_gene_header_to_gene_seq_dict(
         args.gene_translation_seq
     )
-    unitigs = get_unitigs_dict(args.unitigs)
     unitigs_to_clade, clade_base_align = get_clade_and_unitigs(args.kraken_output)
-
     output_table_path = (
         args.output + "/" + args.case + "_unitigs_to_clade_and_gene_functions.tsv"
     )
     output_clades_path = args.output + "/" + args.case + "_clades.tsv"
+
+    print("step 3    done")
     write_output_gene_table(
         output_table_path,
         gene_header_to_gene_function_dict=gene_header_to_gene_function,
-        unitigs_dict=unitigs,
         gene_header_to_gene_seq_dict=gene_header_to_gene_seq,
         unitigs_to_clade_dict=unitigs_to_clade,
     )
