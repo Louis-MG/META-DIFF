@@ -22,109 +22,108 @@ rule annot_extract_candidates:
 
 ############# detects gene sequences in candidates
 
-rule prodigal:
-    input:
-        config["project_path"] + config['experiment_name'] + "/functional_annotation/{condition}_unitigs.filtered.fa"
-    output:
-        config["project_path"] + config['experiment_name'] + "/functional_annotation/{condition}_protein_translation.faa",
-        config["project_path"] + config['experiment_name'] + "/functional_annotation/{condition}_coords.gbk"
-    threads : config["threads"]
-    params:
-        coords = config["project_path"] + config['experiment_name'] + "/functional_annotation/{condition}_coords.gbk",
-        translation = config["project_path"] + config['experiment_name'] + "/functional_annotation/{condition}_protein_translation.faa"
-    log:
-        stdout = config["project_path"] + config['experiment_name'] + "/logs/prodigal_{condition}.stdout",
-        stderr = config["project_path"] + config['experiment_name'] + "/logs/prodigal_{condition}.stderr"
-    conda:
-        "../../env/prodigal.yaml"
-    shell:
-        """
-        if [ ! -s {input} ]
-        then
-            echo "No unitigs for gene sequence detection and translation." > {log.stdout}
-            touch {output}
-            exit 0
-        else
-            prodigal -p meta -i {input} -o {params.coords} -a {params.translation} > {log.stdout} 2> {log.stderr}
-        fi
-        """
+#rule prodigal:
+#    input:
+#        config["project_path"] + config['experiment_name'] + "/functional_annotation/{condition}_unitigs.filtered.fa"
+#    output:
+#        config["project_path"] + config['experiment_name'] + "/functional_annotation/{condition}_protein_translation.faa",
+#        config["project_path"] + config['experiment_name'] + "/functional_annotation/{condition}_coords.gbk"
+#    threads : config["threads"]
+#    params:
+#        coords = config["project_path"] + config['experiment_name'] + "/functional_annotation/{condition}_coords.gbk",
+#        translation = config["project_path"] + config['experiment_name'] + "/functional_annotation/{condition}_protein_translation.faa"
+#    log:
+#        stdout = config["project_path"] + config['experiment_name'] + "/logs/prodigal_{condition}.stdout",
+#        stderr = config["project_path"] + config['experiment_name'] + "/logs/prodigal_{condition}.stderr"
+#    conda:
+#        "../../env/prodigal.yaml"
+#    shell:
+#        """
+#        if [ ! -s {input} ]
+#        then
+#            echo "No unitigs for gene sequence detection and translation." > {log.stdout}
+#            touch {output}
+#            exit 0
+#        else
+#            prodigal -p meta -i {input} -o {params.coords} -a {params.translation} > {log.stdout} 2> {log.stderr}
+#        fi
+#        """
 
 ############# annotates the genes detected
 
 rule bakta:
      input:
-        case = config["project_path"] + config['experiment_name'] + "/functional_annotation/case_protein_translation.faa",
-        control = config["project_path"] + config['experiment_name'] + "/functional_annotation/control_protein_translation.faa"
+        config["project_path"] + config['experiment_name'] + "/functional_annotation/{condition}_unitigs.filtered.fa"
      output:
-        case_annot = config["project_path"] + config['experiment_name'] + "/functional_annotation/annotation_results/case.tsv",
-        control_annot = config["project_path"] + config['experiment_name'] + "/functional_annotation/annotation_results/control.tsv"
+        config["project_path"] + config['experiment_name'] + "/functional_annotation/{condition}.tsv",
+        config["project_path"] + config['experiment_name'] + "/functional_annotation/{condition}.faa
      threads: config["threads"]
-        stdout = config["project_path"] + "logs/bakta.stdout",
-        stderr = config["project_path"] + "logs/bakta.stderr"
+     log:
+        stdout = config["project_path"] + "logs/bakta_{condition}.stdout",
+        stderr = config["project_path"] + "logs/bakta_{condition}.stderr"
      params:
-        bakta_db_path: config["bakta_db_path"],
-        output: config["project_path"] + config['experiment_name'] + "/functional_annotation/",
-        prefix: {condition}
+        bakta_db_path = config["bakta_db_path"],
+        output = config["project_path"] + config['experiment_name'] + "/functional_annotation/",
+        prefix = lambda wildcards: wildcards.condition
      conda:
          "../../env/bakta.yaml"
      shell:
         """
-        bakta --db {params.bakta_DB} --prefix {params.prefix} --threads {threads} --output {params.output} --keep-contig-headers {input}
+        bakta --db {params.bakta_db_path} --prefix {params.prefix} --threads {threads} --output {params.output} --keep-contig-headers {input}
         """
 
-rule microbeannotator:
-    input:
-        case = config["project_path"] + config['experiment_name'] + "/functional_annotation/case_protein_translation.faa",
-        control = config["project_path"] + config['experiment_name'] + "/functional_annotation/control_protein_translation.faa"
-    output:
-        case_annot = config["project_path"] + config['experiment_name'] + "/functional_annotation/annotation_results/case_protein_translation.faa.annot",
-        case_ko = config["project_path"] + config['experiment_name'] + "/functional_annotation/annotation_results/case_protein_translation.faa.ko",
-        control_annot = config["project_path"] + config['experiment_name'] + "/functional_annotation/annotation_results/control_protein_translation.faa.annot",
-        control_ko = config["project_path"] + config['experiment_name'] + "/functional_annotation/annotation_results/control_protein_translation.faa.ko"
-    threads: config["threads"]
-    log:
-        stdout = config["project_path"] + "logs/microbeannotator.stdout",
-        stderr = config["project_path"] + "logs/microbeannotator.stderr"
-    params:
-        process = 1,
-        database = config["microbeannotator_db_path"],
-        output_folder = config["project_path"] + config['experiment_name'] + "/functional_annotation/"
-    conda:
-        "../../env/microbeannotator.yaml"
-    shell:
-        """
-        if [ ! -s {input.case} ] && [ ! -s {input.control} ]
-        then
-            echo "No gene sequence detected." > {log.stdout}
-            touch {output}
-            exit 0
-        elif [ ! -s {input.case} ] && [ -s {input.control} ]
-        then
-            echo "No unitigs to annotate in cases" > {log.stdout}
-            touch {output.case_annot} {output.case_ko}
-            microbeannotator  -p {params.process} -t {threads} -m diamond --database {params.database} --cluster rows \
-                     -o {params.output_folder} -i {input.control} >> {log.stdout} 2> {log.stderr}
-        elif [ -s {input.case} ] && [ ! -s {input.control} ]
-        then
-            echo "No unitigs to annotate in controls" > {log.stdout}
-            touch {output.control_annot} {output.control_ko}
-            microbeannotator  -p {params.process} -t {threads} -m diamond --database {params.database} --cluster rows \
-                     -o {params.output_folder} -i {input.case} >> {log.stdout} 2> {log.stderr}
-        else
-            microbeannotator  -p {params.process} -t {threads} -m diamond --database {params.database} --cluster rows \
-                     -o {params.output_folder} -i {input.control} {input.case} > {log.stdout} 2> {log.stderr}
-        fi
-        """
+#rule microbeannotator:
+#    input:
+#        case = config["project_path"] + config['experiment_name'] + "/functional_annotation/case_protein_translation.faa",
+#        control = config["project_path"] + config['experiment_name'] + "/functional_annotation/control_protein_translation.faa"
+#    output:
+#        case_annot = config["project_path"] + config['experiment_name'] + "/functional_annotation/annotation_results/case_protein_translation.faa.annot",
+#        case_ko = config["project_path"] + config['experiment_name'] + "/functional_annotation/annotation_results/case_protein_translation.faa.ko",
+#        control_annot = config["project_path"] + config['experiment_name'] + "/functional_annotation/annotation_results/control_protein_translation.faa.annot",
+#        control_ko = config["project_path"] + config['experiment_name'] + "/functional_annotation/annotation_results/control_protein_translation.faa.ko"
+#    threads: config["threads"]
+#    log:
+#        stdout = config["project_path"] + "logs/microbeannotator.stdout",
+#        stderr = config["project_path"] + "logs/microbeannotator.stderr"
+#    params:
+#        process = 1,
+#        database = config["microbeannotator_db_path"],
+#        output_folder = config["project_path"] + config['experiment_name'] + "/functional_annotation/"
+#    conda:
+#        "../../env/microbeannotator.yaml"
+#    shell:
+#        """
+#        if [ ! -s {input.case} ] && [ ! -s {input.control} ]
+#        then
+#            echo "No gene sequence detected." > {log.stdout}
+#            touch {output}
+#            exit 0
+#        elif [ ! -s {input.case} ] && [ -s {input.control} ]
+#        then
+#            echo "No unitigs to annotate in cases" > {log.stdout}
+#            touch {output.case_annot} {output.case_ko}
+#            microbeannotator  -p {params.process} -t {threads} -m diamond --database {params.database} --cluster rows \
+#                     -o {params.output_folder} -i {input.control} >> {log.stdout} 2> {log.stderr}
+#        elif [ -s {input.case} ] && [ ! -s {input.control} ]
+#        then
+#            echo "No unitigs to annotate in controls" > {log.stdout}
+#            touch {output.control_annot} {output.control_ko}
+#            microbeannotator  -p {params.process} -t {threads} -m diamond --database {params.database} --cluster rows \
+#                     -o {params.output_folder} -i {input.case} >> {log.stdout} 2> {log.stderr}
+#        else
+#            microbeannotator  -p {params.process} -t {threads} -m diamond --database {params.database} --cluster rows \
+#                     -o {params.output_folder} -i {input.control} {input.case} > {log.stdout} 2> {log.stderr}
+#        fi
+#        """
 
 ############# Tale of gene seq to unitigs and annotation
 
 rule summary_table:
     input:
-        translation = config["project_path"] + config['experiment_name'] + "/functional_annotation/{condition}_protein_translation.faa",
+        translation = config["project_path"] + config['experiment_name'] + "/functional_annotation/{condition}.faa",
         unitigs = config["project_path"] + config['experiment_name'] + "/functional_annotation/{condition}_unitigs.filtered.fa",
         kraken_output = config["project_path"] + config['experiment_name'] + "/taxonomy/kraken_{condition}.output",
-        ko = config["project_path"] + config['experiment_name'] + "/functional_annotation/annotation_results/{condition}_protein_translation.faa.ko",
-        annot = config["project_path"] + config['experiment_name'] + "/functional_annotation/annotation_results/{condition}_protein_translation.faa.annot",
+        annot = config["project_path"] + config['experiment_name'] + "/functional_annotation/annotation_results/{condition}.csv",
         daemon_hunter = config["project_path"] + config['experiment_name'] + "/taxonomy/killed_daemon.txt"
     output:
         table = config["project_path"] + config['experiment_name'] + "/functional_annotation/{condition}_unitigs_to_clade_and_gene_functions.tsv",
