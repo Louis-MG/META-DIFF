@@ -34,7 +34,7 @@ rule bakta:
         stderr = config["project_path"] + "logs/bakta_{condition}.stderr"
      params:
         bakta_db_path = config["bakta_db_path"],
-        output = config["project_path"] + config['experiment_name'] + "/functional_annotation/",
+        output = config["project_path"] + config['experiment_name'] + "/functional_annotation/bakta/",
         prefix = lambda wildcards: wildcards.condition
      conda:
          "../../env/bakta.yaml"
@@ -50,7 +50,7 @@ rule summary_table:
         translation = config["project_path"] + config['experiment_name'] + "/functional_annotation/bakta/{condition}.faa",
         unitigs = config["project_path"] + config['experiment_name'] + "/functional_annotation/{condition}_unitigs.filtered.fa",
         kraken_output = config["project_path"] + config['experiment_name'] + "/taxonomy/kraken_{condition}.output",
-        annot = config["project_path"] + config['experiment_name'] + "/functional_annotation/bakta/{condition}.csv",
+        annot = config["project_path"] + config['experiment_name'] + "/functional_annotation/bakta/{condition}.tsv",
         daemon_hunter = config["project_path"] + config['experiment_name'] + "/taxonomy/killed_daemon.txt"
     output:
         table = config["project_path"] + config['experiment_name'] + "/functional_annotation/{condition}_unitigs_to_clade_and_gene_functions.tsv",
