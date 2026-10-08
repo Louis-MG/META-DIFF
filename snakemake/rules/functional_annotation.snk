@@ -69,7 +69,7 @@ rule bakta:
          "../../env/bakta.yaml"
      shell:
         """
-        bakta --db {params.bakta_db_path} --prefix {params.prefix} --threads {threads} --output {params.output} --keep-contig-headers {input}
+        bakta --db {params.bakta_db_path} --prefix {params.prefix} --threads {threads} --output {params.output} --keep-contig-headers {input} > {log.stdout} 2> {log.stderr}
         """
 
 #rule microbeannotator:
