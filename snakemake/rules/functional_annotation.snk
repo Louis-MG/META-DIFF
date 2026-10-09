@@ -74,7 +74,7 @@ rule summary_table:
         else
             python3 {params.script_path} -a {input.annot} -g {input.translation} -o {params.output} \
             -c {params.condition_name} -k {input.kraken_output} >> {log.stdout} 2> {log.stderr}
-            mv {params.output}/{params.condition_name}_clades.tsv  {params.output}/../taxonomy/
+            mv {params.output}/{params.condition_name}_clades.tsv  {params.output}/../../taxonomy/
         fi
         """
     
