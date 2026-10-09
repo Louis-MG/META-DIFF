@@ -40,7 +40,7 @@ rule bakta:
          "../../env/bakta.yaml"
      shell:
         """
-        bakta --db {params.bakta_db_path} --prefix {params.prefix} --threads {threads} --output {params.output} --keep-contig-headers {input} > {log.stdout} 2> {log.stderr}
+        bakta --force --db {params.bakta_db_path} --prefix {params.prefix} --threads {threads} --output {params.output} --keep-contig-headers {input} > {log.stdout} 2>> {log.stderr}
         """
 
 ############# Tale of gene seq to unitigs and annotation
@@ -48,7 +48,6 @@ rule bakta:
 rule summary_table:
     input:
         translation = config["project_path"] + config['experiment_name'] + "/functional_annotation/bakta/{condition}.faa",
-        unitigs = config["project_path"] + config['experiment_name'] + "/functional_annotation/{condition}_unitigs.filtered.fa",
         kraken_output = config["project_path"] + config['experiment_name'] + "/taxonomy/kraken_{condition}.output",
         annot = config["project_path"] + config['experiment_name'] + "/functional_annotation/bakta/{condition}.tsv",
         daemon_hunter = config["project_path"] + config['experiment_name'] + "/taxonomy/killed_daemon.txt"
@@ -73,7 +72,7 @@ rule summary_table:
             touch {output.clades} {output.table}
             exit 0
         else
-            python3 {params.script_path} -a {input.annot} -g {input.translation} -o {params.output} -u {input.unitigs} \
+            python3 {params.script_path} -a {input.annot} -g {input.translation} -o {params.output} \
             -c {params.condition_name} -k {input.kraken_output} >> {log.stdout} 2> {log.stderr}
             mv {params.output}/{params.condition_name}_clades.tsv  {params.output}/../taxonomy/
         fi

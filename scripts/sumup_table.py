@@ -54,8 +54,9 @@ def get_gene_header_to_gene_function_dict(
                         line.split("\t")[7],
                         line.split("\t")[8]
                     ]
-                except:
-                    print(f'This line causes an issu: {line.split("\t")}')
+                except KeyError:
+                    problematic_line = line.split("\t")
+                    print(f'This line causes an issu: {problematic_line}')
     return gene_to_function_dict
 
 
@@ -125,7 +126,7 @@ def write_output_gene_table(
                 )
             except KeyError:
                 print(f'This is the unitig header causing an issue: {unitig_header}')
-		exit(1)
+                exit(1)
     print(f"Output written to {path_output}")
 
 
