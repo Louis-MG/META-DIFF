@@ -41,7 +41,7 @@ do
 	shift 2;;
 	-1) R1="$2"
 	shift 2;;
-	-2)  R2="$2"
+	-2) R2="$2"
 	shift 2;;
 	-h | --help) Help; exit;;
 	-* | --*) unknown="$1"; echo -e "Unknown option: ${unknown}"; Help; exit;;
