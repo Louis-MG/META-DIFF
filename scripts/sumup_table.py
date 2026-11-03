@@ -116,7 +116,7 @@ def write_output_gene_table(
     """
     with open(path_output, "w") as f:
         f.write(
-            f"{'gene_header'}\t{'gene_translated_seq'}\t{'unitig_header'}\t{'unitig_seq'}\t{'gene_product'}\t{'gene_annotation_source'}\t{'unitig_clade'}\n"
+            f"{'gene_header'}\t{'gene_translated_seq'}\t{'unitig_header'}\t{'gene_product'}\t{'gene_annotation_source'}\t{'unitig_clade'}\n"
         )
         for gene in gene_header_to_gene_seq_dict.keys():
             unitig_header = gene_header_to_gene_function_dict[gene][0]
