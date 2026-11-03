@@ -122,7 +122,7 @@ Finally, ssssstart the pipeline :snake::
 snakemake --cores X --use-conda
 ```
 
-You can test the pipeline using the minimal example provided in the `test` folder.
+You can test the pipeline using the minimal example provided in the `test` folder, with its file of file. The case `bacilysin` contains a bacilysin gene that is absent from `no_funtionnal`.
 
 # Coming next 
 
