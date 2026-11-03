@@ -38,15 +38,13 @@ Faecalibacterium prausnitzii (taxid 853)        10234613
 Bacteria (taxid 2)      10146249
 ```
 
- - case/control functional annotation in the form of a barplot, table and a heatmap of pathways detected:
-
-![Heatmap](/figures/metabolic_summary__heatmap.png?raw=true "Example of a heatmap of pathways complete at 90%")
+ - case/control functional annotation in the form of tables.
 
  - Machine-learning models and their performance (as well as feature selection):
 
 ![Heatmap](/figures/model_example.png "Confusion matrix and Shap values example")
 
- - table of unitigs to functions by condition. Each unitig is linked to the genes it contains and their function, KO number.
+ - table of unitigs to functions by condition. Each gene is linked to the unitig it comes from and its function, annotation source, and taxonomic annotation.
 
 | Gene ID     | Translated Gene seq      | Unitig ID | Product | Annotation source | Clade       |
 | ------------- | ------------- | ------------- | ------------- | ------------- |-------------|
@@ -70,13 +68,13 @@ git clone https://github.com/Louis-MG/META-DIFF.git
 ```
 
 Get your functional database ready by following instructions at [Bakta](https://github.com/oschwengers/bakta/). Don't worry, it's just a few lines that take a while. 
-Copy the path to the Bakta database in the `snakemake/config.yaml` file (pay attention to the potential `db/`):
+Copy the path to the Bakta database in the `config.yaml` file (pay attention to the potential `db/`):
 ```
 bakta_db_path: "/path/to/bakta_DB/"
 ```
 
 Get a Kraken2 DB ready by checking the instructions at [Kraken2](https://github.com/DerrickWood/kraken2/wiki/Manual). 
-Copy the path to the `snakemake/config.yaml` file:
+Copy the path to the `config.yaml` file:
 ```
 kraken_database_path: "/path/to/krakenDB/db_name"
 ```
