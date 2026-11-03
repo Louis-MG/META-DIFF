@@ -30,8 +30,8 @@ rule bakta:
         config["project_path"] + config['experiment_name'] + "/functional_annotation/bakta/{condition}.faa"
      threads: config["threads"]
      log:
-        stdout = config["project_path"] + "logs/bakta_{condition}.stdout",
-        stderr = config["project_path"] + "logs/bakta_{condition}.stderr"
+        stdout = config["project_path"] + config['experiment_name'] + "/logs/bakta_{condition}.stdout",
+        stderr = config["project_path"] + config['experiment_name'] + "/logs/bakta_{condition}.stderr"
      params:
         bakta_db_path = config["bakta_db_path"],
         output = config["project_path"] + config['experiment_name'] + "/functional_annotation/bakta/",
@@ -60,8 +60,8 @@ rule summary_table:
         script_path = config["src_path"] + "/scripts/sumup_table.py"
     threads: 1
     log:
-        stdout = config["project_path"] + "logs/summary_table_{condition}.stdout",
-        stderr = config["project_path"] + "logs/summary_table_{condition}.stderr"
+        stdout = config["project_path"] + config['experiment_name'] + "/logs/summary_table_{condition}.stdout",
+        stderr = config["project_path"] + config['experiment_name'] + "/logs/summary_table_{condition}.stderr"
     conda: 
         "../../env/python.3.10.yaml"
     shell:
