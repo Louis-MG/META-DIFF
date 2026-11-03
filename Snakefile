@@ -11,7 +11,7 @@ configfile: "./config.yaml"
 rule all:
     input:
         expand(config["project_path"] + f"{config['experiment_name']}" + "/kmdiff_output/{condition}_kmers.fasta", condition = config["condition"]),
-        expand(config["project_path"] + f"{config['experiment_name']}" + "k/mdiff_output/{condition}_kmers.unitigs.fa", condition = config["condition"]),
+        expand(config["project_path"] + f"{config['experiment_name']}" + "/kmdiff_output/{condition}_kmers.unitigs.fa", condition = config["condition"]),
         expand(config["project_path"] + f"{config['experiment_name']}" + "/functional_annotation/{condition}_unitigs.filtered.fa", condition = config["condition"]),
         expand(config['project_path'] + f"{config['experiment_name']}" + "/functional_annotation/bakta/{condition}.faa", condition = config["condition"]),
         expand(config["project_path"] + f"{config['experiment_name']}" + "/biomarker/{condition}.aggregated.fa", condition = config["condition"]),

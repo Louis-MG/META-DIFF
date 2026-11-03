@@ -104,7 +104,7 @@ Output is :
 		case2: /path/to/case2_read1.fastq ; /path/to/case2_read2.fastq
 ```
 
-Add the last paths to `./snakemake/config.yaml`:
+Add the last paths to `./config.yaml`:
 ```
 # path to this repo, "META-DIFF/" included:
 src_path: "/path/to/META-DIFF/"
