@@ -7,7 +7,7 @@ Help() {
 This script generates the file of file (fof.txt) for kmdiff. Its arguments are:
 	--cases -c <PATH> path to the directory of cases samples.
 	--controls -C <PATH> path to the directory of control samples.
-	--output -o <PATH> path to where the fof should be.
+	--output -o <PATH> path to where the kmdiff_fof.txt should be.
 	-1 <STRING> -2 <STRING> strings to determine forward and reverse reads.
 	--help -h displays this help message and exits.
 
@@ -15,7 +15,7 @@ EX: bash kmdiff_fof_prep.sh --cases /path/to/cases/ --controls /path/to/controls
 TIP: you may add the determinant for a grade in your condition in the -1 and -2 argument if all your samples are in the same folder.
 
 Output is :
-	- a fof.txt named after the output parameter. The file is tab separated, format:
+	- a kmdiff_fof.txt file located in the given output directory. The file is tab separated, format:
 		control1: /path/to/control1_read1.fastq ; /path/to/control1_read2.fastq
 		control2: /path/to/control2_read1.fastq ; /path/to/control2_read2.fastq
 		case1: /path/to/case1_read1.fastq ; /path/to/case1_read2.fastq
