@@ -12,7 +12,7 @@ rule kmdiff_count:
         partitions = config["partitions"]
     log:
         stdout = config["project_path"] + config['experiment_name']+ "/logs/kmdiff_count.stdout",
-        stderr = config["project_path"] + config['experiment_name']+ "/logs/kmdiff_counts.stderr"
+        stderr = config["project_path"] + config['experiment_name']+ "/logs/kmdiff_count.stderr"
     conda:
         "../../env/kmdiff.yaml"
     shell:
