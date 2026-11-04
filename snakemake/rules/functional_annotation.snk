@@ -26,8 +26,8 @@ rule bakta:
      input:
         config["project_path"] + config['experiment_name'] + "/functional_annotation/{condition}_unitigs.filtered.fa"
      output:
-        config["project_path"] + config['experiment_name'] + "/functional_annotation/bakta/{condition}.tsv",
-        config["project_path"] + config['experiment_name'] + "/functional_annotation/bakta/{condition}.faa"
+        tsv = config["project_path"] + config['experiment_name'] + "/functional_annotation/bakta/{condition}.tsv",
+        faa = config["project_path"] + config['experiment_name'] + "/functional_annotation/bakta/{condition}.faa"
      threads: config["threads"]
      log:
         stdout = config["project_path"] + config['experiment_name'] + "/logs/bakta_{condition}.stdout",
@@ -40,7 +40,13 @@ rule bakta:
          "../../env/bakta.yaml"
      shell:
         """
-        bakta --force --db {params.bakta_db_path} --prefix {params.prefix} --threads {threads} --output {params.output} --keep-contig-headers {input} > {log.stdout} 2>> {log.stderr}
+        if [ ! -s {input} ]
+        then
+            echo "No gene sequence detected for {params.prefix}." > {log.stdout}
+            touch {output.tsv} {output.faa}
+        else
+            bakta --force --db {params.bakta_db_path} --prefix {params.prefix} --threads {threads} --output {params.output} --keep-contig-headers {input} > {log.stdout} 2>> {log.stderr}
+        fi
         """
 
 ############# Tale of gene seq to unitigs and annotation
