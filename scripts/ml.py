@@ -132,7 +132,7 @@ if __name__ == "__main__":
 #     os.makedirs(shap_dir, exist_ok=True)
 #
 #     # Inclure aussi le groupe 'all'
-#     for group in ["valid", "test", "all"]:
+#     for group in ["valid", "test"]:
 #         if group not in args_dict["inputs"]:
 #             continue
 #         try:

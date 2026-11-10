@@ -14,9 +14,6 @@ from sklearn.model_selection import StratifiedShuffleSplit
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 
 
-# TODO: les figures et résultats shap divers ne sont pas dans la structure de répertoire la plus claire
-# TODO: les dossiers histogrames, ord,scores etc sont pas dans la bonne structure non plus
-
 
 def interactions_mean_matrix(shap_interactions, X, run, group):
     # Get absolute mean of matrices
@@ -58,7 +55,14 @@ def make_force_plot(
     category="explainer",
     mlops="neptune",
 ):
-    shap.plots.force(values, show=False)
+    # For shap 0.44.1, pass instance data, not just names
+    shap.plots.force(
+        base_value=values.base_values[0],
+        shap_values=values.values[0] if hasattr(values, 'values') else values[0],
+        features=df.iloc[0].values,
+        feature_names=features,
+        show=False,
+    )
     f = plt.gcf()
     if mlops == "neptune" and run is not None:
         run[f"shap/force_{category}/{group}_values"].upload(f)
@@ -511,7 +515,7 @@ def log_explainer(run, group, args_dict):
 
     make_force_plot(
         x_df,
-        shap_values[0],
+        shap_values,
         x_df.columns,
         group,
         run,

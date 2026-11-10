@@ -399,6 +399,10 @@ class Train:
 
             h += 1
 
+        # for future me: the valid mcc should be used instead of the test mcc because the valid mcc evolution guides the
+        # tuning. Moreover, a signature could work well on the mcc test by chance; if generating new data to verify that
+        # its generalisation is effectively good is possible then using the test mcc could be justified. Still weird as
+        # leaderboards are made with test metrics but hey not my field.
         score = np.mean(scores["valid"]["mcc"])
 
         self.pbar.update(1)
@@ -472,40 +476,37 @@ class Train:
                 elif scaler == "binary":
                     X = X.applymap(lambda x: 1 if x > 0.5 else 0)
 
-                # Réentraînement du meilleur modèle avec les meilleurs hyperparamètres sur toutes les données
-                try:
-                    best_param_grid = {}
-                    best_ensemble_grid = {}
-                    bag = 1 if "bagging" in self.name else 0
-                    for name, val in h_params_dict.items():
-                        if bag and name != "n_aug" and "bagging" in self.name:
-                            best_ensemble_grid[name] = val
-                        elif name not in [
-                            "n_aug",
-                            "p",
-                            "g",
-                            "scaler",
-                            "features_cutoff",
-                            "zeros_cutoff",
-                        ]:
-                            best_param_grid[name] = val
+                # # Réentraînement du meilleur modèle avec les meilleurs hyperparamètres sur toutes les données
+                # try:
+                #     best_param_grid = {}
+                #     best_ensemble_grid = {}
+                #     bag = 1 if "bagging" in self.name else 0
+                #     for name, val in h_params_dict.items():
+                #         if bag and name != "n_aug" and "bagging" in self.name:
+                #             best_ensemble_grid[name] = val
+                #         elif name not in [
+                #             "n_aug",
+                #             "p",
+                #             "g",
+                #             "scaler",
+                #             "features_cutoff",
+                #             "zeros_cutoff",
+                #         ]:
+                #             best_param_grid[name] = val
+                #
+                #     clf_for_shap = copy.deepcopy(self.model)
+                #     if "bagging" in self.name and hasattr(
+                #         clf_for_shap, "base_estimator"
+                #     ):
+                #         clf_for_shap.base_estimator.set_params(**best_ensemble_grid)
+                #     clf_for_shap.set_params(**best_param_grid)
+                #     # y complet (sans split) pour l'entraînement global
+                #     y_full = self.data["y"].copy()
+                #     clf_for_shap.fit(X.values, y_full.values)
+                #     self.best_model = clf_for_shap
+                # except Exception as e:
+                #     print(f"[WARNING] Failed to refit best model for SHAP: {e}")
 
-                    clf_for_shap = copy.deepcopy(self.model)
-                    if "bagging" in self.name and hasattr(
-                        clf_for_shap, "base_estimator"
-                    ):
-                        clf_for_shap.base_estimator.set_params(**best_ensemble_grid)
-                    clf_for_shap.set_params(**best_param_grid)
-                    # y complet (sans split) pour l'entraînement global
-                    y_full = self.data["y"].copy()
-                    clf_for_shap.fit(X.values, y_full.values)
-                    self.best_model = clf_for_shap
-                except Exception as e:
-                    print(f"[WARNING] Failed to refit best model for SHAP: {e}")
-
-                # TODO: regarder pourquoi le meilleur model ne se lance pas
-                # TODO: se lance quand shap se fait, donc a la derniere run.
-                # TODO: les indices sont references avant leur creation eventuellement
                 # Utiliser les indices de la dernière itération pour constituer les groupes valid/test
                 Xs = {
                     group: X.iloc[inds].copy()
@@ -513,17 +514,10 @@ class Train:
                         ["train", "valid", "test"], [train_inds, valid_inds, test_inds]
                     )
                 }
-                Xs["all"] = X.copy()
-                ys_all = {
-                    "train": ys["train"],
-                    "valid": ys["valid"],
-                    "test": ys["test"],
-                }
-                ys_all["all"] = y_full.copy()
 
                 args_dict = {
                     "inputs": Xs,
-                    "labels": ys_all,
+                    "labels": ys,
                     "model": self.best_model,
                     "model_name": self.name,
                     "exp_name": self.exp_name,
