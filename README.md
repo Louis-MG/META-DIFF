@@ -13,9 +13,11 @@ The pipeline completes the analysis of a dataset of about 100G, 60 samples (comp
 
 # Workflow
 
-The workflow is described by the following figure :
+The workflow as in the publication is described by the following figure :
 
 ![Schematic of the META-DIFF pipeline](/figures/pipeline.png?raw=true "Pipeline Overview")
+
+It is now slightly changed, as MicrobeAnnotator was changed for Bakta
 
 # [wiki](https://github.com/Louis-MG/META-DIFF/wiki) ! :books:
 
@@ -81,7 +83,9 @@ kraken_database_path: "/path/to/krakenDB/db_name"
 
 # Usage
 
-Build a file-of-files yourself or using the provided script:
+To use META-DIFF, you need only two files in the same folder: the `config.yaml` and the `Snakefile`. Other paths and parameters are in the `config.yaml`. 
+
+1. Build a file-of-files yourself or using the provided script:
 ```bash
 bash kmdiff_fof_prep.sh --help
 
@@ -103,7 +107,7 @@ Output is :
 		case2: /path/to/case2_read1.fastq ; /path/to/case2_read2.fastq
 ```
 
-Add the last paths to `./config.yaml`:
+2. Add the last paths to `./config.yaml`:
 ```
 # path to this repo, "META-DIFF/" included:
 src_path: "/path/to/META-DIFF/"
@@ -117,17 +121,21 @@ project_path: "/path/to/your/project/"
 fof: "/path/to/your/fof.txt"
 ```
 
-Finally, ssssstart the pipeline :snake::
+3. Finally, ssssstart the pipeline :snake::
 ```bash
 snakemake --cores X --use-conda
 ```
 
-You can test the pipeline using the minimal example provided in the `test` folder, with its file of file. The case `bacilysin` contains a bacilysin gene that is absent from `no_funtionnal`.
+# Test
+
+You can test the pipeline using the minimal example provided in the `test` folder, with its file of file. The case `bacilysin` contains a bacilysin gene that is absent from `no_funtionnal`. The pipeline will stop at the machine-learning step (`ML` rule) as the number of features and samples is too small. This is the expected behavior.
 
 # Coming next 
 
 - addition of a quarto report with all the numbers and figures
 - addition of a script to automatically set up the databases
+- exploration of RASTRO to obtain more accurate unitigs ?
+- exploration of MUSET to obtain a better matrix of unitig abundances in samples ?
 
 # Issues
 
